@@ -3,6 +3,35 @@ An interface to the `ESGF Search API`_
 
  :author: Stephen Pascoe
 
+Search parameter categories
+---------------------------
+
+We divide the parameters to the ESGF serach API into 4 categories
+
+1. Connection parameters: distrib, shards.  These are best set at the connection level.
+2. Search configuration parameters: type, latest, facets, fields, from/to, replica.  These configure the search response and constrain the results in ways not related to the data.
+3. Constraint parameters: facet names, query, start/end and lat/lon/bbox/location/radius/polygon.  These are parameters directly related to the data.
+4. Hidden parameters: limit, offset.  These are hidden within the client code so the user doesn't need to deal with them.
+
+Specifying Facet constraints
+----------------------------
+
+There are 3 ways to specify multiple values to a facet in the API:
+ 1. Using a query string 'facet=value1&facet=values2'.  This returns the logical OR of applying the constraints
+ 2. Using a query string 'facet=value1,value2'.  This returns the logical AND of applying the constraints
+ 3. Within the freetext search keyword "query"
+
+We will leave method 3 completely open to the user and encompass 1&2 into a single constraint data structure as follows:
+
+ facet_constraints = {facet_name: facet_constraint, ...}
+ facet_constraint = facet_value | [facet_value, facet_value, ...]
+ facet_value = string | (ALL_OF, facet_value, facet_value, facet_value)
+
+A convenience function is supplied for specifying all_of
+
+E.g. you could specify a search accross 2 experiments for datasets containing both variables 'tas' and 'pr':
+ search_context.search(experiment=['piControl', 'historical'], variable=all_of('tas', 'pr'))
+
 Examples
 --------
 
@@ -55,194 +84,19 @@ Examples
 .. _`ESGF Search API`: http://esgf.org/wiki/ESGF_Search_API
 
 """
-#!TODO: logical AND/OR difference on whether keyword is repeated or coma separated
-#!TODO: goespatial/temporal
+
+from .connection import SearchConnection
+from .context import SearchContext
+from .constraints import GeospatialConstraint, all_of
+from .results import ResultSet
+from .consts import TYPE_DATASET, TYPE_FILE
+
+
 #!TODO: ResultFormatter class.  process response json to specialise the result json.  Default is None
 #!TODO: pipe results to new process.  Command-line interface.
 #!TODO: Helper methods for "get opendap" "get download urls"
 
-
-TYPE_DATASET = 'Dataset'
-TYPE_FILE = 'File'
-
-class GeospatialConstraint(object):
-    """
-    Class to encapsulate all geospatial constraints in the ESGF Search API
-    """
-
-    def __init__(self, lat=None, lon=None, bbox=None, location=None,
-                 radius=None, polygon=None):
-        self.lat, self.lon = lat, lon
-        self.bbox = bbox
-        self.location = location
-        self.radius, self.polygon = radius, polygon
-
-
-class SearchConnection(object):
-    """
-    :ivar url: The URL to the Search API service.  Usually <prefix>/esgf-search
-    :ivar distrib: Boolean stating whether searches through this connection are
-        distributed.  I.e. whether the Search service distributes the query to
-        other search peers.
-    :ivar shards: List of shards to send the query to.  An empty list implies
-        distrib==False.  None implies the default of all shards.
-        
-    """
-    #TODO: we don't need both distrib and shards.
-
-    def __init__(self, url, distrib=True, shards=None, limit=None, 
-                 context_class=None):
-	"""
-        :param context_class: Override the default SearchContext class.
-
-        """
-        self.url = url
-        self.distrib = distrib
-        self.shards = shards
-	self.limit = limit
-	
-        if context_class:
-            self.__context_class = context_class
-        else:
-            self.__context_class = SearchContext
-        
-        #!TODO: set_shards(). shards should probably be a property.
-        
-    def send_query(self, query_dict, limit=None, distrib=None, shards=None):
-        """
-        Generally not to be called directly by the user but via SearchContext
-	instances.
-        
-        :param query_dict: dictionary of query string parameers to send.
-        :return: ElementTree instance (TODO: think about this)
-        
-        """
-        raise NotImplementedError
-
-    def get_shard_list(self):
-	"""
-        :return: the list of available shards
-
-        """
-        raise NotImplementedError
     
-    def new_context(self, **constraints):
-	#!MAYBE: context_class=None, 
-	return self.__context_class(self, constraints)
-
-
-class SearchContext(object):
-    """
-    Instances of this class represent the state of a current search.
-    It exposes what facets are available to select and the facet counts
-    if they are available.
     
-    Subclasses of this class can restrict the search options.  For instance
-    FileSearchContext, DatasetSerachContext or CMIP5SearchContext
-    
-    SearchContext instances are connected to SearchConnection instances.  You
-    normally create SearchContext instances via one of:
-    1. Calling SearchConnection.new_context()
-    2. Calling SearchContext.constrain()
-    
-    :ivar constraints: A dictionary of facet constraints currently in effect.
-        constraint[facet_name] = [value, value, ...]
-        
-    """
-
-    def __init__(self, connection, constraints, type=TYPE_DATASET,
-		 latest=None, facets=None, fields=None,
-		 replica=None):
-        """
-        :param connection: The SearchConnection
-        :param constraints: A dictionary of initial constraints
-	:param type: One of TYPE_* constants defining the document type to
-	    search for
-	:param facets: The list of facets for which counts will be retrieved
-	    and constraints be validated against.  Or None to represent all
-	    facets.
-	:param fields: A list of field names to return in search responses
-	:param replica: A boolean defining whether to return master records
-	    or replicas, or None to return both.
-	:param latest: A boolean defining whether to return only latest verisons
-	    or only non-latest versions, or None to return both.
-
-        """
-	self.connection = connection
-        self.constraints = {}
-        self.__update_constraints(constraints)
-	
-	self.type = type
-	self.latest = latest
-	self.facets = facets
-
-        # Non facet constraints
-        self.from_timestamp, self.to_timestamp = None, None
-        self.start, self.end = None, None
-        self.query = None
-        self.geosplatial_constraint = None
-
-    def search(self, **constraints):
-        """
-        :param constraints: Further constraints for this query.  Equivilent
-            to calling self.constrain(**constraints).search()
-        :return: A ResultSet for this query
-
-        """
-        if constraints:
-            sc = self.constrain(**constraints)
-        else:
-            sc = self
-            
-        raise NotImplementedError
-
-    def constrain(self, **constraints):
-        new_sc = self.__class__(self.connection, self.constraints)
-        new_sc.constrain(**constraints)
-	return new_sc
-    
-    def constrain_timestamp(self, from_timestamp, to_timestamp):
-        """
-        :param from: a datetime instance specifying the earliest timestamp for
-            records returned
-        :param to: a datetime instance specifying the latest timestamp for
-            records returned
-        """
-        self.from_timestamp = from_timestamp
-        self.to_timestamp = to_timestamp
-
-    def constrain_freetext(self, query):
-        self.query = query
-
-    def constrain_temporal(self, start, end):
-        """
-        :param start: a datetime instance specifying the start of the temporal
-            constraint.
-        :param end: a datetime instance specifying the end of the temporal
-            constraint.
-
-        """
-        self.start = start
-        self.end = end
-
-    def constrain_geospatial(self, lat=None, lon=None, bbox=None, location=None,
-                 radius=None, polygon=None):
-        self.geospatial_constraint = GeospatialConstraint(lat, lon, bbox, location, radius, polygon)
-        
-    @property
-    def facet_counts(self):
-        raise NotImplementedError
-
-    def __update_constraints(self, constraints):
-        raise NotImplementedError
-
-    
-class ResultSet(list):
-    #!TODO: maybe encapsulate list rather than inherit
-    """
-    :ivar header:
-    :ivar context:
-
-    """
 
     
