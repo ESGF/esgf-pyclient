@@ -1,0 +1,6 @@
+This package contains API code for calling the ESGF Search API [1] within
+client code.  The initial implementation is in Python.
+
+See docs/conepts.rst
+
+[1] http://esgf.org/wiki/ESGF_Search_API
