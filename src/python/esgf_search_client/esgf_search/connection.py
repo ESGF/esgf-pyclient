@@ -5,8 +5,15 @@ Defines the class representing connections to the ESGF Search API.
 
 """
 
+import urllib2, urllib, urlparse
+import json
+
+import logging
+log = logging.getLogger(__name__)
 
 from .context import SearchContext
+
+RESPONSE_FORMAT='application/solr+json'
 
 class SearchConnection(object):
     """
@@ -49,14 +56,36 @@ class SearchConnection(object):
         :return: ElementTree instance (TODO: think about this)
         
         """
-        raise NotImplementedError
+        
+        full_query = {
+            'format': RESPONSE_FORMAT,
+            }
+        full_query.update(query_dict)
+        if limit is not None:
+            full_query['limit'] = limit
+        if distrib is not None:
+            full_query['distrib'] = distrib
+        if shards is not None:
+            full_query['shards'] = ','.join(shards)
+
+        query_url = '%s?%s' % (self.url, urllib.urlencode(full_query))
+        log.debug('Query request is %s' % query_url)
+
+        response = urllib2.urlopen(query_url)
+        ret = json.load(response)
+
+        return ret
+    
 
     def get_shard_list(self):
 	"""
         :return: the list of available shards
 
         """
-        raise NotImplementedError
+        response = self.send_query({'facets': [], 'fields': []})
+        shards = response['responseHeader']['params']['shards'].split(',')
+        
+        return shards
     
     def new_context(self, **constraints):
 	#!MAYBE: context_class=None, 
