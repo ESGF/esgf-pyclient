@@ -38,3 +38,14 @@ def test_context_facets3():
 
     assert doc['project'] == ['CMIP5']
     assert doc['model'] == ['IPSL-CM5A-LR']
+
+def test_facet_count():
+    conn = SearchConnection(TEST_SERVICE)
+    
+    context = conn.new_context(project='CMIP5')
+    context2 = context.constrain(model="IPSL-CM5A-LR")
+
+    counts = context2.facet_counts
+    assert counts['model'].keys() == ['IPSL-CM5A-LR']
+    assert counts['project'].keys() == ['CMIP5']
+    

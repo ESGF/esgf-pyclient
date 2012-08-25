@@ -45,6 +45,7 @@ class SearchContext(object):
         """
         
         self.connection = connection
+        self.__facet_counts = None
         
         #  Constraints
         self.freetext_constraint = None
@@ -93,9 +94,23 @@ class SearchContext(object):
         new_sc._update_constraints(constraints)
 	return new_sc
 
+
     @property
     def facet_counts(self):
-        raise NotImplementedError
+        if self.__facet_counts is None:
+            self.__facet_counts = {}
+            query_dict = self._build_query()
+            query_dict['facets'] = '*'
+            query_dict['limit'] = 0
+
+            response = self.connection.send_query(query_dict)
+            for facet, counts in (
+                    response['facet_counts']['facet_fields'].items()):
+                d = self.__facet_counts[facet] = {}
+                while counts:
+                    d[counts.pop()] = counts.pop()
+
+        return self.__facet_counts
 
     #-------------------------------------------------------------------------
     # Constraint mutation interface
