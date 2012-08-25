@@ -59,14 +59,15 @@ class SearchConnection(object):
         
         full_query = {
             'format': RESPONSE_FORMAT,
+            'limit': limit,
+            'distrib': distrib,
+            'shards': ','.join(shards) if shards else None,
             }
         full_query.update(query_dict)
-        if limit is not None:
-            full_query['limit'] = limit
-        if distrib is not None:
-            full_query['distrib'] = distrib
-        if shards is not None:
-            full_query['shards'] = ','.join(shards)
+
+        # Remove all None valued items
+        full_query = dict(item for item in full_query.items() if item[1] is not None)
+
 
         query_url = '%s?%s' % (self.url, urllib.urlencode(full_query))
         log.debug('Query request is %s' % query_url)
@@ -90,3 +91,27 @@ class SearchConnection(object):
     def new_context(self, **constraints):
 	#!MAYBE: context_class=None, 
 	return self.__context_class(self, constraints)
+
+
+def query_keyword_type(keyword):
+    """
+    Returns the keyword type of a search query keyword.
+
+    Possible values are 'system', 'freetext', 'facet', 'temporal' and
+    'geospatial'.  If the keyword is unknown it is assumed to be a
+    facet keyword
+
+    """
+    #!TODO: support "last update" constraints (to/from)
+
+    if keyword == 'query':
+        return 'freetext'
+    elif keyword in ['start', 'end']:
+        return 'temporal'
+    elif keyword in ['lat', 'lon', 'bbox', 'location', 'radius', 'polygon']:
+        return 'geospatial'
+    elif keyword in ['limit', 'from', 'to', 'fields', 'facets', 'format',
+                     'type', 'distrib', 'replica', 'id', 'shards']:
+        return 'system'
+    else:
+        return 'facet'

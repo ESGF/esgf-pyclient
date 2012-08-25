@@ -75,7 +75,11 @@ class SearchContext(object):
         else:
             sc = self
 
-        raise NotImplementedError
+        query_dict = sc._build_query()
+        response = self.connection.send_query(query_dict)
+
+        #!TODO: return ResultSet instead of raw json
+        return response
 
     def constrain(self, **constraints):
         """
@@ -101,13 +105,19 @@ class SearchContext(object):
         Update the constraints in-place by calling _constrain_*() methods.
         
         """
-        raise NotImplementedError
+        constraints_split = self._split_constraints(constraints)
+        self._constrain_facets(constraints_split['facets'])
+        self._constrain_freetext(constraints_split['freetext'])
+
+        #!TODO: implement temporal and geospatial constraints
+        #self._constrain_temporal()
+        #self._constrain_geospatial()
 
     def _constrain_facets(self, facet_constraints):
         self.facet_constraints = facet_constraints
     
     def _constrain_freetext(self, query):
-        self.query = query
+        self.freetext_constraint = query
 
     def _constrain_temporal(self, start, end):
         """
@@ -117,17 +127,59 @@ class SearchContext(object):
             constraint.
 
         """
+        #!TODO: support solr date keywords like "NOW" and "NOW-1DAY"
+        #     we will probably need a separate TemporalConstraint object
         self.temporal_constraint = (start, end)
 
     def _constrain_geospatial(self, lat=None, lon=None, bbox=None, location=None,
                  radius=None, polygon=None):
         self.geospatial_constraint = GeospatialConstraint(lat, lon, bbox, location, radius, polygon)
+
+        raise NotImplementedError
         
     #-------------------------------------------------------------------------
 
+    def _split_constraints(self, constraints):
+        """
+        Divide a constraint dictionary into 4 types of constraints:
+        1. Freetext query
+        2. Facet constraints
+        3. Temporal constraints
+        4. Geospatial constraints
+
+        :return: A dictionary of the 4 types of constraint.
+        
+        """
+        # local import to prevent circular importing
+        from .connection import query_keyword_type
+
+        constraints_split = {}
+        for kw, val in constraints.items():
+            constraint_type = query_keyword_type(kw)
+            d = constraints_split.setdefault(constraint_type, {})
+            d[kw] = val
+
+        return constraints_split
+        
     def _build_query(self):
         """
         Build query string parameters as a dictionary.
 
         """
-        raise NotImplementedError
+
+        query_dict = {"query": self.freetext_constraint,
+                      "type": self.type,
+                      "latest": self.latest,
+                      "facets": self.facets,
+                      "fields": self.fields,
+                      "replica": self.replica,
+                      }
+        query_dict.update(self.facet_constraints)
+        
+        #!TODO: encode datetime
+        #start, end = self.temporal_constraint
+        #query_dict.update(start=start, end=end)
+
+        return query_dict
+    
+        
