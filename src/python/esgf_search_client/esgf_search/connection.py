@@ -12,8 +12,8 @@ import logging
 log = logging.getLogger(__name__)
 
 from .context import SearchContext
+from .config import RESPONSE_FORMAT
 
-RESPONSE_FORMAT='application/solr+json'
 
 class SearchConnection(object):
     """
