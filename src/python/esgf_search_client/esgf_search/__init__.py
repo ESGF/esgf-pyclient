@@ -92,6 +92,8 @@ from .results import ResultSet
 from .consts import TYPE_DATASET, TYPE_FILE
 
 
+__version__ = '0.0.1'
+
 #!TODO: ResultFormatter class.  process response json to specialise the result json.  Default is None
 #!TODO: pipe results to new process.  Command-line interface.
 #!TODO: Helper methods for "get opendap" "get download urls"
