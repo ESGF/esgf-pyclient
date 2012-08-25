@@ -3,7 +3,7 @@
 import copy
 
 from .constraints import GeospatialConstraint
-from .consts import TYPE_DATASET, TYPE_FILE
+from .consts import TYPE_DATASET, TYPE_FILE, QUERY_KEYWORD_TYPES
 
 class SearchContext(object):
     """
@@ -43,6 +43,9 @@ class SearchContext(object):
 	    or only non-latest versions, or None to return both.
 
         """
+        
+        self.connection = connection
+        
         #  Constraints
         self.freetext_constraint = None
         self.facet_constraints = {}
@@ -106,15 +109,15 @@ class SearchContext(object):
         
         """
         constraints_split = self._split_constraints(constraints)
-        self._constrain_facets(constraints_split['facets'])
-        self._constrain_freetext(constraints_split['freetext'])
+        self._constrain_facets(constraints_split['facet'])
+        self._constrain_freetext(constraints_split['freetext'].get('query'))
 
         #!TODO: implement temporal and geospatial constraints
         #self._constrain_temporal()
         #self._constrain_geospatial()
 
     def _constrain_facets(self, facet_constraints):
-        self.facet_constraints = facet_constraints
+        self.facet_constraints.update(facet_constraints)
     
     def _constrain_freetext(self, query):
         self.freetext_constraint = query
@@ -153,11 +156,10 @@ class SearchContext(object):
         # local import to prevent circular importing
         from .connection import query_keyword_type
 
-        constraints_split = {}
+        constraints_split = dict((kw, {}) for kw in QUERY_KEYWORD_TYPES)
         for kw, val in constraints.items():
             constraint_type = query_keyword_type(kw)
-            d = constraints_split.setdefault(constraint_type, {})
-            d[kw] = val
+            constraints_split[constraint_type][kw] = val
 
         return constraints_split
         

@@ -8,7 +8,7 @@ Test SearchConnection object
 
 from esgf_search.connection import SearchConnection
 
-TEST_SERVICE='http://esgf-node.ipsl.fr/esg-search/search'
+from .config import TEST_SERVICE
 
 def test_blank_query():
     conn = SearchConnection(TEST_SERVICE)
