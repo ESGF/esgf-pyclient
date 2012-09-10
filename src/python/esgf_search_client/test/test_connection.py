@@ -20,6 +20,6 @@ def test_get_shard_list():
     conn = SearchConnection(TEST_SERVICE)
     shards = conn.get_shard_list()
     assert 'localhost:8983/solr/datasets' in shards
-    assert 'pcmdi9.llnl.gov:8983/solr/datasets' in shards
+    assert 'pcmdi11.llnl.gov:8983/solr/datasets' in shards
 
     

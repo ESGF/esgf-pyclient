@@ -12,7 +12,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from .context import SearchContext
-from .config import RESPONSE_FORMAT
+from .consts import RESPONSE_FORMAT
 
 
 class SearchConnection(object):
@@ -47,7 +47,7 @@ class SearchConnection(object):
         
         #!TODO: set_shards(). shards should probably be a property.
         
-    def send_query(self, query_dict, limit=None, distrib=None, shards=None):
+    def send_query(self, query_dict, limit=None, offset=None, distrib=None, shards=None):
         """
         Generally not to be called directly by the user but via SearchContext
 	instances.
@@ -61,6 +61,7 @@ class SearchConnection(object):
             'format': RESPONSE_FORMAT,
             'limit': limit,
             'distrib': distrib,
+            'offset': offset,
             'shards': ','.join(shards) if shards else None,
             }
         full_query.update(query_dict)

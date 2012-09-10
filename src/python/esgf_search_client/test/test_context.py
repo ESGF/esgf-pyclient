@@ -33,8 +33,8 @@ def test_context_facets3():
     context = conn.new_context(project='CMIP5')
     context2 = context.constrain(model="IPSL-CM5A-LR")
 
-    response = context2.search()
-    doc = response['response']['docs'][0]
+    results = context2.search()
+    doc = results[0]
 
     assert doc['project'] == ['CMIP5']
     assert doc['model'] == ['IPSL-CM5A-LR']

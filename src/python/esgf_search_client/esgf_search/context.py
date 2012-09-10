@@ -1,9 +1,9 @@
 
-
 import copy
 
 from .constraints import GeospatialConstraint
 from .consts import TYPE_DATASET, TYPE_FILE, QUERY_KEYWORD_TYPES
+from .results import ResultSet
 
 class SearchContext(object):
     """
@@ -46,6 +46,7 @@ class SearchContext(object):
         
         self.connection = connection
         self.__facet_counts = None
+        self.__hit_count = None
         
         #  Constraints
         self.freetext_constraint = None
@@ -79,11 +80,9 @@ class SearchContext(object):
         else:
             sc = self
 
-        query_dict = sc._build_query()
-        response = self.connection.send_query(query_dict)
-
-        #!TODO: return ResultSet instead of raw json
-        return response
+        self.__update_counts()
+        
+        return ResultSet(sc)
 
     def constrain(self, **constraints):
         """
@@ -97,21 +96,33 @@ class SearchContext(object):
 
     @property
     def facet_counts(self):
-        if self.__facet_counts is None:
-            self.__facet_counts = {}
-            query_dict = self._build_query()
-            query_dict['facets'] = '*'
-            query_dict['limit'] = 0
-
-            response = self.connection.send_query(query_dict)
-            for facet, counts in (
-                    response['facet_counts']['facet_fields'].items()):
-                d = self.__facet_counts[facet] = {}
-                while counts:
-                    d[counts.pop()] = counts.pop()
-
+        self.__update_counts()
         return self.__facet_counts
 
+    @property
+    def hit_count(self):
+        self.__update_counts()
+        return self.__hit_count
+
+    def __update_counts(self):
+        # If hit_count is set the counts are already retrieved
+        if self.__hit_count is not None:
+            return
+        
+        self.__facet_counts = {}
+        self.__hit_count = None
+        query_dict = self._build_query()
+        query_dict['facets'] = '*'
+
+        response = self.connection.send_query(query_dict, limit=0)
+        for facet, counts in (
+                response['facet_counts']['facet_fields'].items()):
+            d = self.__facet_counts[facet] = {}
+            while counts:
+                d[counts.pop()] = counts.pop()
+
+        self.__hit_count = response['response']['numFound']
+                
     #-------------------------------------------------------------------------
     # Constraint mutation interface
     # These functions update the instance in-place.
