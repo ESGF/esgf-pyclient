@@ -142,6 +142,10 @@ class SearchContext(object):
         #self._constrain_temporal()
         #self._constrain_geospatial()
 
+        # reset cached values
+        self.__hit_count = None
+        self.__facet_counts = None
+
     def _constrain_facets(self, facet_constraints):
         self.facet_constraints.update(facet_constraints)
     

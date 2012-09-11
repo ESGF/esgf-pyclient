@@ -48,4 +48,25 @@ def test_facet_count():
     counts = context2.facet_counts
     assert counts['model'].keys() == ['IPSL-CM5A-LR']
     assert counts['project'].keys() == ['CMIP5']
+
+def test_distrib():
+    conn = SearchConnection(TEST_SERVICE)
+
+    context = conn.new_context(project='CMIP5')
+    count1 = context.hit_count
+
+    #!TODO: this breaks caching!
+    conn.distrib = False
+    count2 = context.hit_count
+
+    assert count1 > count2
+
+def test_constrain():
+    conn = SearchConnection(TEST_SERVICE)
     
+    context = conn.new_context(project='CMIP5')
+    count1 = context.hit_count
+    context = context.constrain(model="IPSL-CM5A-LR")
+    count2 = context.hit_count
+
+    assert count1 > count2
