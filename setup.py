@@ -10,10 +10,10 @@ import sys, os
 
 # Import version from the top-level package
 sys.path[:0] = os.path.dirname(__file__)
-from esgf_search import __version__
-from esgf_search import __doc__ as long_description
+from pyesgf import __version__
+from pyesgf import __doc__ as long_description
 
-setup(name='esgf_search_client',
+setup(name='pyesgf',
       version=__version__,
       description="A library querying the ESGF search API",
       long_description=long_description,
@@ -21,7 +21,7 @@ setup(name='esgf_search_client',
       keywords='',
       author='Stephen Pascoe',
       author_email='Stephen.Pascoe@stfc.ac.uk',
-      url='http://github.org/stephenpascoe/esgf-search-client',
+      url='http://github.org/stephenpascoe/esgf-pyclient',
       #download_url='',
       license='BSD',
       packages=find_packages(exclude=['ez_setup', 'examples', 'test']),

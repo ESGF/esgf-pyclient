@@ -3,7 +3,7 @@ Test the SearchContext class
 
 """
 
-from esgf_search.connection import SearchConnection
+from pyesgf.connection import SearchConnection
 
 from .config import TEST_SERVICE
 
