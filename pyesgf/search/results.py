@@ -62,7 +62,8 @@ class ResultSet(Sequence):
         limit = self.batch_size
 
         query_dict = self.context._build_query()
-        response = self.context.connection.send_query(query_dict, limit=limit, offset=offset)
+        response = self.context.connection.send_query(query_dict, limit=limit, 
+                                                      offset=offset)
 
         #!TODO: strip out results
         return response['response']['docs']

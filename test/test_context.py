@@ -50,16 +50,16 @@ def test_facet_count():
     assert counts['project'].keys() == ['CMIP5']
 
 def test_distrib():
-    conn = SearchConnection(TEST_SERVICE)
+    conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     context = conn.new_context(project='CMIP5')
     count1 = context.hit_count
 
-    #!TODO: this breaks caching!
-    conn.distrib = False
+    conn2 = SearchConnection(TEST_SERVICE, distrib=True)
+    context = conn2.new_context(project='CMIP5')
     count2 = context.hit_count
 
-    assert count1 > count2
+    assert count1 < count2
 
 def test_constrain():
     conn = SearchConnection(TEST_SERVICE)

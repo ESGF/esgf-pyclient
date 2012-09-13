@@ -11,7 +11,7 @@ import urllib2
 import httplib
 import os
 import StringIO
-import md5
+from hashlib import md5
 
 def install_cache(cache_dir):
     h = CacheHandler(cache_dir)
@@ -52,13 +52,13 @@ class CachedResponse(StringIO.StringIO):
     the network, check the x-cache header rather than the object type."""
     
     def ExistsInCache(cacheLocation, url):
-        hash = md5.new(url).hexdigest()
+        hash = md5(url).hexdigest()
         return (os.path.exists(cacheLocation + "/" + hash + ".headers") and 
                 os.path.exists(cacheLocation + "/" + hash + ".body"))
     ExistsInCache = staticmethod(ExistsInCache)
 
     def StoreInCache(cacheLocation, url, response):
-        hash = md5.new(url).hexdigest()
+        hash = md5(url).hexdigest()
         f = open(cacheLocation + "/" + hash + ".headers", "w")
         headers = str(response.info())
         f.write(headers)
@@ -70,7 +70,7 @@ class CachedResponse(StringIO.StringIO):
     
     def __init__(self, cacheLocation,url,setCacheHeader=True):
         self.cacheLocation = cacheLocation
-        hash = md5.new(url).hexdigest()
+        hash = md5(url).hexdigest()
         StringIO.StringIO.__init__(self, file(self.cacheLocation + "/" + hash+".body").read())
         self.url     = url
         self.code    = 200

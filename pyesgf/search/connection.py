@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 from .context import SearchContext
 from .consts import RESPONSE_FORMAT
-
+from .exceptions import EsgfSearchException
 
 class SearchConnection(object):
     """
@@ -45,9 +45,9 @@ class SearchConnection(object):
         else:
             self.__context_class = SearchContext
         
-        #!TODO: set_shards(). shards should probably be a property.
+        #!TODO: shards should probably be a property.
         
-    def send_query(self, query_dict, limit=None, offset=None, distrib=None, shards=None):
+    def send_query(self, query_dict, limit=None, offset=None):
         """
         Generally not to be called directly by the user but via SearchContext
 	instances.
@@ -60,9 +60,9 @@ class SearchConnection(object):
         full_query = {
             'format': RESPONSE_FORMAT,
             'limit': limit,
-            'distrib': distrib,
+            'distrib': 'true' if self.distrib else 'false',
             'offset': offset,
-            'shards': ','.join(shards) if shards else None,
+            'shards': ','.join(self.shards) if self.shards else None,
             }
         full_query.update(query_dict)
 
@@ -84,6 +84,9 @@ class SearchConnection(object):
         :return: the list of available shards
 
         """
+        if not self.distrib:
+            raise EsgfSearchException('Shard list not available for '
+                                      'non-distributed queries')
         response = self.send_query({'facets': [], 'fields': []})
         shards = response['responseHeader']['params']['shards'].split(',')
         
