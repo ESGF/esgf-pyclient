@@ -6,7 +6,7 @@ Test SearchConnection object
 #!TODO: replace calls to the a live search service with a mock.
 #!TODO: Test for HTTP proxies
 
-from pyesgf.connection import SearchConnection
+from pyesgf.search.connection import SearchConnection
 
 from .config import TEST_SERVICE
 
