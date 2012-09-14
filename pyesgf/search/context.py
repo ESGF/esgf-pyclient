@@ -4,6 +4,7 @@ import copy
 from .constraints import GeospatialConstraint
 from .consts import TYPE_DATASET, TYPE_FILE, QUERY_KEYWORD_TYPES
 from .results import ResultSet
+from .exceptions import EsgfSearchException
 
 class SearchContext(object):
     """
@@ -24,7 +25,7 @@ class SearchContext(object):
         
     """
 
-    def __init__(self, connection, constraints, type=TYPE_DATASET,
+    def __init__(self, connection, constraints, search_type=TYPE_DATASET,
 		 latest=None, facets=None, fields=None,
                  from_timestamp=None, to_timestamp=None,
 		 replica=None):
@@ -58,7 +59,13 @@ class SearchContext(object):
 
 	# Search configuration parameters
         self.timestamp_range = (from_timestamp, to_timestamp)
-	self.type = type
+
+        search_types = [TYPE_DATASET, TYPE_FILE]
+        if search_type not in search_types:
+            raise EsgfSearchException('search_type must be one of %s' 
+                                      % ','.join(search_types))
+	self.search_type = search_type
+
 	self.latest = latest
 	self.facets = facets
         self.fields = fields
@@ -200,7 +207,7 @@ class SearchContext(object):
         """
 
         query_dict = {"query": self.freetext_constraint,
-                      "type": self.type,
+                      "type": self.search_type,
                       "latest": self.latest,
                       "facets": self.facets,
                       "fields": self.fields,
