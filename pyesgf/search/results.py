@@ -37,7 +37,8 @@ class ResultSet(Sequence):
         batch_i = index / self.batch_size
         offset = index % self.batch_size
         if self.__batch_cache[batch_i] is None:
-            batch = self.__batch_cache[batch_i] = self.__get_batch(batch_i)
+            self.__batch_cache[batch_i] = self.__get_batch(batch_i)
+        batch = self.__batch_cache[batch_i]
 
         search_type = self.context.search_type
         ResultClass = _result_classes[search_type]
@@ -91,7 +92,19 @@ class BaseResult(object):
         
 
 class DatasetResult(BaseResult):
-    pass
+    @property
+    def dataset_id(self):
+        return self.json['id']
+    
+    def files_context(self):
+        from .context import SearchContext
+
+        files_context = SearchContext(
+            connection=self.context.connection,
+            constraints={'dataset_id': self.dataset_id},
+            search_type=TYPE_FILE,
+            )
+        return files_context
 
 class FileResult(BaseResult):
     pass
