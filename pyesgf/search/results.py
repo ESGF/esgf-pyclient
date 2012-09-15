@@ -6,7 +6,8 @@ hides paging of large result sets behind a client-side cache.
 
 from collections import Sequence
 
-from .consts import DEFAULT_BATCH_SIZE
+from .consts import DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE
+
 
 class ResultSet(Sequence):
     """
@@ -16,7 +17,8 @@ class ResultSet(Sequence):
         cannot change.
 
     """
-    def __init__(self, context, batch_size=DEFAULT_BATCH_SIZE, eager=True):
+    def __init__(self, context, batch_size=DEFAULT_BATCH_SIZE, eager=True,
+                 result_type=TYPE_DATASET):
         """
         :param context: The search context object used to generate this resultset
         :param batch_size: The number of results that will be requested from
@@ -36,8 +38,12 @@ class ResultSet(Sequence):
         offset = index % self.batch_size
         if self.__batch_cache[batch_i] is None:
             batch = self.__batch_cache[batch_i] = self.__get_batch(batch_i)
-            
-        return batch[offset]
+
+        search_type = self.context.search_type
+        ResultClass = _result_classes[search_type]
+
+        #!TODO: should probably wrap the json inside self.__batch_cache
+        return ResultClass(batch[offset], self.context)
             
 
     def __len__(self):
@@ -67,3 +73,31 @@ class ResultSet(Sequence):
 
         #!TODO: strip out results
         return response['response']['docs']
+
+
+class BaseResult(object):
+    """
+    Base class for results.
+
+    Subclasses represent different search types such as File and Dataset.
+
+    :ivar json: The oroginial json representation of the result.
+    :ivar context: The SearchContext which generated this result.
+    
+    """
+    def __init__(self, json, context):
+        self.json = json
+        self.context = context
+        
+
+class DatasetResult(BaseResult):
+    pass
+
+class FileResult(BaseResult):
+    pass
+
+
+_result_classes = {
+    TYPE_DATASET: DatasetResult,
+    TYPE_FILE: FileResult,
+    }
