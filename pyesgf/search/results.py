@@ -4,7 +4,7 @@ hides paging of large result sets behind a client-side cache.
 
 """
 
-from collections import Sequence
+from collections import Sequence, defaultdict
 
 from .consts import DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE
 
@@ -84,19 +84,39 @@ class BaseResult(object):
 
     :ivar json: The oroginial json representation of the result.
     :ivar context: The SearchContext which generated this result.
-    
+    :property urls: a dictionary of the form {service: [(url, mime_type), ...], ...}
+
     """
     def __init__(self, json, context):
         self.json = json
         self.context = context
         
+    @property
+    def urls(self):
+        url_dict = defaultdict(list)
+        for encoded in self.json['url']:
+            url, mime_type, service = encoded.split('|')
+            url_dict[service].append((url, mime_type))
+
+        return url_dict
 
 class DatasetResult(BaseResult):
+    """
+    A result object for ESGF datasets.
+
+    :property dataset_id: The solr dataset_id which is unique throughout the system.
+
+    """
+
     @property
     def dataset_id(self):
+        #!TODO: should we decode this into a tuple?  self.json['id'].split('|')
         return self.json['id']
     
     def files_context(self):
+        """
+        Return a SearchContext for searching for files within this dataset.
+        """
         from .context import SearchContext
 
         files_context = SearchContext(
@@ -106,8 +126,11 @@ class DatasetResult(BaseResult):
             )
         return files_context
 
+
 class FileResult(BaseResult):
-    pass
+    @property
+    def file_id(self):
+        return self.jsoin['id']
 
 
 _result_classes = {

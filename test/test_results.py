@@ -26,4 +26,23 @@ def test_file_context():
     f_ctx = r1.files_context()
 
     assert f_ctx.facet_constraints['dataset_id'] == r1.dataset_id
-    
+
+def test_file_list():
+    conn = SearchConnection(TEST_SERVICE, distrib=False)
+
+    ctx = conn.new_context(project='CMIP5')
+    results = ctx.search()
+
+    r1 = results[0]
+    f_ctx = r1.files_context()
+
+    file_results = f_ctx.search()
+    f1 = file_results[0]
+
+    ds_id, shard = r1.dataset_id.split('|')
+    download_url = f1.urls['HTTPServer'][0][0]
+
+    # Assumes dataset is published with DRS path.
+    ds_subpath = ds_id.replace('.', '/')
+    assert ds_subpath.lower() in download_url.lower()
+
