@@ -6,7 +6,8 @@ hides paging of large result sets behind a client-side cache.
 
 from collections import Sequence, defaultdict
 
-from .consts import DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE
+from .consts import (DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE, 
+                     TYPE_AGGREGATION)
 
 
 class ResultSet(Sequence):
@@ -126,14 +127,33 @@ class DatasetResult(BaseResult):
             )
         return files_context
 
+    def aggregations_context(self):
+        """
+        Return a SearchContext for searching for aggregations within this dataset.
+        """
+        from .context import SearchContext
+
+        agg_context = SearchContext(
+            connection=self.context.connection,
+            constraints={'dataset_id': self.dataset_id},
+            search_type=TYPE_AGGREGATION,
+            )
+        return agg_context
 
 class FileResult(BaseResult):
     @property
     def file_id(self):
-        return self.jsoin['id']
+        return self.json['id']
+
+
+class AggregationResult(BaseResult):
+    @property
+    def aggregation_id(self):
+        return self.json['id']
 
 
 _result_classes = {
     TYPE_DATASET: DatasetResult,
     TYPE_FILE: FileResult,
+    TYPE_AGGREGATION: AggregationResult,
     }

@@ -2,7 +2,8 @@
 import copy
 
 from .constraints import GeospatialConstraint
-from .consts import TYPE_DATASET, TYPE_FILE, QUERY_KEYWORD_TYPES
+from .consts import (TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION, 
+                     QUERY_KEYWORD_TYPES)
 from .results import ResultSet
 from .exceptions import EsgfSearchException
 
@@ -60,7 +61,7 @@ class SearchContext(object):
 	# Search configuration parameters
         self.timestamp_range = (from_timestamp, to_timestamp)
 
-        search_types = [TYPE_DATASET, TYPE_FILE]
+        search_types = [TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION]
         if search_type not in search_types:
             raise EsgfSearchException('search_type must be one of %s' 
                                       % ','.join(search_types))
