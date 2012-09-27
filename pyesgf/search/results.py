@@ -114,7 +114,7 @@ class DatasetResult(BaseResult):
         #!TODO: should we decode this into a tuple?  self.json['id'].split('|')
         return self.json['id']
     
-    def files_context(self):
+    def file_context(self):
         """
         Return a SearchContext for searching for files within this dataset.
         """
@@ -145,6 +145,21 @@ class FileResult(BaseResult):
     def file_id(self):
         return self.json['id']
 
+    @property
+    def checksum(self):
+        return self.json['checksum'][0]
+
+    @property
+    def checksum_type(self):
+        self.json['checksum_type'][0]
+
+    @property
+    def filename(self):
+        return self.json['title']
+
+    @property
+    def size(self):
+        return int(self.json['size'])
 
 class AggregationResult(BaseResult):
     @property

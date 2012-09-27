@@ -23,7 +23,7 @@ def test_file_context():
     results = ctx.search()
 
     r1 = results[0]
-    f_ctx = r1.files_context()
+    f_ctx = r1.file_context()
 
     assert f_ctx.facet_constraints['dataset_id'] == r1.dataset_id
 
@@ -34,7 +34,7 @@ def test_file_list():
     results = ctx.search()
 
     r1 = results[0]
-    f_ctx = r1.files_context()
+    f_ctx = r1.file_context()
 
     file_results = f_ctx.search()
     f1 = file_results[0]
