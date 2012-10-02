@@ -13,7 +13,7 @@ sys.path[:0] = os.path.dirname(__file__)
 from pyesgf import __version__
 from pyesgf import __doc__ as long_description
 
-setup(name='pyesgf',
+setup(name='esgf-pyclient',
       version=__version__,
       description="A library interacting with ESGF services within Python",
       long_description=long_description,
