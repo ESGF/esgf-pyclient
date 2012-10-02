@@ -15,9 +15,13 @@ from pyesgf import __doc__ as long_description
 
 setup(name='pyesgf',
       version=__version__,
-      description="A library querying the ESGF search API",
+      description="A library interacting with ESGF services within Python",
       long_description=long_description,
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+        'License :: OSI Approved :: BSD License',
+        'Topic :: Scientific/Engineering',
+        ], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='',
       author='Stephen Pascoe',
       author_email='Stephen.Pascoe@stfc.ac.uk',
