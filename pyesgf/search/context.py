@@ -214,6 +214,7 @@ class SearchContext(object):
                       "fields": self.fields,
                       "replica": self.replica,
                       }
+
         query_dict.update(self.facet_constraints)
         
         #!TODO: encode datetime

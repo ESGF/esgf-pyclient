@@ -5,10 +5,11 @@ hides paging of large result sets behind a client-side cache.
 """
 
 from collections import Sequence, defaultdict
+import re
 
 from .consts import (DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE, 
                      TYPE_AGGREGATION)
-
+from .exceptions import EsgfSearchException
 
 class ResultSet(Sequence):
     """
@@ -101,6 +102,17 @@ class BaseResult(object):
 
         return url_dict
 
+    @property
+    def opendap_url(self):
+        try:
+            url, mime = self.urls['OPENDAP'][0]
+        except KeyError:
+            raise EsgfSearchException('No OPeNDAP service found')
+        url = re.sub(r'.html$', '', url)
+
+        return url
+
+
 class DatasetResult(BaseResult):
     """
     A result object for ESGF datasets.
@@ -127,7 +139,7 @@ class DatasetResult(BaseResult):
             )
         return files_context
 
-    def aggregations_context(self):
+    def aggregation_context(self):
         """
         Return a SearchContext for searching for aggregations within this dataset.
         """

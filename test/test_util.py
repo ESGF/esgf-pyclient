@@ -17,3 +17,24 @@ def test_get_manifest():
 
     filename = 'psl_day_HadGEM2-ES_G1_r1i1p1_19291201-19291230.nc'
     assert manifest[filename]['checksum'] == 'd20bbba8e05d6689f44cf3f8eebb9e7b'
+
+#!TODO: this test belongs somewhere else
+def test_opendap():
+    conn = SearchConnection(CEDA_SERVICE, distrib=False)
+
+    ctx = conn.new_context()
+    results = ctx.search(drs_id='GeoMIP.output1.MOHC.HadGEM2-ES.G1.day.atmos.day.r1i1p1')
+    assert len(results) == 1
+
+    agg_ctx = results[0].aggregation_context()
+    aggs = agg_ctx.search()
+
+    # Take first aggregation
+    agg = aggs[0]
+     
+    print agg.aggregation_id
+    print agg.json['cf_standard_name']
+    print agg.urls
+
+    opendap_url = agg.opendap_url
+    print opendap_url

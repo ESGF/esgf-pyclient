@@ -54,7 +54,7 @@ def test_aggregations():
     results = ctx.search()
 
     r1 = results[0]
-    agg_ctx = r1.aggregations_context()
+    agg_ctx = r1.aggregation_context()
 
     agg_results = agg_ctx.search()
     agg1 = agg_results[0]
