@@ -37,6 +37,20 @@ def test_context_facets_multivalue():
     assert context2.facet_constraints['project'] == 'CMIP5'
     assert context2.facet_constraints['model'] == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
 
+def test_context_facet_options():
+    conn = SearchConnection(TEST_SERVICE)
+    context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR',
+                               ensemble='r1i1p1', experiment='rcp60',
+                               realm='seaIce'
+        )
+
+    assert context.get_facet_options().keys() == [
+        'product', 'cf_standard_name', 'variable_long_name', 'cmor_table',
+        'time_frequency', 'variable'
+        ]
+    
+
+
 def test_context_facets3():
     conn = SearchConnection(TEST_SERVICE)
     

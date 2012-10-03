@@ -112,6 +112,23 @@ class SearchContext(object):
         self.__update_counts()
         return self.__hit_count
 
+    def get_facet_options(self):
+        """
+        Return a dictionary of facet counts filtered to remove all facets that
+        are completely constrained.
+        
+        """
+        facet_options = {}
+        hits = self.hit_count
+        for facet, counts in self.facet_counts.items():
+            # filter out counts that match total hits
+            counts = dict(items for items in counts.items()
+                          if items[1] < hits)
+            if len(counts) > 1:
+                facet_options[facet] = counts
+
+        return facet_options
+
     def __update_counts(self):
         # If hit_count is set the counts are already retrieved
         if self.__hit_count is not None:
