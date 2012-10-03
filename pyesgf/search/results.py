@@ -106,8 +106,9 @@ class BaseResult(object):
     def opendap_url(self):
         try:
             url, mime = self.urls['OPENDAP'][0]
-        except KeyError:
-            raise EsgfSearchException('No OPeNDAP service found')
+        except KeyError, IndexError:
+            return None
+        
         url = re.sub(r'.html$', '', url)
 
         return url
@@ -172,6 +173,10 @@ class FileResult(BaseResult):
     @property
     def size(self):
         return int(self.json['size'])
+
+    @property
+    def url(self):
+        return self.urls['HTTPServer'][0][0]
 
 class AggregationResult(BaseResult):
     @property

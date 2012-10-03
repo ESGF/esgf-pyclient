@@ -3,6 +3,8 @@ Test the Results classes
 
 """
 
+import re
+
 from pyesgf.search.connection import SearchConnection
 
 from .config import TEST_SERVICE
@@ -40,12 +42,25 @@ def test_file_list():
     f1 = file_results[0]
 
     ds_id, shard = r1.dataset_id.split('|')
-    download_url = f1.urls['HTTPServer'][0][0]
+    download_url = f1.url
 
     # Assumes dataset is published with DRS path.
     ds_subpath = ds_id.replace('.', '/')
     assert ds_subpath.lower() in download_url.lower()
 
+def test_file_list2():
+    conn = SearchConnection(TEST_SERVICE, distrib=False)
+
+    ctx = conn.new_context(project='CMIP5')
+    results = ctx.search()
+
+    r1 = results[0]
+    f_ctx = r1.file_context()
+
+    file_results = f_ctx.search()
+    for file_result in file_results:
+        print file_result.url
+        assert re.match(r'http://vesg.ipsl.fr/thredds/.*\.nc', file_result.url)
 
 def test_aggregations():
     conn = SearchConnection(TEST_SERVICE, distrib=False)
