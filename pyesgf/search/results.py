@@ -106,7 +106,7 @@ class BaseResult(object):
     def opendap_url(self):
         try:
             url, mime = self.urls['OPENDAP'][0]
-        except KeyError, IndexError:
+        except (KeyError, IndexError):
             return None
         
         url = re.sub(r'.html$', '', url)
