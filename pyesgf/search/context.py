@@ -1,6 +1,8 @@
 
 import copy
 
+from pyesgf.multidict import MultiDict
+
 from .constraints import GeospatialConstraint
 from .consts import (TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION, 
                      QUERY_KEYWORD_TYPES)
@@ -52,7 +54,7 @@ class SearchContext(object):
         
         #  Constraints
         self.freetext_constraint = None
-        self.facet_constraints = {}
+        self.facet_constraints = MultiDict()
         self.temporal_constraint = (None, None)
         self.geosplatial_constraint = None
 
@@ -172,7 +174,13 @@ class SearchContext(object):
         self.__facet_counts = None
 
     def _constrain_facets(self, facet_constraints):
-        self.facet_constraints.update(facet_constraints)
+        for key, values in facet_constraints.mixed().items():
+            if isinstance(values, list):
+                for value in values:
+                    self.facet_constraints.add(key, value)
+            else:
+                self.facet_constraints.add(key, values)
+        
     
     def _constrain_freetext(self, query):
         self.freetext_constraint = query
@@ -211,7 +219,7 @@ class SearchContext(object):
         # local import to prevent circular importing
         from .connection import query_keyword_type
 
-        constraints_split = dict((kw, {}) for kw in QUERY_KEYWORD_TYPES)
+        constraints_split = dict((kw, MultiDict()) for kw in QUERY_KEYWORD_TYPES)
         for kw, val in constraints.items():
             constraint_type = query_keyword_type(kw)
             constraints_split[constraint_type][kw] = val
@@ -224,15 +232,15 @@ class SearchContext(object):
 
         """
 
-        query_dict = {"query": self.freetext_constraint,
+        query_dict = MultiDict({"query": self.freetext_constraint,
                       "type": self.search_type,
                       "latest": self.latest,
                       "facets": self.facets,
                       "fields": self.fields,
                       "replica": self.replica,
-                      }
+                      })
 
-        query_dict.update(self.facet_constraints)
+        query_dict.extend(self.facet_constraints)
         
         #!TODO: encode datetime
         #start, end = self.temporal_constraint

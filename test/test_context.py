@@ -35,7 +35,7 @@ def test_context_facets_multivalue():
     assert context2.hit_count > 0
     
     assert context2.facet_constraints['project'] == 'CMIP5'
-    assert context2.facet_constraints['model'] == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
+    assert context2.facet_constraints.getall('model') == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
 
 def test_context_facet_options():
     conn = SearchConnection(TEST_SERVICE)

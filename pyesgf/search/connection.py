@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 from .context import SearchContext
 from .consts import RESPONSE_FORMAT
 from .exceptions import EsgfSearchException
+from pyesgf.multidict import MultiDict
 
 class SearchConnection(object):
     """
@@ -57,14 +58,14 @@ class SearchConnection(object):
         
         """
         
-        full_query = {
+        full_query = MultiDict({
             'format': RESPONSE_FORMAT,
             'limit': limit,
             'distrib': 'true' if self.distrib else 'false',
             'offset': offset,
             'shards': ','.join(self.shards) if self.shards else None,
-            }
-        full_query.update(query_dict)
+            })
+        full_query.extend(query_dict)
 
         # Remove all None valued items
         full_query = dict(item for item in full_query.items() if item[1] is not None)
