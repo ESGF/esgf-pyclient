@@ -72,7 +72,7 @@ class SearchConnection(object):
 
         # Remove all None valued items
         full_query = MultiDict(item for item in full_query.items() if item[1] is not None)
-
+        log.debug('Query dict is %s' % full_query)
 
         query_url = '%s?%s' % (self.url, urllib.urlencode(full_query))
         log.debug('Query request is %s' % query_url)
