@@ -1,6 +1,11 @@
 """
-Search results are retrieved through the ResultSet class.  This class
-hides paging of large result sets behind a client-side cache.
+
+Module :mod:`pyesgf.search.results`
+===================================
+
+Search results are retrieved through the :class:`ResultSet` class.  This class
+hides paging of large result sets behind a client-side cache.  Subclasses of 
+:class:`Result` represent results of different SOLr record type.
 
 """
 

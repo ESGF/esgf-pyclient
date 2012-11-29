@@ -1,3 +1,12 @@
+"""
+
+Module :mod:`pyesgf.search.context`
+===================================
+
+Defines the :class:`SearchContext` class which represents each ESGF search query.
+
+"""
+
 
 import copy
 

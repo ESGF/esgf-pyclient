@@ -1,7 +1,10 @@
 """
+
+Module :mod:`pyesgf.search.connection`
+======================================
+
 Defines the class representing connections to the ESGF Search API.
 
-:author: Stephen Pascoe
 
 """
 

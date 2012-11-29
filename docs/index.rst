@@ -3,10 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ESGF Pyclient's documentation!
-=========================================
+Welcome to esgf-pyclient  documentation!
+========================================
 
-Contents:
+ESGF Pyclient is a Python package designed for interacting with the `Earth System Grid Federation`_ system.  Current development is focussed on support for the ESGF Search API.
+
+Getting Started
+===============
+
+The package can be downloaded via ``pip`` or ``easy_install``::
+
+  $ pip install esgf-pyclient
+  $ easy_install esgf-pyclient
+
+The source code is available on github at https://github.com/stephenpascoe/esgf-pyclient
+
+Once installed you import the package as the name ``pyesgf``.  See the recipes for examples.
 
 .. toctree::
    :maxdepth: 2
@@ -21,3 +33,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+
+.. _`Earth System Grid Federation`: http://esgf.org
