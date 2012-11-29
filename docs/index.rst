@@ -8,6 +8,7 @@ Welcome to esgf-pyclient  documentation!
 
 ESGF Pyclient is a Python package designed for interacting with the `Earth System Grid Federation`_ system.  Current development is focussed on support for the ESGF Search API.
 
+
 Getting Started
 ===============
 
@@ -20,11 +21,17 @@ The source code is available on github at https://github.com/stephenpascoe/esgf-
 
 Once installed you import the package as the name ``pyesgf``.  See the recipes for examples.
 
+
+Contents
+========
+
 .. toctree::
    :maxdepth: 2
 
    concepts
+   examples
    search_api
+
 
 Indices and tables
 ==================
