@@ -18,7 +18,7 @@ setup(name='esgf-pyclient',
       description="A library interacting with ESGF services within Python",
       long_description=long_description,
       classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
         'Topic :: Scientific/Engineering',
         ], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
