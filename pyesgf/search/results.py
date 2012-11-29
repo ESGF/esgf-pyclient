@@ -118,6 +118,14 @@ class BaseResult(object):
 
         return url
 
+    @property
+    def download_url(self):
+        try:
+            url, mime = self.urls['HTTPServer'][0]
+        except (KeyError, IndexError):
+            return None
+
+        return url
 
 class DatasetResult(BaseResult):
     """

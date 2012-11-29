@@ -3,6 +3,8 @@ Test pyesgf.util module.
 
 """
 
+import re
+
 from pyesgf.search.connection import SearchConnection
 from pyesgf.util import get_manifest
 
@@ -19,7 +21,7 @@ def test_get_manifest():
     assert manifest[filename]['checksum'] == 'd20bbba8e05d6689f44cf3f8eebb9e7b'
 
 #!TODO: this test belongs somewhere else
-def test_opendap():
+def test_opendap_url():
     conn = SearchConnection(CEDA_SERVICE, distrib=False)
 
     ctx = conn.new_context()
@@ -39,6 +41,16 @@ def test_opendap():
     opendap_url = agg.opendap_url
     print opendap_url
 
+def test_download_url():
+    conn = SearchConnection(CEDA_SERVICE, distrib=False)
+
+    ctx = conn.new_context()
+    results = ctx.search(drs_id='GeoMIP.output1.MOHC.HadGEM2-ES.G1.day.atmos.day.r1i1p1')
+    files = results[0].file_context().search()
+
+    download_url = files[0].download_url
+    assert re.match(r'http://.*\.nc', download_url)
+    
 
 def test_opendap_fail():
     conn = SearchConnection(CEDA_SERVICE, distrib=False)
