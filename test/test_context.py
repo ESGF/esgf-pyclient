@@ -94,3 +94,13 @@ def test_constrain():
     count2 = context.hit_count
 
     assert count1 > count2
+
+
+def test_constrain_freetext():
+    conn = SearchConnection(TEST_SERVICE)
+
+    context = conn.new_context(project='CMIP5', query='humidity')
+    assert context.freetext_constraint == 'humidity'
+
+    context = context.constrain(experiment='historical')
+    assert context.freetext_constraint == 'humidity'

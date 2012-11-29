@@ -172,7 +172,9 @@ class SearchContext(object):
         """
         constraints_split = self._split_constraints(constraints)
         self._constrain_facets(constraints_split['facet'])
-        self._constrain_freetext(constraints_split['freetext'].get('query'))
+        if 'query' in constraints_split['freetext']:
+            new_freetext = constraints_split['freetext']['query']
+            self._constrain_freetext(new_freetext)
 
         #!TODO: implement temporal and geospatial constraints
         #self._constrain_temporal()
