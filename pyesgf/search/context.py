@@ -186,11 +186,14 @@ class SearchContext(object):
 
     def _constrain_facets(self, facet_constraints):
         for key, values in facet_constraints.mixed().items():
+            current_values = self.facet_constraints.getall(key)
             if isinstance(values, list):
                 for value in values:
-                    self.facet_constraints.add(key, value)
+                    if value not in current_values:
+                        self.facet_constraints.add(key, value)
             else:
-                self.facet_constraints.add(key, values)
+                if values not in current_values:
+                    self.facet_constraints.add(key, values)
         
     
     def _constrain_freetext(self, query):

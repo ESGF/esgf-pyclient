@@ -71,7 +71,7 @@ class SearchConnection(object):
         full_query.extend(query_dict)
 
         # Remove all None valued items
-        full_query = dict(item for item in full_query.items() if item[1] is not None)
+        full_query = MultiDict(item for item in full_query.items() if item[1] is not None)
 
 
         query_url = '%s?%s' % (self.url, urllib.urlencode(full_query))

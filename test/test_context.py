@@ -35,7 +35,29 @@ def test_context_facets_multivalue():
     assert context2.hit_count > 0
     
     assert context2.facet_constraints['project'] == 'CMIP5'
-    assert context2.facet_constraints.getall('model') == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
+    assert sorted(context2.facet_constraints.getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
+
+def test_context_facet_multivalue2():
+    conn = SearchConnection(TEST_SERVICE)
+    context = conn.new_context(project='CMIP5', model='IPSL-CM5A-MR')
+    assert context.facet_constraints.getall('model') == ['IPSL-CM5A-MR']
+
+    
+    context2 = context.constrain(model=['IPSL-CM5A-MR', 'IPSL-CM5A-LR'])
+    assert sorted(context2.facet_constraints.getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
+
+
+def test_context_facet_multivalue3():
+    conn = SearchConnection(TEST_SERVICE)
+    ctx = conn.new_context(project='CMIP5', query='humidity', experiment='rcp45')
+    hits1 = ctx.hit_count
+    assert hits1 > 0
+    ctx2 = conn.new_context(project='CMIP5', query='humidity',
+                           experiment=['rcp45','rcp85'])
+    hits2 = ctx2.hit_count
+
+    assert hits2 > hits1
+
 
 def test_context_facet_options():
     conn = SearchConnection(TEST_SERVICE)
