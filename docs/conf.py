@@ -15,14 +15,14 @@ import sys, os
 from ConfigParser import SafeConfigParser
 import os.path as op
 
-from pyesgf import __version__ as pyesgf_version
-
 # Get distribution configuration
 dist_root = op.join(op.dirname(__file__), '..')
 setup_cfg = op.join(dist_root, 'setup.cfg')
 dist_config = SafeConfigParser()
 dist_config.read(setup_cfg)
 
+sys.path.append(dist_root)
+from pyesgf import __version__ as pyesgf_version
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
