@@ -3,7 +3,7 @@ Test the SearchContext class
 
 """
 
-from pyesgf.search.connection import SearchConnection
+from pyesgf.search import SearchConnection, not_equals
 
 from .config import TEST_SERVICE
 
@@ -126,3 +126,30 @@ def test_constrain_freetext():
 
     context = context.constrain(experiment='historical')
     assert context.freetext_constraint == 'humidity'
+
+def test_constrain_regression1():
+    conn = SearchConnection(TEST_SERVICE)
+
+    context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR')
+    assert 'experiment' not in context.facet_constraints
+
+    context2 = context.constrain(experiment='historical')
+    assert 'experiment' not in context.facet_constraints
+
+def test_negative_facet():
+    conn = SearchConnection(TEST_SERVICE)
+
+    context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR')
+    hits1 = context.hit_count
+
+    print context.facet_counts['experiment']
+
+    context2 = context.constrain(experiment='historical')
+    hits2 = context2.hit_count
+
+    context3 = context.constrain(experiment=not_equals('historical'))
+    hits3 = context3.hit_count
+
+
+    assert hits1 == hits2 + hits3
+    

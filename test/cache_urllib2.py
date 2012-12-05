@@ -18,6 +18,14 @@ def install_cache(cache_dir):
     opener = urllib2.build_opener(h)
     urllib2.install_opener(opener)
 
+def remove_from_cache(url, cache_dir):
+    hash = md5(url).hexdigest()
+    prefix = os.path.join(cache_dir, hash)
+    if os.path.exists(prefix+'.headers'):
+        os.remove(prefix+'.headers')
+        os.remove(prefix+'.body')
+    else:
+        raise RuntimeError('No cache found for %s' % hash)
 
 class CacheHandler(urllib2.BaseHandler):
     """Stores responses in a persistant on-disk cache.

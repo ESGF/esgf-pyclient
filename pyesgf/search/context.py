@@ -108,7 +108,7 @@ class SearchContext(object):
         Return a *new* instance with the additional constraints.
         
         """
-        new_sc = copy.copy(self)
+        new_sc = copy.deepcopy(self)
         new_sc._update_constraints(constraints)
 	return new_sc
 

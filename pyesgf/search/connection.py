@@ -18,6 +18,7 @@ from .context import SearchContext
 from .consts import RESPONSE_FORMAT
 from .exceptions import EsgfSearchException
 from pyesgf.multidict import MultiDict
+from pyesgf.util import urlencode
 
 class SearchConnection(object):
     """
@@ -74,7 +75,7 @@ class SearchConnection(object):
         full_query = MultiDict(item for item in full_query.items() if item[1] is not None)
         log.debug('Query dict is %s' % full_query)
 
-        query_url = '%s?%s' % (self.url, urllib.urlencode(full_query))
+        query_url = '%s?%s' % (self.url, urlencode(full_query))
         log.debug('Query request is %s' % query_url)
 
         response = urllib2.urlopen(query_url)

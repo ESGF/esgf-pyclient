@@ -1,5 +1,4 @@
-
-from .consts import ALL_OF
+from .consts import OPERATOR_NEQ
 
 class GeospatialConstraint(object):
     """
@@ -16,6 +15,15 @@ class GeospatialConstraint(object):
 #-----------------------------------------------------------------------------
 # Convenience functions
 
-def all_of(*facet_values):
-    return ([ALL_OF] + facet_values)
+#!TODO: document constraint operators
+        
+def any_of(values):
+    """
+    Constrains to any of the specified values.
+    This is a synonym for list(values).
+    
+    """
+    return list(values)
 
+def not_equals(value):
+    return (OPERATOR_NEQ, value)
