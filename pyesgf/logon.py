@@ -10,9 +10,11 @@ Manage the client's interaction with esg-security
 import os
 import os.path as op
 import datetime
+import shutil
 
 try:
     from myproxy.client import MyProxyClient
+    import OpenSSL
 except ImportError:
     raise ImportError('pyesgf.logon requires MyProxyClient')
 
@@ -20,10 +22,10 @@ except ImportError:
 # Constants
 
 ESGF_DIR = op.join(os.environ['HOME'], '.esg')
-ESGF_CERTS_DIR = op.join(ESGF_DIR, 'certificates')
-ESGF_CREDENTIALS = op.join(ESGF_DIR, 'credentials.pem')
+ESGF_CERTS_DIR = 'certificates'
+ESGF_CREDENTIALS = 'credentials.pem'
 #!TODO: support .httprc as well
-DAP_CONFIG = op.join(os.environ['HOME'], '.dodsrc')
+DAP_CONFIG = op.join(os.environ['HOME'], '.httprc')
 
 #-----------------------------------------------------------------------------
 # classes
@@ -38,23 +40,31 @@ class LogonManager(object):
     STATE_EXPIRED_CREDENTIALS = 2
     STATE_INVALID_CREDENTIALS = 3
 
-    def __init__(self, openid):
-        self.openid=openid
+    def __init__(self, esgf_dir=ESGF_DIR, dap_config=DAP_CONFIG):
+        """
+        :param esgf_dir: Root directory of ESGF state.  Default ~/.esg
+        :param dap_config: Set the location of .httprc.  Defaults to ~/.httprc
+
+        Note if dap_config is defined your current working directory must be the
+        same as the location as the dap_config file when OPeNDAP is initiallised.
+
+        """
         
-        username, myproxy = cls._get_logon_details()
-        self.username = username
-        self.myproxy = myproxy
+        self.esgf_dir = esgf_dir
+        self.esgf_credentials = op.join(self.esgf_dir, ESGF_CREDENTIALS)
+        self.esgf_certs_dir = op.join(self.esgf_dir, ESGF_CERTS_DIR)
+        self.dap_config = dap_config
 
         self._write_dap_config()
 
     @property
     def state(self):
-        if not op.exists(ESGF_CREDENTIALS):
+        if not op.exists(self.esgf_credentials):
             return self.STATE_NO_CREDENTIALS
         else:
-            with open(ESGF_CREDENTIALS) as fh:
+            with open(self.esgf_credentials) as fh:
                 data = fh.read()
-                cert = OpenSSL.cryto.load_certificate(OpenSSL.SSL.FILETYPE_PEM, data)
+                cert = OpenSSL.crypto.load_certificate(OpenSSL.SSL.FILETYPE_PEM, data)
 
             if cert.has_expired():
                 return self.STATE_EXPIRED_CREDENTIALS
@@ -66,17 +76,33 @@ class LogonManager(object):
     def is_logged_on(self):
         return self.state == self.STATE_LOGGED_ON
 
-    def logon(self, password=None, bootstrap=False, update_trustroots=False):
+    def logon_with_openid(self, openid,
+                          bootstrap=False, update_trustroots=False):
+        username, myproxy = self._get_logon_details(openid)
+        return self.logon(username, myproxy, bootstrap, update_trustroots)
+
+    def logon(self, username=None, password=None, myproxy=None,
+              bootstrap=False, update_trustroots=False):
         if password is None:
             password = getpass('Enter password for %s: ' % self.open_id)
 
-        c = MyProxyClient(hostname=self.myproxy, caCertDir=ESGF_CERT_DIR)
+        c = MyProxyClient(hostname=myproxy, caCertDir=self.esgf_certs_dir)
 
-        c.logon(self.username, self.password,
-                boostrap=bootstrap, updateTrustRoots=update_trustroots,
-                sslCertFile=ESGF_CERTS_DIR, sslKeyFile=ESGF_CREDENTIALS)
+        creds = c.logon(username, password,
+                        bootstrap=bootstrap, updateTrustRoots=update_trustroots)
+        with open(self.esgf_credentials, 'w') as fh:
+            for cred in creds:
+                fh.write(cred)
+                
 
-    def _get_logon_details(self):
+    def logoff(self, clear_trustroots=False):
+        if op.exists(self.esgf_credentials):
+            os.remove(self.esgf_credentials)
+
+        if clear_trustroots:
+            shutil.rmtree(self.esgf_certs_dir)
+
+    def _get_logon_details(self, openid):
         raise NotImplementedError
 
     def _write_dap_config(self, verbose=False):
@@ -89,4 +115,4 @@ CURL.SSL.VALIDATE=1
 CURL.SSL.CERTIFICATE={1}/credentials.pem
 CURL.SSL.KEY={1}/credentials.pem
 CURL.SSL.CAPATH={1}/certificates
-""".format(1 if verbose else 0, ESGF_DIR)
+""".format(1 if verbose else 0, self.esgf_certs_dir))
