@@ -8,6 +8,15 @@
 from setuptools import setup, find_packages
 import sys, os
 
+# This package requires Python 2.7+
+if not (sys.version_info.major > 2 or
+        sys.version_info.minor >= 7):
+    print '''
+Sorry, esgf-pyclient requires Python v2.7 or greater.  Version detected is
+%s
+'''.format(sys.version)
+    raise SystemExit()
+
 # Import version from the top-level package
 sys.path[:0] = os.path.dirname(__file__)
 from pyesgf import __version__
