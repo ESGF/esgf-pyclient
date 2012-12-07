@@ -3,7 +3,31 @@
 Module :mod:`pyesgf.logon`
 ==========================
 
-Manage the client's interaction with esg-security
+Manage the client's interaction with ESGF's security system.
+
+To obtain ESGF credentials create a :class:`LogonManager` instance and supply it with logon
+details::
+
+  >>> lm = LogonManager()
+  >>> lm.is_logged_on()
+  False
+  >>> lm.logon(username, password, myproxy_hostname)
+  >>> lm.is_logged_on()
+  True
+
+Logon parameters that aren't specified will be prompted for at the terminal
+by default.  The :class:`LogonManager` object also writes a ``.httprc`` file configuring
+OPeNDAP access through the NetCDF API.
+
+You can use your OpenID to logon instead.  The logon details will be deduced
+from the OpenID where possible::
+
+  >>> lm.logoff()
+  >>> lm.is_logged_on()
+  False
+  >>> lm.logon_with_openid(openid, password)
+  >>> lm.is_logged_on()
+  True
 
 """
 
@@ -42,7 +66,9 @@ MYPROXY_URI_REXP = r'socket://([^:]*):?(\d+)?'
 
 class LogonManager(object):
     """
-    Manages ESGF crendentials and security config files.
+    Manages ESGF crendentials and security configuration files.
+
+    Also integrates with NetCDF's secure OPeNDAP configuration.
     
     """
     STATE_LOGGED_ON = 0
@@ -89,12 +115,17 @@ class LogonManager(object):
 
 
     def logon_with_openid(self, openid, password=None,
-                          bootstrap=False, update_trustroots=False,
+                          bootstrap=False, update_trustroots=True,
                           interactive=True):
         """
-        :param openid: OpenID to login with
-        :param interactive: Whether to ask for input at the terminal for
-            any information that cannot be deduced from the OpenID.
+        Obtains ESGF credentials by detecting the MyProxy parameters from
+        the users OpenID.  Some ESGF compatible OpenIDs do not contain enough
+        information to obtain credentials.  In this case the user is prompted
+        for missing information if ``interactive == True``, otherwise an
+        exception is raised.
+
+        :param openid: OpenID to login with See :meth:`logon` for parameters
+            ``interactive``, ``bootstrap`` and ``update_trustroots``.
         """
         username, myproxy = self._get_logon_details(openid)
         return self.logon(username, password, myproxy,
@@ -104,8 +135,22 @@ class LogonManager(object):
 
 
     def logon(self, username=None, password=None, hostname=None,
-              bootstrap=False, update_trustroots=False,
+              bootstrap=False, update_trustroots=True,
               interactive=True):
+        """
+        Obtain ESGF credentials from the specified MyProxy service.
+
+        If ``interactive == True`` then any missing parameters of ``password``,
+        ``username`` or ``hostname`` will be prompted for at the terminal.
+        
+        :param interactive: Whether to ask for input at the terminal for
+            any missing information.  I.e. username, password or hostname.
+        :param bootstrap: Whether to bootstrap the trustroots for this
+            MyProxy service.
+        :param update_trustroots: Whether to update the trustroots for this
+            MyProxy service.
+
+        """
         if interactive:
             if hostname is None:
                 print 'Enter myproxy hostname:',
@@ -129,6 +174,12 @@ class LogonManager(object):
                 
 
     def logoff(self, clear_trustroots=False):
+        """
+        Remove any obtained credentials from the ESGF environment.
+        
+        :param clear_trustroots: If True also remove trustroots.
+    
+        """
         if op.exists(self.esgf_credentials):
             os.remove(self.esgf_credentials)
 
