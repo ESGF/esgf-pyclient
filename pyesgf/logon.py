@@ -11,12 +11,17 @@ import os
 import os.path as op
 import datetime
 import shutil
+from xml.etree import ElementTree
+import urllib2
+import re
 
 try:
     from myproxy.client import MyProxyClient
     import OpenSSL
 except ImportError:
     raise ImportError('pyesgf.logon requires MyProxyClient')
+
+from .exceptions import OpenidResolutionError
 
 #-----------------------------------------------------------------------------
 # Constants
@@ -26,6 +31,11 @@ ESGF_CERTS_DIR = 'certificates'
 ESGF_CREDENTIALS = 'credentials.pem'
 #!TODO: support .httprc as well
 DAP_CONFIG = op.join(os.environ['HOME'], '.httprc')
+
+XRI_NS = 'xri://$xrd*($v*2.0)'
+MYPROXY_URN = 'urn:esg:security:myproxy-service'
+ESGF_OPENID_REXP = r'https://.*/esgf-idp/openid/(.*)'
+MYPROXY_URI_REXP = r'socket://([^:]*):?(\d+)?'
 
 #-----------------------------------------------------------------------------
 # classes
@@ -73,20 +83,43 @@ class LogonManager(object):
 
             return self.STATE_LOGGED_ON
 
+
     def is_logged_on(self):
         return self.state == self.STATE_LOGGED_ON
 
-    def logon_with_openid(self, openid,
-                          bootstrap=False, update_trustroots=False):
+
+    def logon_with_openid(self, openid, password=None,
+                          bootstrap=False, update_trustroots=False,
+                          interactive=True):
+        """
+        :param openid: OpenID to login with
+        :param interactive: Whether to ask for input at the terminal for
+            any information that cannot be deduced from the OpenID.
+        """
         username, myproxy = self._get_logon_details(openid)
-        return self.logon(username, myproxy, bootstrap, update_trustroots)
+        return self.logon(username, password, myproxy,
+                          bootstrap=bootstrap,
+                          update_trustroots=update_trustroots,
+                          interactive=interactive)
 
-    def logon(self, username=None, password=None, myproxy=None,
-              bootstrap=False, update_trustroots=False):
-        if password is None:
-            password = getpass('Enter password for %s: ' % self.open_id)
 
-        c = MyProxyClient(hostname=myproxy, caCertDir=self.esgf_certs_dir)
+    def logon(self, username=None, password=None, hostname=None,
+              bootstrap=False, update_trustroots=False,
+              interactive=True):
+        if interactive:
+            if hostname is None:
+                print 'Enter myproxy hostname:',
+                hostname = raw_input()
+            if username is None:
+                print 'Enter myproxy username:',
+                username = raw_input()
+            if password is None:
+                password = getpass('Enter password for %s: ' % self.open_id)
+
+        if None in (hostname, username, password):
+            raise OpenidResolutionError('Full logon details not available')
+
+        c = MyProxyClient(hostname=hostname, caCertDir=self.esgf_certs_dir)
 
         creds = c.logon(username, password,
                         bootstrap=bootstrap, updateTrustRoots=update_trustroots)
@@ -103,7 +136,39 @@ class LogonManager(object):
             shutil.rmtree(self.esgf_certs_dir)
 
     def _get_logon_details(self, openid):
-        raise NotImplementedError
+        openid_doc = urllib2.urlopen(openid).read()
+        xml = ElementTree.fromstring(openid_doc)
+
+        hostname = None
+        port = None
+        username = None
+
+        services = xml.findall('.//{%s}Service' % XRI_NS)
+        for service in services:
+            try:
+                service_type = service.find('{%s}Type' % XRI_NS).text
+            except AttributeError:
+                continue
+
+            # Detect myproxy hostname and port
+            if service_type == MYPROXY_URN:
+                myproxy_uri = service.find('{%s}URI' % XRI_NS).text
+                mo = re.match(MYPROXY_URI_REXP, myproxy_uri)
+                if mo:
+                    hostname, port = mo.groups()
+
+        # If the OpenID matches the standard ESGF pattern assume it contains
+        # the username, otherwise prompt or raise an exception
+        mo = re.match(ESGF_OPENID_REXP, openid)
+        if mo:
+            username = mo.group(1)
+                
+        #!TODO maybe support different myproxy port
+        if port is not None:
+            assert int(port) == 7512
+            
+        return username, hostname
+            
 
     def _write_dap_config(self, verbose=False):
         #!TODO: replace with more sophisticated routine that merges settings
