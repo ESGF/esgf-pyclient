@@ -8,7 +8,11 @@ Welcome to esgf-pyclient  documentation!
 
 ESGF Pyclient is a Python package designed for interacting with the `Earth System Grid Federation`_ system.  Current development is focussed on support for the ESGF Search API.
 
-ESGF Pyclient is currently in development and should be considered alpha-quality software.  Anyone wishing to contribute or give feedback can do so through the project's `github site`_
+ESGF Pyclient is currently in development and should be considered
+alpha-quality software.  Contributions to development are gratefully
+received.  Anyone wishing to contribute or give feedback can do so
+through the project's `github site`_. 
+
 
 Getting Started
 ===============
@@ -32,6 +36,7 @@ Contents
    concepts
    examples
    search_api
+   logon
 
 
 Indices and tables

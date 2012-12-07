@@ -83,3 +83,13 @@ def test_logoff():
     assert not op.exists(op.join(esgf_dir, 'credentials.pem'))
     assert not lm.is_logged_on()
     assert lm.state == lm.STATE_NO_CREDENTIALS
+
+def test_logon_openid():
+    _clear_creds()
+    _load_creds(certificates_tarball='pcmdi9-certs.tar.gz')
+    lm = LogonManager(esgf_dir)
+    lm.logon_with_openid(TEST_OPENID, TEST_PASSWORD, interactive=False)
+
+    assert lm.is_logged_on()
+
+    
