@@ -42,8 +42,9 @@ import re
 try:
     from myproxy.client import MyProxyClient
     import OpenSSL
+    _has_myproxy = True
 except ImportError:
-    raise ImportError('pyesgf.logon requires MyProxyClient')
+    _has_myproxy = False
 
 from .exceptions import OpenidResolutionError
 
@@ -85,7 +86,9 @@ class LogonManager(object):
         same as the location as the dap_config file when OPeNDAP is initiallised.
 
         """
-        
+        if not _has_myproxy:
+            raise ImportError('pyesgf.logon requires MyProxyClient')
+
         self.esgf_dir = esgf_dir
         self.esgf_credentials = op.join(self.esgf_dir, ESGF_CREDENTIALS)
         self.esgf_certs_dir = op.join(self.esgf_dir, ESGF_CERTS_DIR)
