@@ -30,6 +30,7 @@ setup(name='esgf-pyclient',
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
         'Topic :: Scientific/Engineering',
+        'Programming Language :: Python :: 2.7',
         ], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='',
       author='Stephen Pascoe',
