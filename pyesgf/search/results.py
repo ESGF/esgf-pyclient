@@ -187,9 +187,6 @@ class FileResult(BaseResult):
     def size(self):
         return int(self.json['size'])
 
-    @property
-    def url(self):
-        return self.urls['HTTPServer'][0][0]
 
 class AggregationResult(BaseResult):
     @property

@@ -42,7 +42,7 @@ def test_file_list():
     f1 = file_results[0]
 
     ds_id, shard = r1.dataset_id.split('|')
-    download_url = f1.url
+    download_url = f1.download_url
 
     # Assumes dataset is published with DRS path.
     ds_subpath = ds_id.replace('.', '/')
@@ -59,8 +59,8 @@ def test_file_list2():
 
     file_results = f_ctx.search()
     for file_result in file_results:
-        print file_result.url
-        assert re.match(r'http://vesg.ipsl.fr/thredds/.*\.nc', file_result.url)
+        print file_result.download_url
+        assert re.match(r'http://vesg.ipsl.fr/thredds/.*\.nc', file_result.download_url)
 
 def test_aggregations():
     conn = SearchConnection(TEST_SERVICE, distrib=False)
