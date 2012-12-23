@@ -14,7 +14,7 @@ import json
 import logging
 log = logging.getLogger(__name__)
 
-from .context import SearchContext
+from .context import DatasetSearchContext
 from .consts import RESPONSE_FORMAT
 from .exceptions import EsgfSearchException
 from pyesgf.multidict import MultiDict
@@ -48,7 +48,7 @@ class SearchConnection(object):
         if context_class:
             self.__context_class = context_class
         else:
-            self.__context_class = SearchContext
+            self.__context_class = DatasetSearchContext
         
         #!TODO: shards should probably be a property.
         
@@ -97,10 +97,11 @@ class SearchConnection(object):
         
         return shards
     
-    def new_context(self, **constraints):
-	#!MAYBE: context_class=None, 
-	return self.__context_class(self, constraints)
+    def new_context(self, context_class=None, **constraints):
+	if context_class is None:
+            context_class = self.__context_class
 
+	return context_class(self, constraints)
 
 def query_keyword_type(keyword):
     """

@@ -24,8 +24,7 @@ class ResultSet(Sequence):
         cannot change.
 
     """
-    def __init__(self, context, batch_size=DEFAULT_BATCH_SIZE, eager=True,
-                 result_type=TYPE_DATASET):
+    def __init__(self, context, batch_size=DEFAULT_BATCH_SIZE, eager=True):
         """
         :param context: The search context object used to generate this resultset
         :param batch_size: The number of results that will be requested from
@@ -144,12 +143,11 @@ class DatasetResult(BaseResult):
         """
         Return a SearchContext for searching for files within this dataset.
         """
-        from .context import SearchContext
+        from .context import FileSearchContext
 
-        files_context = SearchContext(
+        files_context = FileSearchContext(
             connection=self.context.connection,
             constraints={'dataset_id': self.dataset_id},
-            search_type=TYPE_FILE,
             )
         return files_context
 
@@ -157,12 +155,11 @@ class DatasetResult(BaseResult):
         """
         Return a SearchContext for searching for aggregations within this dataset.
         """
-        from .context import SearchContext
+        from .context import AggregationSearchContext
 
-        agg_context = SearchContext(
+        agg_context = AggregationSearchContext(
             connection=self.context.connection,
             constraints={'dataset_id': self.dataset_id},
-            search_type=TYPE_AGGREGATION,
             )
         return agg_context
 

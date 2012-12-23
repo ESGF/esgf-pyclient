@@ -37,15 +37,17 @@ class SearchContext(object):
         
     """
 
-    def __init__(self, connection, constraints, search_type=TYPE_DATASET,
+    DEFAULT_SEARCH_TYPE = NotImplemented
+
+    def __init__(self, connection, constraints, search_type=None,
 		 latest=None, facets=None, fields=None,
                  from_timestamp=None, to_timestamp=None,
 		 replica=None):
         """
         :param connection: The SearchConnection
         :param constraints: A dictionary of initial constraints
-	:param type: One of TYPE_* constants defining the document type to
-	    search for
+	:param search_type: One of TYPE_* constants defining the document 
+            type to search for.  Overrides SearchContext.DEFAULT_SEARCH_TYPE
 	:param facets: The list of facets for which counts will be retrieved
 	    and constraints be validated against.  Or None to represent all
 	    facets.
@@ -61,6 +63,9 @@ class SearchContext(object):
         self.__facet_counts = None
         self.__hit_count = None
         
+        if search_type is None:
+            search_type = self.DEFAULT_SEARCH_TYPE
+
         #  Constraints
         self.freetext_constraint = None
         self.facet_constraints = MultiDict()
@@ -261,5 +266,15 @@ class SearchContext(object):
         #query_dict.update(start=start, end=end)
 
         return query_dict
-    
-        
+       
+
+class DatasetSearchContext(SearchContext):
+    DEFAULT_SEARCH_TYPE = TYPE_DATASET
+
+class FileSearchContext(SearchContext):
+    DEFAULT_SEARCH_TYPE = TYPE_FILE
+
+class AggregationSearchContext(SearchContext):
+    DEFAULT_SEARCH_TYPE = TYPE_AGGREGATION
+
+
