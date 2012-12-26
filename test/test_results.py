@@ -4,6 +4,7 @@ Test the Results classes
 """
 
 import re
+from urlparse import urlparse
 
 from pyesgf.search.connection import SearchConnection
 
@@ -79,3 +80,33 @@ def test_aggregations():
 
     #!FIXME: A pretty dumb test for a correct aggregation
     assert '.aggregation' in las_url
+
+
+def test_index_node():
+    conn = SearchConnection(TEST_SERVICE, distrib=False)
+
+    ctx = conn.new_context(project='CMIP5')
+    results = ctx.search()
+
+    r1 = results[0]
+    service = urlparse(TEST_SERVICE)
+
+    assert r1.index_node == service.hostname
+
+
+def test_other_index_node():
+    conn = SearchConnection(TEST_SERVICE, distrib=True)
+
+    ctx = conn.new_context(project='CMIP5', institute='INM')
+    results = ctx.search()
+
+    r1 = results[0]
+    service = urlparse(TEST_SERVICE)
+    print 'index_node = %s' % r1.index_node
+    
+    assert r1.index_node is not None
+    assert r1.index_node != service.hostname
+
+
+    
+                           

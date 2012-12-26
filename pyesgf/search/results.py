@@ -126,6 +126,15 @@ class BaseResult(object):
 
         return url
 
+    @property
+    def index_node(self):
+        try:
+            index_node = self.json['index_node']
+        except KeyError:
+            return None
+
+        return index_node
+
 class DatasetResult(BaseResult):
     """
     A result object for ESGF datasets.
