@@ -27,11 +27,11 @@ class SearchConnection(object):
     :ivar distrib: Boolean stating whether searches through this connection are
         distributed.  I.e. whether the Search service distributes the query to
         other search peers.
-    :ivar shards: List of shards to send the query to.  An empty list implies
+    :property shards: List of shards to send the query to.  An empty list implies
         distrib==False.  None implies the default of all shards.  Shards should
         be specified by hostname rather than the ESGF search API syntax of
         <hostname>:<port>/solr/*
-        
+
     """
     #TODO: we don't need both distrib and shards.
 
@@ -47,7 +47,12 @@ class SearchConnection(object):
         self.url = url
         self.distrib = distrib
 
-        self._shard_map = None
+        # _available_shards stores all available shards once retrieved from the server.
+        # A value of None means they haven't been retrieved yet.
+        self._available_shards = None
+        # __shards holds the list of shard keys that are used for querying.
+        # None means use the default shard list (i.e. self._available_shards once they
+        # have been retrieved.
         self.__shards = None
         # Delay initialising shards if none are specified
         if shards is not None:
@@ -69,10 +74,8 @@ class SearchConnection(object):
         
         """
         
-        #!FIXME: we shouldn't need to resolve the default shard list
-        #        if shards haven't been constrained!
-        if self.distrib:
-            shards = ','.join(self._shard_map[k] for k in self.shards)
+        if self.distrib and self.__shards is not None:
+            shards = ','.join(self._available_shards)
         else:
             shards = None
 
@@ -99,11 +102,7 @@ class SearchConnection(object):
 
     @property
     def shards(self):
-        if self.__shards is None:
-            # Triggers setter which returns default list
-            self.shards = None
-
-        return self.__shards
+        return __shards
 
     @shards.setter
     def shards(self, shards):
@@ -111,34 +110,43 @@ class SearchConnection(object):
         Restrict the available shards.  Setting to None will target all 
         available shards.
 
-        Calling this method for the first time will trigger querying the
-        API to get available shards.
+        Unless shards=None calling this setter will trigger retrieving
+        the list of available shards from the server.
 
         """
 
-        if self._shard_map is None:
-            self._set_shard_map()
-
+        # If set to None this means the default.  The default shard list
+        # is not retrieved from the server unless needed
         if shards is None:
-            self.__shards = self._shard_map.keys()
+            self.__shards = shards
         else:
+            if self._available_shards is None:
+                self._load_available_shards()
+
             self.__shards = []
             for shard in shards:
-                try:
-                    self.__shards.append(self._shard_map[shard])
-                except KeyError:
+                if shard in self._available_shards:
+                    self.__shards.append(shard)
+                else:
                     raise EsgfSearchException('Shard %s is not available')
 
         #!TODO: what if shards=[].  This is meant to mean distrib=False
+        return self.__shards
 
+    def _load_available_shards(self):
 
-    def _set_shard_map(self):
-        self._shard_map = {}
+        # Shards are not available if distrib=False.  The server won't send
+        # back a list of shards
+        if not self.distrib:
+            raise EsgfSearchException('Shard list not available for '
+                                      'non-distributed queries')
+
+        self._available_shards = set()
 
         response_json = self.send_query({'facets': [], 'fields': []})
         shards = response_json['responseHeader']['params']['shards'].split(',')
         
-        # Extract the hostname from each shard string as the shard key
+        # Extract hostname and port from each shard.
         for shard in shards:
             mo = re.match(SHARD_REXP, shard)
             if not mo:
@@ -147,16 +155,22 @@ class SearchConnection(object):
             shard_parts = mo.groupdict()
             general_spec = '%(host)s:%(port)s/solr' % shard_parts
 
-            self._shard_map[shard_parts['host']] = general_spec
+            self._available_shards.add(general_spec)
 
 
     def get_shard_list(self):
 	"""
+        return the list of all available shards.  This is not the same as the list
+        of shards that will be used in the query which can be obtained from the 'shards' property.
+
+
         :return: the list of available shards
-        :deprecated:
 
         """
-        return self.shards
+        if self._available_shards is None:
+            self._load_available_shards()
+
+        return self._available_shards
 
     
     def new_context(self, context_class=None, **constraints):
