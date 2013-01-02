@@ -155,9 +155,15 @@ class DatasetResult(BaseResult):
         """
         from .context import FileSearchContext
 
+        if self.context.connection.distrib:
+            shards=[self.index_node]
+        else:
+            shards=None
+
         files_context = FileSearchContext(
             connection=self.context.connection,
             constraints={'dataset_id': self.dataset_id},
+            shards=shards,
             )
         return files_context
 
@@ -167,9 +173,15 @@ class DatasetResult(BaseResult):
         """
         from .context import AggregationSearchContext
 
+        if self.context.connection.distrib:
+            shards=[self.index_node]
+        else:
+            shards=None
+
         agg_context = AggregationSearchContext(
             connection=self.context.connection,
             constraints={'dataset_id': self.dataset_id},
+            shards=shards,
             )
         return agg_context
 

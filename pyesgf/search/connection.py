@@ -62,13 +62,26 @@ class SearchConnection(object):
         
         """
         
+        full_query = self._build_query(query_dict, limit, offset, shards)
+        log.debug('Query dict is %s' % full_query)
+
+        query_url = '%s?%s' % (self.url, urlencode(full_query))
+        log.debug('Query request is %s' % query_url)
+
+        response = urllib2.urlopen(query_url)
+        ret = json.load(response)
+
+        return ret
+
+
+    def _build_query(self, query_dict, limit=None, offset=None, shards=None):
         if shards is not None:
             if self._available_shards is None:
                 self._load_available_shards()
 
             for shard in shards:
                 if shard not in self._available_shards:
-                    raise EsgfSearchException('Shard %s is not available')
+                    raise EsgfSearchException('Shard %s is not available' % shard)
 
             shard_str = ','.join(shards)
         else:
@@ -86,16 +99,8 @@ class SearchConnection(object):
 
         # Remove all None valued items
         full_query = MultiDict(item for item in full_query.items() if item[1] is not None)
-        log.debug('Query dict is %s' % full_query)
 
-        query_url = '%s?%s' % (self.url, urlencode(full_query))
-        log.debug('Query request is %s' % query_url)
-
-        response = urllib2.urlopen(query_url)
-        ret = json.load(response)
-
-        return ret
-
+        return full_query
 
     def _load_available_shards(self):
 
@@ -119,6 +124,9 @@ class SearchConnection(object):
             shard_parts = mo.groupdict()
             general_spec = '%(host)s:%(port)s/solr' % shard_parts
 
+
+            #!FIXME: We need to reconcile available_shards with the SOLr property 'index_node'
+            #    The former is <host>:<port>/solr/* the latter is just <host>.
             self._available_shards.add(general_spec)
 
 

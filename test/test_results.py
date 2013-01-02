@@ -107,6 +107,21 @@ def test_other_index_node():
     assert r1.index_node is not None
     assert r1.index_node != service.hostname
 
-
+def test_shards_constrain():
+    # Test that a file-context constrains the shard list
     
-                           
+    conn = SearchConnection(TEST_SERVICE, distrib=True)
+
+    ctx = conn.new_context(project='CMIP5')
+    results = ctx.search()
+
+    r1 = results[0]
+    f_ctx = r1.file_context()
+
+    #!TODO: white-box test.  Refactor.
+    query_dict = f_ctx._build_query()
+    full_query = f_ctx.connection._build_query(query_dict, shards=f_ctx.shards)
+
+    #!TODO: Force fail to see whether shards is passed through.
+    print full_query
+    assert False
