@@ -9,3 +9,5 @@ RESPONSE_FORMAT='application/solr+json'
 DEFAULT_BATCH_SIZE = 50
 
 OPERATOR_NEQ = 'not_equal'
+
+SHARD_REXP = r'(?P<host>.*?):(?P<port>\d*)/solr/?(?P<type>.*)'

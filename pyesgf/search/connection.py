@@ -10,12 +10,13 @@ Defines the class representing connections to the ESGF Search API.
 
 import urllib2, urllib, urlparse
 import json
+import re
 
 import logging
 log = logging.getLogger(__name__)
 
 from .context import DatasetSearchContext
-from .consts import RESPONSE_FORMAT
+from .consts import RESPONSE_FORMAT, SHARD_REXP
 from .exceptions import EsgfSearchException
 from pyesgf.multidict import MultiDict
 from pyesgf.util import urlencode
@@ -27,7 +28,9 @@ class SearchConnection(object):
         distributed.  I.e. whether the Search service distributes the query to
         other search peers.
     :ivar shards: List of shards to send the query to.  An empty list implies
-        distrib==False.  None implies the default of all shards.
+        distrib==False.  None implies the default of all shards.  Shards should
+        be specified by hostname rather than the ESGF search API syntax of
+        <hostname>:<port>/solr/*
         
     """
     #TODO: we don't need both distrib and shards.
@@ -43,14 +46,18 @@ class SearchConnection(object):
         """
         self.url = url
         self.distrib = distrib
-        self.shards = shards
+
+        self._shard_map = None
+        self.__shards = None
+        # Delay initialising shards if none are specified
+        if shards is not None:
+            self.shards = shards
 	
         if context_class:
             self.__context_class = context_class
         else:
             self.__context_class = DatasetSearchContext
         
-        #!TODO: shards should probably be a property.
         
     def send_query(self, query_dict, limit=None, offset=None):
         """
@@ -62,12 +69,19 @@ class SearchConnection(object):
         
         """
         
+        #!FIXME: we shouldn't need to resolve the default shard list
+        #        if shards haven't been constrained!
+        if self.distrib:
+            shards = ','.join(self._shard_map[k] for k in self.shards)
+        else:
+            shards = None
+
         full_query = MultiDict({
             'format': RESPONSE_FORMAT,
             'limit': limit,
             'distrib': 'true' if self.distrib else 'false',
             'offset': offset,
-            'shards': ','.join(self.shards) if self.shards else None,
+            'shards': shards,
             })
         full_query.extend(query_dict)
 
@@ -82,26 +96,75 @@ class SearchConnection(object):
         ret = json.load(response)
 
         return ret
-    
+
+    @property
+    def shards(self):
+        if self.__shards is None:
+            # Triggers setter which returns default list
+            self.shards = None
+
+        return self.__shards
+
+    @shards.setter
+    def shards(self, shards):
+        """
+        Restrict the available shards.  Setting to None will target all 
+        available shards.
+
+        Calling this method for the first time will trigger querying the
+        API to get available shards.
+
+        """
+
+        if self._shard_map is None:
+            self._set_shard_map()
+
+        if shards is None:
+            self.__shards = self._shard_map.keys()
+        else:
+            self.__shards = []
+            for shard in shards:
+                try:
+                    self.__shards.append(self._shard_map[shard])
+                except KeyError:
+                    raise EsgfSearchException('Shard %s is not available')
+
+        #!TODO: what if shards=[].  This is meant to mean distrib=False
+
+
+    def _set_shard_map(self):
+        self._shard_map = {}
+
+        response_json = self.send_query({'facets': [], 'fields': []})
+        shards = response_json['responseHeader']['params']['shards'].split(',')
+        
+        # Extract the hostname from each shard string as the shard key
+        for shard in shards:
+            mo = re.match(SHARD_REXP, shard)
+            if not mo:
+                raise EsgfSearchException('Shard spec %s not recognised' %
+                                          shard)
+            shard_parts = mo.groupdict()
+            general_spec = '%(host)s:%(port)s/solr' % shard_parts
+
+            self._shard_map[shard_parts['host']] = general_spec
+
 
     def get_shard_list(self):
 	"""
         :return: the list of available shards
+        :deprecated:
 
         """
-        if not self.distrib:
-            raise EsgfSearchException('Shard list not available for '
-                                      'non-distributed queries')
-        response = self.send_query({'facets': [], 'fields': []})
-        shards = response['responseHeader']['params']['shards'].split(',')
-        
-        return shards
+        return self.shards
+
     
     def new_context(self, context_class=None, **constraints):
 	if context_class is None:
             context_class = self.__context_class
 
 	return context_class(self, constraints)
+
 
 def query_keyword_type(keyword):
     """
