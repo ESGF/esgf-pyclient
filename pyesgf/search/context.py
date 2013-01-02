@@ -42,7 +42,7 @@ class SearchContext(object):
     def __init__(self, connection, constraints, search_type=None,
 		 latest=None, facets=None, fields=None,
                  from_timestamp=None, to_timestamp=None,
-		 replica=None):
+		 replica=None, shards=None):
         """
         :param connection: The SearchConnection
         :param constraints: A dictionary of initial constraints
@@ -56,6 +56,8 @@ class SearchContext(object):
 	    or replicas, or None to return both.
 	:param latest: A boolean defining whether to return only latest verisons
 	    or only non-latest versions, or None to return both.
+        :param shards: list of shards to restrict searches to.  Should be from the list
+            self.connection.get_shard_list()
 
         """
         
@@ -87,6 +89,7 @@ class SearchContext(object):
 	self.facets = facets
         self.fields = fields
         self.replica = replica
+        self.shards = shards
 
     #-------------------------------------------------------------------------
     # Functional search interface

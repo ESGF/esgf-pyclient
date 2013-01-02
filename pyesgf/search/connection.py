@@ -27,14 +27,8 @@ class SearchConnection(object):
     :ivar distrib: Boolean stating whether searches through this connection are
         distributed.  I.e. whether the Search service distributes the query to
         other search peers.
-    :property shards: List of shards to send the query to.  An empty list implies
-        distrib==False.  None implies the default of all shards.  Shards should
-        be specified by hostname rather than the ESGF search API syntax of
-        <hostname>:<port>/solr/*
 
     """
-    #TODO: we don't need both distrib and shards.
-
     # Default limit for queries.  None means use service default.
     default_limit = None
 
@@ -50,13 +44,6 @@ class SearchConnection(object):
         # _available_shards stores all available shards once retrieved from the server.
         # A value of None means they haven't been retrieved yet.
         self._available_shards = None
-        # __shards holds the list of shard keys that are used for querying.
-        # None means use the default shard list (i.e. self._available_shards once they
-        # have been retrieved.
-        self.__shards = None
-        # Delay initialising shards if none are specified
-        if shards is not None:
-            self.shards = shards
 	
         if context_class:
             self.__context_class = context_class
@@ -64,27 +51,36 @@ class SearchConnection(object):
             self.__context_class = DatasetSearchContext
         
         
-    def send_query(self, query_dict, limit=None, offset=None):
+    def send_query(self, query_dict, limit=None, offset=None, shards=None):
         """
         Generally not to be called directly by the user but via SearchContext
 	instances.
         
         :param query_dict: dictionary of query string parameers to send.
+        :param shards: None or a subset of :meth:`get_shard_list`.
         :return: ElementTree instance (TODO: think about this)
         
         """
         
-        if self.distrib and self.__shards is not None:
-            shards = ','.join(self._available_shards)
+        if shards is not None:
+            if self._available_shards is None:
+                self._load_available_shards()
+
+            for shard in shards:
+                if shard not in self._available_shards:
+                    raise EsgfSearchException('Shard %s is not available')
+
+            shard_str = ','.join(shards)
         else:
-            shards = None
+            shard_str = None
+
 
         full_query = MultiDict({
             'format': RESPONSE_FORMAT,
             'limit': limit,
             'distrib': 'true' if self.distrib else 'false',
             'offset': offset,
-            'shards': shards,
+            'shards': shard_str,
             })
         full_query.extend(query_dict)
 
@@ -100,38 +96,6 @@ class SearchConnection(object):
 
         return ret
 
-    @property
-    def shards(self):
-        return __shards
-
-    @shards.setter
-    def shards(self, shards):
-        """
-        Restrict the available shards.  Setting to None will target all 
-        available shards.
-
-        Unless shards=None calling this setter will trigger retrieving
-        the list of available shards from the server.
-
-        """
-
-        # If set to None this means the default.  The default shard list
-        # is not retrieved from the server unless needed
-        if shards is None:
-            self.__shards = shards
-        else:
-            if self._available_shards is None:
-                self._load_available_shards()
-
-            self.__shards = []
-            for shard in shards:
-                if shard in self._available_shards:
-                    self.__shards.append(shard)
-                else:
-                    raise EsgfSearchException('Shard %s is not available')
-
-        #!TODO: what if shards=[].  This is meant to mean distrib=False
-        return self.__shards
 
     def _load_available_shards(self):
 
@@ -160,9 +124,8 @@ class SearchConnection(object):
 
     def get_shard_list(self):
 	"""
-        return the list of all available shards.  This is not the same as the list
-        of shards that will be used in the query which can be obtained from the 'shards' property.
-
+        return the list of all available shards.  A subset of the returned list can be
+        supplied to 'send_query()' to limit the query to selected shards.
 
         :return: the list of available shards
 
