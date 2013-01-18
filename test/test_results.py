@@ -123,5 +123,13 @@ def test_shards_constrain():
     full_query = f_ctx.connection._build_query(query_dict, shards=f_ctx.shards)
 
     #!TODO: Force fail to see whether shards is passed through.
-    print full_query
-    assert False
+    q_shard = full_query['shards']
+    # Check it isn't a ',' separated list
+    assert ',' not in q_shard
+    q_shard_host = q_shard.split(':')[0]
+    assert q_shard_host == r1.json['index_node']
+
+    # Now make the query to make sure it returns data from the right index_node
+    f_results = f_ctx.search()
+    f_r1 = results[0]
+    assert f_r1.json['index_node'] == r1.json['index_node']

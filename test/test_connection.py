@@ -28,7 +28,7 @@ def test_get_shard_list():
     shards = conn.get_shard_list()
     #!NOTE: the exact shard list will change depending on the shard replication configuration
     #    on the test server
-    assert 'localhost:8983/solr' in shards
-    assert 'esgf-index1.ceda.ac.uk:8983/solr' in shards
+    assert 'localhost' in shards
+    assert 'esgf-index1.ceda.ac.uk' in shards
     
     

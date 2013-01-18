@@ -43,6 +43,7 @@ class SearchConnection(object):
 
         # _available_shards stores all available shards once retrieved from the server.
         # A value of None means they haven't been retrieved yet.
+        # Once set it is a dictionary {'host': [(port, suffix), ...], ...}
         self._available_shards = None
 	
         if context_class:
@@ -79,11 +80,16 @@ class SearchConnection(object):
             if self._available_shards is None:
                 self._load_available_shards()
 
+            shard_specs = []
             for shard in shards:
                 if shard not in self._available_shards:
                     raise EsgfSearchException('Shard %s is not available' % shard)
+                else:
+                    for port, suffix in self._available_shards[shard]:
+                        # suffix should be ommited when querying
+                        shard_specs.append('%s:%s/solr' % (shard, port))
 
-            shard_str = ','.join(shards)
+            shard_str = ','.join(shard_specs)
         else:
             shard_str = None
 
@@ -110,7 +116,7 @@ class SearchConnection(object):
             raise EsgfSearchException('Shard list not available for '
                                       'non-distributed queries')
 
-        self._available_shards = set()
+        self._available_shards = {}
 
         response_json = self.send_query({'facets': [], 'fields': []})
         shards = response_json['responseHeader']['params']['shards'].split(',')
@@ -122,12 +128,8 @@ class SearchConnection(object):
                 raise EsgfSearchException('Shard spec %s not recognised' %
                                           shard)
             shard_parts = mo.groupdict()
-            general_spec = '%(host)s:%(port)s/solr' % shard_parts
-
-
-            #!FIXME: We need to reconcile available_shards with the SOLr property 'index_node'
-            #    The former is <host>:<port>/solr/* the latter is just <host>.
-            self._available_shards.add(general_spec)
+            self._available_shards.setdefault(shard_parts['host'], []).append((shard_parts['port'], 
+                                                                               shard_parts['suffix']))
 
 
     def get_shard_list(self):
