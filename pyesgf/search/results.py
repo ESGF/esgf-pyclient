@@ -24,8 +24,7 @@ class ResultSet(Sequence):
         cannot change.
 
     """
-    def __init__(self, context, batch_size=DEFAULT_BATCH_SIZE, eager=True,
-                 result_type=TYPE_DATASET):
+    def __init__(self, context, batch_size=DEFAULT_BATCH_SIZE, eager=True):
         """
         :param context: The search context object used to generate this resultset
         :param batch_size: The number of results that will be requested from
@@ -38,7 +37,7 @@ class ResultSet(Sequence):
         self.__batch_size = batch_size
         self.__batch_cache = [None] * ((len(self) / batch_size) + 1)
         if eager and len(self)>0:
-            self.__get_batch(0)
+            self.__batch_cache[0] = self.__get_batch(0)
 
     def __getitem__(self, index):
         batch_i = index / self.batch_size
@@ -77,7 +76,8 @@ class ResultSet(Sequence):
 
         query_dict = self.context._build_query()
         response = self.context.connection.send_query(query_dict, limit=limit, 
-                                                      offset=offset)
+                                                      offset=offset,
+                                                      shards=self.context.shards)
 
         #!TODO: strip out results
         return response['response']['docs']
@@ -92,6 +92,10 @@ class BaseResult(object):
     :ivar json: The oroginial json representation of the result.
     :ivar context: The SearchContext which generated this result.
     :property urls: a dictionary of the form {service: [(url, mime_type), ...], ...}
+    :property opendap_url: The url of an OPeNDAP endpoint for this result if available
+    :property download_url: The url for downloading the result by HTTP if available
+    :property index_node: The index node from where the metadata is stored.  
+        Calls to *_context() will optimise queries to only address this node.
 
     """
     def __init__(self, json, context):
@@ -127,6 +131,15 @@ class BaseResult(object):
 
         return url
 
+    @property
+    def index_node(self):
+        try:
+            index_node = self.json['index_node']
+        except KeyError:
+            return None
+
+        return index_node
+
 class DatasetResult(BaseResult):
     """
     A result object for ESGF datasets.
@@ -144,12 +157,17 @@ class DatasetResult(BaseResult):
         """
         Return a SearchContext for searching for files within this dataset.
         """
-        from .context import SearchContext
+        from .context import FileSearchContext
 
-        files_context = SearchContext(
+        if self.context.connection.distrib:
+            shards=[self.index_node]
+        else:
+            shards=None
+
+        files_context = FileSearchContext(
             connection=self.context.connection,
             constraints={'dataset_id': self.dataset_id},
-            search_type=TYPE_FILE,
+            shards=shards,
             )
         return files_context
 
@@ -157,16 +175,31 @@ class DatasetResult(BaseResult):
         """
         Return a SearchContext for searching for aggregations within this dataset.
         """
-        from .context import SearchContext
+        from .context import AggregationSearchContext
 
-        agg_context = SearchContext(
+        if self.context.connection.distrib:
+            shards=[self.index_node]
+        else:
+            shards=None
+
+        agg_context = AggregationSearchContext(
             connection=self.context.connection,
             constraints={'dataset_id': self.dataset_id},
-            search_type=TYPE_AGGREGATION,
+            shards=shards,
             )
         return agg_context
 
 class FileResult(BaseResult):
+    """
+    A result object for ESGF files.  Properties from :class:`BaseResult` are inherited.
+
+    :property file_id: The identifier for the file
+    :property checksum: The checksum of the file
+    :property checksum_type: The algorithm used for generating the checksum
+    :property filename: The filename
+    :proprty size: The file size in bytes
+
+    """
     @property
     def file_id(self):
         return self.json['id']
@@ -187,11 +220,13 @@ class FileResult(BaseResult):
     def size(self):
         return int(self.json['size'])
 
-    @property
-    def url(self):
-        return self.urls['HTTPServer'][0][0]
 
 class AggregationResult(BaseResult):
+    """
+    A result object for ESGF aggregations.  Properties from :class:`BaseResult` are inherited.
+
+    :property aggregation_id: The aggregation id
+    """
     @property
     def aggregation_id(self):
         return self.json['id']

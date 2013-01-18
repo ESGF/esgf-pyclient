@@ -33,19 +33,27 @@ class SearchContext(object):
     2. Calling SearchContext.constrain()
     
     :ivar constraints: A dictionary of facet constraints currently in effect.
-        constraint[facet_name] = [value, value, ...]
+        ``constraint[facet_name] = [value, value, ...]``
+    :property facet_counts: A dictionary of available hits with each 
+        facet value for the search as currently constrained.
+        This property returns a dictionary of dictionaries where 
+        ``facet_counts[facet][facet_value] == hit_count``
+    :property hit_count: The total number of hits available with current constraints.
+
         
     """
 
-    def __init__(self, connection, constraints, search_type=TYPE_DATASET,
+    DEFAULT_SEARCH_TYPE = NotImplemented
+
+    def __init__(self, connection, constraints, search_type=None,
 		 latest=None, facets=None, fields=None,
                  from_timestamp=None, to_timestamp=None,
-		 replica=None):
+		 replica=None, shards=None):
         """
         :param connection: The SearchConnection
         :param constraints: A dictionary of initial constraints
-	:param type: One of TYPE_* constants defining the document type to
-	    search for
+	:param search_type: One of TYPE_* constants defining the document 
+            type to search for.  Overrides SearchContext.DEFAULT_SEARCH_TYPE
 	:param facets: The list of facets for which counts will be retrieved
 	    and constraints be validated against.  Or None to represent all
 	    facets.
@@ -54,6 +62,8 @@ class SearchContext(object):
 	    or replicas, or None to return both.
 	:param latest: A boolean defining whether to return only latest verisons
 	    or only non-latest versions, or None to return both.
+        :param shards: list of shards to restrict searches to.  Should be from the list
+            self.connection.get_shard_list()
 
         """
         
@@ -61,6 +71,9 @@ class SearchContext(object):
         self.__facet_counts = None
         self.__hit_count = None
         
+        if search_type is None:
+            search_type = self.DEFAULT_SEARCH_TYPE
+
         #  Constraints
         self.freetext_constraint = None
         self.facet_constraints = MultiDict()
@@ -82,6 +95,7 @@ class SearchContext(object):
 	self.facets = facets
         self.fields = fields
         self.replica = replica
+        self.shards = shards
 
     #-------------------------------------------------------------------------
     # Functional search interface
@@ -89,6 +103,8 @@ class SearchContext(object):
 
     def search(self, **constraints):
         """
+        Perform the search with current constraints returning a set of results.
+
         :param constraints: Further constraints for this query.  Equivilent
             to calling self.constrain(**constraints).search()
         :return: A ResultSet for this query
@@ -125,8 +141,10 @@ class SearchContext(object):
 
     def get_facet_options(self):
         """
-        Return a dictionary of facet counts filtered to remove all facets that
-        are completely constrained.
+        Return a dictionary of facet counts filtered to remove all
+        facets that are completely constrained.  This method is
+        similar to the property ``facet_counts`` except facet values
+        which are not relevant for further constraining are removed.
         
         """
         facet_options = {}
@@ -261,5 +279,15 @@ class SearchContext(object):
         #query_dict.update(start=start, end=end)
 
         return query_dict
-    
-        
+       
+
+class DatasetSearchContext(SearchContext):
+    DEFAULT_SEARCH_TYPE = TYPE_DATASET
+
+class FileSearchContext(SearchContext):
+    DEFAULT_SEARCH_TYPE = TYPE_FILE
+
+class AggregationSearchContext(SearchContext):
+    DEFAULT_SEARCH_TYPE = TYPE_AGGREGATION
+
+

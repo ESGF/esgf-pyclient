@@ -3,7 +3,9 @@
 Module :mod:`pyesgf.logon`
 ==========================
 
-Manage the client's interaction with ESGF's security system.
+Manage the client's interaction with ESGF's security system.  Using this module requires installing the MyProxyClient_ library.
+
+.. _MyProxyClient: http://pypi.python.org/pypi/MyProxyClient
 
 To obtain ESGF credentials create a :class:`LogonManager` instance and supply it with logon
 details::
@@ -54,7 +56,6 @@ from .exceptions import OpenidResolutionError
 ESGF_DIR = op.join(os.environ['HOME'], '.esg')
 ESGF_CERTS_DIR = 'certificates'
 ESGF_CREDENTIALS = 'credentials.pem'
-#!TODO: support .httprc as well
 DAP_CONFIG = op.join(os.environ['HOME'], '.httprc')
 
 XRI_NS = 'xri://$xrd*($v*2.0)'

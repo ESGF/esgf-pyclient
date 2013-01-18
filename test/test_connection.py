@@ -22,12 +22,13 @@ def test_blank_query():
 def test_get_shard_list_fail():
     conn = SearchConnection(TEST_SERVICE, distrib=False)
     nt.assert_raises(exc.EsgfSearchException, conn.get_shard_list)
-    
 
 def test_get_shard_list():
     conn = SearchConnection(TEST_SERVICE, distrib=True)
     shards = conn.get_shard_list()
-    assert 'localhost:8983/solr/datasets' in shards
-    assert 'pcmdi11.llnl.gov:8983/solr/datasets' in shards
+    #!NOTE: the exact shard list will change depending on the shard replication configuration
+    #    on the test server
+    assert 'localhost' in shards
+    assert 'esgf-index1.ceda.ac.uk' in shards
     
     
