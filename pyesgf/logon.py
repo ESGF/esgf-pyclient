@@ -54,7 +54,6 @@ from .exceptions import OpenidResolutionError
 ESGF_DIR = op.join(os.environ['HOME'], '.esg')
 ESGF_CERTS_DIR = 'certificates'
 ESGF_CREDENTIALS = 'credentials.pem'
-#!TODO: support .httprc as well
 DAP_CONFIG = op.join(os.environ['HOME'], '.httprc')
 
 XRI_NS = 'xri://$xrd*($v*2.0)'
