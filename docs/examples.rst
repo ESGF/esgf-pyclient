@@ -51,3 +51,16 @@ Find download URLs for all files in a dataset
   http://esg-datanode.jpl.nasa.gov/thredds/fileServer/esg_dataroot/obs4MIPs/observations/atmos/tro3Nobs/mon/grid/NASA-JPL/TES/v20110608/tro3Nobs_TES_L3_tbd_200507-200912.nc
   http://esg-datanode.jpl.nasa.gov/thredds/fileServer/esg_dataroot/obs4MIPs/observations/atmos/tro3/mon/grid/NASA-JPL/TES/v20110608/tro3_TES_L3_tbd_200507-200912.nc
   http://esg-datanode.jpl.nasa.gov/thredds/fileServer/esg_dataroot/obs4MIPs/observations/atmos/tro3Stderr/mon/grid/NASA-JPL/TES/v20110608/tro3Stderr_TES_L3_tbd_200507-200912.nc
+
+Obtain MyProxy credentials to allow downloading files or using secured OPeNDAP
+
+  >>> from pyesgf.logon import LogonManager
+  >>> lm = LogonManager()
+  >>> lm.logoff()
+  >>> lm.is_logged_on()
+  False
+  >>> lm.logon_with_openid(openid, password)
+  >>> lm.is_logged_on()
+  True
+
+See the :mod:`pyesgf.logon` module documentation for details of how to use myproxy username instead of OpenID.
