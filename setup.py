@@ -19,7 +19,7 @@ setup(name='esgf-pyclient',
       description="A library interacting with ESGF services within Python",
       long_description=long_description,
       classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: BSD License',
         'Topic :: Scientific/Engineering',
         'Programming Language :: Python :: 2.6',
