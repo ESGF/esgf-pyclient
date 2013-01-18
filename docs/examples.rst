@@ -54,6 +54,8 @@ Find download URLs for all files in a dataset
 
 Obtain MyProxy credentials to allow downloading files or using secured OPeNDAP
 
+  >>> from pyesgf.logon import LogonManager
+  >>> lm = LogonManager()
   >>> lm.logoff()
   >>> lm.is_logged_on()
   False
