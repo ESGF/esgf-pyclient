@@ -92,6 +92,10 @@ class BaseResult(object):
     :ivar json: The oroginial json representation of the result.
     :ivar context: The SearchContext which generated this result.
     :property urls: a dictionary of the form {service: [(url, mime_type), ...], ...}
+    :property opendap_url: The url of an OPeNDAP endpoint for this result if available
+    :property download_url: The url for downloading the result by HTTP if available
+    :property index_node: The index node from where the metadata is stored.  
+        Calls to *_context() will optimise queries to only address this node.
 
     """
     def __init__(self, json, context):
@@ -186,6 +190,16 @@ class DatasetResult(BaseResult):
         return agg_context
 
 class FileResult(BaseResult):
+    """
+    A result object for ESGF files.  Properties from :class:`BaseResult` are inherited.
+
+    :property file_id: The identifier for the file
+    :property checksum: The checksum of the file
+    :property checksum_type: The algorithm used for generating the checksum
+    :property filename: The filename
+    :proprty size: The file size in bytes
+
+    """
     @property
     def file_id(self):
         return self.json['id']
@@ -208,6 +222,11 @@ class FileResult(BaseResult):
 
 
 class AggregationResult(BaseResult):
+    """
+    A result object for ESGF aggregations.  Properties from :class:`BaseResult` are inherited.
+
+    :property aggregation_id: The aggregation id
+    """
     @property
     def aggregation_id(self):
         return self.json['id']

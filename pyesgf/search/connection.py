@@ -3,8 +3,9 @@
 Module :mod:`pyesgf.search.connection`
 ======================================
 
-Defines the class representing connections to the ESGF Search API.
-
+Defines the class representing connections to the ESGF Search API.  To
+perform a search create a :class:`SearchConnection` instance then use
+:meth:`new_context()` to create a search context.
 
 """
 
@@ -23,7 +24,9 @@ from pyesgf.util import urlencode
 
 class SearchConnection(object):
     """
-    :ivar url: The URL to the Search API service.  Usually <prefix>/esgf-search
+    :ivar url: The URL to the Search API service.  This should be the full URL 
+        of the search endpoint including the servlet name and path_info.  
+        Usually this is http://<hostname>/esg-search/search
     :ivar distrib: Boolean stating whether searches through this connection are
         distributed.  I.e. whether the Search service distributes the query to
         other search peers.
@@ -137,6 +140,8 @@ class SearchConnection(object):
         return the list of all available shards.  A subset of the returned list can be
         supplied to 'send_query()' to limit the query to selected shards.
 
+        Shards are described by hostname and mapped to SOLr shard descriptions internally.
+
         :return: the list of available shards
 
         """
@@ -147,6 +152,11 @@ class SearchConnection(object):
 
     
     def new_context(self, context_class=None, **constraints):
+        """
+        Returns a :class:`pyesgf.search.context.SearchContext` class for performing
+        faceted searches.
+
+        """
 	if context_class is None:
             context_class = self.__context_class
 

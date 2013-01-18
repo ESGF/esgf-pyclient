@@ -33,7 +33,13 @@ class SearchContext(object):
     2. Calling SearchContext.constrain()
     
     :ivar constraints: A dictionary of facet constraints currently in effect.
-        constraint[facet_name] = [value, value, ...]
+        ``constraint[facet_name] = [value, value, ...]``
+    :property facet_counts: A dictionary of available hits with each 
+        facet value for the search as currently constrained.
+        This property returns a dictionary of dictionaries where 
+        ``facet_counts[facet][facet_value] == hit_count``
+    :property hit_count: The total number of hits available with current constraints.
+
         
     """
 
@@ -97,6 +103,8 @@ class SearchContext(object):
 
     def search(self, **constraints):
         """
+        Perform the search with current constraints returning a set of results.
+
         :param constraints: Further constraints for this query.  Equivilent
             to calling self.constrain(**constraints).search()
         :return: A ResultSet for this query
@@ -133,8 +141,10 @@ class SearchContext(object):
 
     def get_facet_options(self):
         """
-        Return a dictionary of facet counts filtered to remove all facets that
-        are completely constrained.
+        Return a dictionary of facet counts filtered to remove all
+        facets that are completely constrained.  This method is
+        similar to the property ``facet_counts`` except facet values
+        which are not relevant for further constraining are removed.
         
         """
         facet_options = {}
