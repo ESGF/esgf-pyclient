@@ -243,7 +243,7 @@ CURL.SSL.CAPATH={1}/certificates
 {4}
 """.format(1 if verbose else 0, 
            self.esgf_certs_dir, 
-           DAP_CONFIG_MARKER
+           DAP_CONFIG_MARKER,
            preamble,
            postamble))
 
@@ -268,8 +268,8 @@ CURL.SSL.CAPATH={1}/certificates
             # In odd circumstances there might be more than 3 parts of the config 
             # so assume the final config is the one to keep
             preamble, postamble = sections[0], ''
-        elif len(config_parts) > 2:
-            preamble, postamble = '\n'.join(config_parts[:-1]), config_parts[-1]
+        elif len(sections) > 2:
+            preamble, postamble = '\n'.join(sections[:-1]), sections[-1]
         else:
             preamble, postamble = sections
 
