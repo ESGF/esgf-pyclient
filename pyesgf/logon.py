@@ -229,7 +229,7 @@ class LogonManager(object):
     def _write_dap_config(self, verbose=False):
         preamble, postamble = self._parse_dap_config()
 
-        with open(DAP_CONFIG, 'w') as fh:
+        with open(self.dap_config, 'w') as fh:
             fh.write("""\
 {3}
 # BEGIN {2}
@@ -250,13 +250,17 @@ CURL.SSL.CAPATH={1}/certificates
 
     def _parse_dap_config(self, config_str=None):
         """
-        Read the DAP_CONFIG file and detect whether it has been customised outside of esgf-pyclient.
+        Read the DAP_CONFIG file and extract the parts not controlled 
+        by esgf-pyclient.
+
+        :return: (preamble, postamble), two strings of configuration lines outside the
+            esgf-pyclient controlled block.
 
         """
         if config_str is None:
-            if not op.exists(DAP_CONFIG):
+            if not op.exists(self.dap_config):
                 return ('', '')
-            config_str = open(DAP_CONFIG).read()
+            config_str = open(self.dap_config).read()
 
         sections = re.split(r'^# (?:BEGIN|END) {0}$\n'.format(DAP_CONFIG_MARKER), config_str, flags=re.M)
 
