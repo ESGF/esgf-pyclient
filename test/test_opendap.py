@@ -38,7 +38,7 @@ class TestOpendap(TestCase):
                          r'\s*^# BEGIN {0}'''.format(DAP_CONFIG_MARKER)), 
                         config, re.M | re.S)
 
-    def check_postable(self, postamble, config):
+    def check_postamble(self, postamble, config):
         return re.search(r'^# END {0}$\s*{1}'.format(DAP_CONFIG_MARKER, postamble),
                          config, re.M | re.S)
     
@@ -95,3 +95,6 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
         assert self.check_preamble(preamble, config1)
         assert self.check_postamble(postamble, config1)
     
+
+#!TODO: more corner cases to test for in DAP_CONFIG
+#!TODO: real opendap connection test

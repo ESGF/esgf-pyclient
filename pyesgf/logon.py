@@ -227,7 +227,7 @@ class LogonManager(object):
             
 
     def _write_dap_config(self, verbose=False):
-        preamble, postamble = self._parse_dap_config()
+        preamble, managed, postamble = self._parse_dap_config()
 
         with open(self.dap_config, 'w') as fh:
             fh.write("""\
@@ -253,24 +253,37 @@ CURL.SSL.CAPATH={1}/certificates
         Read the DAP_CONFIG file and extract the parts not controlled 
         by esgf-pyclient.
 
-        :return: (preamble, postamble), two strings of configuration lines outside the
-            esgf-pyclient controlled block.
+        :return: (preamble, managed, postamble), three strings of 
+            configuration lines before, within and after the esgf-pyclient 
+            controlled block.
 
         """
         if config_str is None:
             if not op.exists(self.dap_config):
-                return ('', '')
+                return ('', '', '')
             config_str = open(self.dap_config).read()
 
         sections = re.split(r'^# (?:BEGIN|END) {0}$\n'.format(DAP_CONFIG_MARKER), config_str, flags=re.M)
 
         if len(sections) < 2:
+            preamble, managed, postamble = sections[0], '', ''
+        elif len(sections) == 2:
+            preamble, managed, postamble = sections + ['']
+        elif len(sections) == 3:
+            preamble, managed, postamble = sections
+        else:
             # In odd circumstances there might be more than 3 parts of the config 
             # so assume the final config is the one to keep
-            preamble, postamble = sections[0], ''
-        elif len(sections) > 2:
-            preamble, postamble = '\n'.join(sections[:-1]), sections[-1]
-        else:
-            preamble, postamble = sections
+            managed, unmanaged = [], []
+            sections.reverse()
+            while sections:
+                unmanaged.append(sections.pop())
+                if sections:
+                    managed.append(sections.pop())
 
-        return preamble, postamble
+            preamble = '\n'.join(unmanaged[:-1])
+            postamble = unmanaged[-1]
+            managed = managed[-1]
+
+
+        return preamble, managed, postamble
