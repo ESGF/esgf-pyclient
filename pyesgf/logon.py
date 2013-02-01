@@ -57,6 +57,7 @@ ESGF_DIR = op.join(os.environ['HOME'], '.esg')
 ESGF_CERTS_DIR = 'certificates'
 ESGF_CREDENTIALS = 'credentials.pem'
 DAP_CONFIG = op.join(os.environ['HOME'], '.httprc')
+DAP_CONFIG_MARKER = '<<< Managed by esgf-pyclient >>>'
 
 XRI_NS = 'xri://$xrd*($v*2.0)'
 MYPROXY_URN = 'urn:esg:security:myproxy-service'
@@ -226,13 +227,46 @@ class LogonManager(object):
             
 
     def _write_dap_config(self, verbose=False):
-        #!TODO: replace with more sophisticated routine that merges settings
+        preamble, postamble = self._parse_dap_config()
+
         with open(DAP_CONFIG, 'w') as fh:
             fh.write("""\
+{3}
+# BEGIN {2}
 CURL.VERBOSE={0}
 CURL.COOKIEJAR={1}/.dods_cookies
 CURL.SSL.VALIDATE=1
 CURL.SSL.CERTIFICATE={1}/credentials.pem
 CURL.SSL.KEY={1}/credentials.pem
 CURL.SSL.CAPATH={1}/certificates
-""".format(1 if verbose else 0, self.esgf_certs_dir))
+# END {2}
+{4}
+""".format(1 if verbose else 0, 
+           self.esgf_certs_dir, 
+           DAP_CONFIG_MARKER
+           preamble,
+           postamble))
+
+
+    def _parse_dap_config(self, config_str=None):
+        """
+        Read the DAP_CONFIG file and detect whether it has been customised outside of esgf-pyclient.
+
+        """
+        if config_str is None:
+            if not op.exists(DAP_CONFIG):
+                return ('', '')
+            config_str = open(DAP_CONFIG).read()
+
+        sections = re.split(r'^# (?:BEGIN|END) {0}$\n'.format(DAP_CONFIG_MARKER), config_str, flags=re.M)
+
+        if len(sections) < 2:
+            # In odd circumstances there might be more than 3 parts of the config 
+            # so assume the final config is the one to keep
+            preamble, postamble = sections[0], ''
+        elif len(config_parts) > 2:
+            preamble, postamble = '\n'.join(config_parts[:-1]), config_parts[-1]
+        else:
+            preamble, postamble = sections
+
+        return preamble, postamble
