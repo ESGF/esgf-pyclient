@@ -10,12 +10,16 @@ import shutil
 from unittest import TestCase
 import re
 
+import netCDF4
+
 from pyesgf.logon import LogonManager, DAP_CONFIG_MARKER
+from pyesgf.search import SearchConnection
+from test.config import TEST_SERVICE
 
 class TestOpendap(TestCase):
     def setUp(self):
         self.esgf_dir = tempfile.mkdtemp(prefix='pyesgf_tmp')
-        self.dap_config = op.join(self.esgf_dir, '.httprc')
+        self.dap_config = op.join(self.esgf_dir, '.dodsrc')
         # NetCDF DAP support looks in CWD for configuration
         self.orig_dir = os.getcwd()
         os.chdir(self.esgf_dir)
@@ -35,7 +39,7 @@ class TestOpendap(TestCase):
 
     def check_preamble(self, preamble, config):
         return re.match((preamble + 
-                         r'\s*^# BEGIN {0}'''.format(DAP_CONFIG_MARKER)), 
+                         r'\s*^# BEGIN {0}'.format(DAP_CONFIG_MARKER)), 
                         config, re.M | re.S)
 
     def check_postamble(self, postamble, config):
@@ -68,7 +72,7 @@ class TestOpendap(TestCase):
 
         lines = ['# Welcome to my config file', 'SOME_OPT=foo', '']
         preamble = '\n'.join(lines)
-
+                        
         lines = ['', '# Some more config here', 'OTHER_OPT=bar', '']
         postamble = '\n'.join(lines)
 
@@ -85,7 +89,7 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
 
 {1}
 '''.format(preamble, postamble)
-
+                        
         self.init_config(config)
 
         lm = LogonManager(self.esgf_dir, dap_config=self.dap_config)
@@ -96,5 +100,25 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
         assert self.check_postamble(postamble, config1)
     
 
+    def test_open_url(self):
+        lm = LogonManager(self.esgf_dir, dap_config=self.dap_config)
+        print 'Using dap_config at %s' % self.dap_config
+
+        conn = SearchConnection(TEST_SERVICE, distrib=False)
+
+        #!TODO: replace with request for specific dataset
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
+
+        r1 = results[0]
+        f_ctx = r1.file_context()
+
+        file_results = f_ctx.search()
+        
+        opendap_url = file_results[0].opendap_url
+        print 'OPeNDAP URL is %s' % opendap_url
+
+        ds = netCDF4.Dataset(opendap_url)
+        print ds.variables.keys()
+
 #!TODO: more corner cases to test for in DAP_CONFIG
-#!TODO: real opendap connection test

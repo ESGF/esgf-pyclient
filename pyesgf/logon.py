@@ -56,7 +56,7 @@ from .exceptions import OpenidResolutionError
 ESGF_DIR = op.join(os.environ['HOME'], '.esg')
 ESGF_CERTS_DIR = 'certificates'
 ESGF_CREDENTIALS = 'credentials.pem'
-DAP_CONFIG = op.join(os.environ['HOME'], '.httprc')
+DAP_CONFIG = op.join(os.environ['HOME'], '.dodsrc')
 DAP_CONFIG_MARKER = '<<< Managed by esgf-pyclient >>>'
 
 XRI_NS = 'xri://$xrd*($v*2.0)'
@@ -226,26 +226,29 @@ class LogonManager(object):
         return username, hostname
             
 
-    def _write_dap_config(self, verbose=False):
+    def _write_dap_config(self, verbose=False, validate=False):
         preamble, managed, postamble = self._parse_dap_config()
 
         with open(self.dap_config, 'w') as fh:
             fh.write("""\
-{3}
-# BEGIN {2}
-CURL.VERBOSE={0}
-CURL.COOKIEJAR={1}/.dods_cookies
-CURL.SSL.VALIDATE=1
-CURL.SSL.CERTIFICATE={1}/credentials.pem
-CURL.SSL.KEY={1}/credentials.pem
-CURL.SSL.CAPATH={1}/certificates
-# END {2}
-{4}
-""".format(1 if verbose else 0, 
-           self.esgf_certs_dir, 
-           DAP_CONFIG_MARKER,
-           preamble,
-           postamble))
+{preamble}
+# BEGIN {marker}
+HTTP.VERBOSE={verbose}
+HTTP.COOKIEJAR={esgf_dir}/.dods_cookies
+HTTP.SSL.VALIDATE=0
+HTTP.SSL.CERTIFICATE={esgf_dir}/credentials.pem
+HTTP.SSL.KEY={esgf_dir}/credentials.pem
+HTTP.SSL.CAPATH={esgf_certs_dir}
+# END {marker}
+{postamble}
+""".format(verbose=1 if verbose else 0, 
+           validate=1 if validate else 0,
+           esgf_certs_dir=self.esgf_certs_dir, 
+           esgf_dir=self.esgf_dir,
+           marker=DAP_CONFIG_MARKER,
+           preamble=preamble,
+           postamble=postamble,
+           ))
 
 
     def _parse_dap_config(self, config_str=None):
@@ -286,4 +289,4 @@ CURL.SSL.CAPATH={1}/certificates
             managed = managed[-1]
 
 
-        return preamble, managed, postamble
+        return preamble.strip(), managed.strip(), postamble.strip()
