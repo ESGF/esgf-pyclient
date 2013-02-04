@@ -7,12 +7,23 @@ Defines the class representing connections to the ESGF Search API.  To
 perform a search create a :class:`SearchConnection` instance then use
 :meth:`new_context()` to create a search context.
 
+.. warning:: 
+   Prior to v0.1.1 the *url* parameter expected the full URL of the
+   search endpoint up to the query string.  This has now been changed
+   to expect *url* to ommit the final endpoint name,
+   e.g. ``http://pcmdi9.llnl.gov/esg-search/search`` should be changed
+   to ``http://pcmdi9.llnl.gov/esg-search`` in client code.  The
+   current implementation detects the presence of ``/search`` and
+   corrects the URL to retain backward compatibility but this feature
+   may not remain in future versions.
+        
 """
 
 import urllib2, urllib, urlparse
 import json
 import re
 
+import warnings
 import logging
 log = logging.getLogger(__name__)
 
@@ -24,9 +35,9 @@ from pyesgf.util import urlencode
 
 class SearchConnection(object):
     """
-    :ivar url: The URL to the Search API service.  This should be the full URL 
-        of the search endpoint including the servlet name and path_info.  
-        Usually this is http://<hostname>/esg-search/search
+    :ivar url: The URL to the Search API service.  This should be the URL 
+        of the ESGF search service excluding the final endpoint name.  
+        Usually this is http://<hostname>/esg-search
     :ivar distrib: Boolean stating whether searches through this connection are
         distributed.  I.e. whether the Search service distributes the query to
         other search peers.
@@ -37,12 +48,15 @@ class SearchConnection(object):
 
     def __init__(self, url, distrib=True, shards=None, 
                  context_class=None):
-	"""
+	"""           
         :param context_class: Override the default SearchContext class.
 
         """
         self.url = url
         self.distrib = distrib
+
+        # Check URL for backward compatibility
+        self.__check_url()
 
         # _available_shards stores all available shards once retrieved from the server.
         # A value of None means they haven't been retrieved yet.
@@ -54,28 +68,78 @@ class SearchConnection(object):
         else:
             self.__context_class = DatasetSearchContext
         
+    def __check_url(self):
+        """
+        Previous versions of the API expected the full URL to be given
+        to SearchConnection's constructure.  This has been deprecated
+        in favour of the URL without the final endpoint name in order
+        to support other endpoints such as wget.
+
+        This method tests whether self.url looks like an old-style full url and
+        fixes the attribute accordingly, raising a depracation warning.
         
-    def send_query(self, query_dict, limit=None, offset=None, shards=None):
+        """
+        
+        mo = re.match(r'(.*?)(/search)?/*$', self.url)
+        assert mo
+
+        if mo.group(2):
+            warnings.warn('Old-style SearchContext URL specified.  '
+                          'In future please specify the URL excluding '
+                          'the "/search" endpoint.')
+            
+        self.url = mo.group(1)
+
+    def send_search(self, query_dict, limit=None, offset=None, shards=None):
+        """
+        Send a query to the "search" endpoint.  See :meth:`send_query()` for details.
+
+        :return: The json document for the search results
+
+        """
+        full_query = self._build_query(query_dict, limit, offset, shards)
+        response = self._send_query('search', full_query)
+        ret = json.load(response)
+
+        return ret
+
+                               
+    def send_wget(self, query_dict, shards=None):
+        """
+        Send a query to the "search" endpoint.  See :meth:`send_query()` for details.
+
+        :return: A string containing the script.
+
+        """
+        full_query = self._build_query(query_dict, shards=shards)
+        if 'type' in full_query:
+            del full_query['type']
+        if 'format' in full_query:
+            del full_query['format']
+
+        response = self._send_query('wget', full_query)
+        script = response.read()
+
+        return script
+                               
+    def _send_query(self, endpoint, full_query):
         """
         Generally not to be called directly by the user but via SearchContext
 	instances.
         
-        :param query_dict: dictionary of query string parameers to send.
-        :param shards: None or a subset of :meth:`get_shard_list`.
-        :return: ElementTree instance (TODO: think about this)
+        :param full_query: dictionary of query string parameers to send.
+        :return: the urllib2 response object from the query.
         
         """
         
-        full_query = self._build_query(query_dict, limit, offset, shards)
         log.debug('Query dict is %s' % full_query)
 
-        query_url = '%s?%s' % (self.url, urlencode(full_query))
+        query_url = '%s/%s?%s' % (self.url, endpoint, urlencode(full_query))
         log.debug('Query request is %s' % query_url)
 
         response = urllib2.urlopen(query_url)
-        ret = json.load(response)
 
-        return ret
+        return response
 
 
     def _build_query(self, query_dict, limit=None, offset=None, shards=None):
@@ -121,7 +185,7 @@ class SearchConnection(object):
 
         self._available_shards = {}
 
-        response_json = self.send_query({'facets': [], 'fields': []})
+        response_json = self.send_search({'facets': [], 'fields': []})
         shards = response_json['responseHeader']['params']['shards'].split(',')
         
         # Extract hostname and port from each shard.
