@@ -140,6 +140,7 @@ class BaseResult(object):
 
         return index_node
 
+
 class DatasetResult(BaseResult):
     """
     A result object for ESGF datasets.

@@ -90,39 +90,56 @@ class SearchConnection(object):
             
         self.url = mo.group(1)
 
-    def send_search(self, query_dict, **kwargs):
+    def send_search(self, query_dict, limit=None, offset=None, shards=None):
         """
         Send a query to the "search" endpoint.  See :meth:`send_query()` for details.
+
+        :return: The json document for the search results
+
         """
-        return self.send_query('search', query_dict, **kwargs)
+        full_query = self._build_query(query_dict, limit, offset, shards)
+        response = self._send_query('search', full_query)
+        ret = json.load(response)
+
+        return ret
+
                                
-    def send_wget(self, query_dict, **kwargs):
+    def send_wget(self, query_dict, shards=None):
         """
         Send a query to the "search" endpoint.  See :meth:`send_query()` for details.
+
+        :return: A string containing the script.
+
         """
-        return self.send_query('wget', query_dict, **kwargs)
+        full_query = self._build_query(query_dict, shards=shards)
+        if 'type' in full_query:
+            del full_query['type']
+        if 'format' in full_query:
+            del full_query['format']
+
+        response = self._send_query('wget', full_query)
+        script = response.read()
+
+        return script
                                
-    def send_query(self, endpoint, query_dict, limit=None, offset=None, shards=None):
+    def _send_query(self, endpoint, full_query):
         """
         Generally not to be called directly by the user but via SearchContext
 	instances.
         
-        :param query_dict: dictionary of query string parameers to send.
-        :param shards: None or a subset of :meth:`get_shard_list`.
-        :return: ElementTree instance (TODO: think about this)
+        :param full_query: dictionary of query string parameers to send.
+        :return: the urllib2 response object from the query.
         
         """
         
-        full_query = self._build_query(query_dict, limit, offset, shards)
         log.debug('Query dict is %s' % full_query)
 
         query_url = '%s/%s?%s' % (self.url, endpoint, urlencode(full_query))
         log.debug('Query request is %s' % query_url)
 
         response = urllib2.urlopen(query_url)
-        ret = json.load(response)
 
-        return ret
+        return response
 
 
     def _build_query(self, query_dict, limit=None, offset=None, shards=None):

@@ -128,6 +128,29 @@ class SearchContext(object):
         new_sc._update_constraints(constraints)
 	return new_sc
 
+    def get_download_script(self, **constraints):
+        """
+        Download a script for downloading all files in the set of results.
+
+        :param constraints: Further constraints for this query.  Equivilent
+            to calling self.constrain(**constraints).get_download_script()
+        :return: A string containing the script
+
+        """
+        if constraints:
+            sc = self.constrain(**constraints)
+        else:
+            sc = self
+
+        self.__update_counts()
+
+        query_dict = self._build_query()
+
+        #!TODO: allow setting limit
+        script = self.connection.send_wget(query_dict,
+                                           shards=self.shards)
+        
+        return script
 
     @property
     def facet_counts(self):
