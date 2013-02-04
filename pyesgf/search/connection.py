@@ -13,6 +13,7 @@ import urllib2, urllib, urlparse
 import json
 import re
 
+import warnings
 import logging
 log = logging.getLogger(__name__)
 
@@ -24,9 +25,9 @@ from pyesgf.util import urlencode
 
 class SearchConnection(object):
     """
-    :ivar url: The URL to the Search API service.  This should be the full URL 
-        of the search endpoint including the servlet name and path_info.  
-        Usually this is http://<hostname>/esg-search/search
+    :ivar url: The URL to the Search API service.  This should be the URL 
+        of the search endpoint excluding the final endpoint name.  
+        Usually this is http://<hostname>/esg-search
     :ivar distrib: Boolean stating whether searches through this connection are
         distributed.  I.e. whether the Search service distributes the query to
         other search peers.
@@ -44,6 +45,9 @@ class SearchConnection(object):
         self.url = url
         self.distrib = distrib
 
+        # Check URL for backward compatibility
+        self.__check_url()
+
         # _available_shards stores all available shards once retrieved from the server.
         # A value of None means they haven't been retrieved yet.
         # Once set it is a dictionary {'host': [(port, suffix), ...], ...}
@@ -54,8 +58,41 @@ class SearchConnection(object):
         else:
             self.__context_class = DatasetSearchContext
         
+    def __check_url(self):
+        """
+        Previous versions of the API expected the full URL to be given
+        to SearchConnection's constructure.  This has been deprecated
+        in favour of the URL without the final endpoint name in order
+        to support other endpoints such as wget.
+
+        This method tests whether self.url looks like an old-style full url and
+        fixes the attribute accordingly, raising a depracation warning.
         
-    def send_query(self, query_dict, limit=None, offset=None, shards=None):
+        """
+        
+        mo = re.match(r'(.*?)(/search)?/*$', self.url)
+        assert mo
+
+        if mo.group(2):
+            warnings.warn('Old-style SearchContext URL specified.  '
+                          'In future please specify the URL excluding '
+                          'the "/search" endpoint.')
+            
+        self.url = mo.group(1)
+
+    def send_search(self, query_dict, **kwargs):
+        """
+        Send a query to the "search" endpoint.  See :meth:`send_query()` for details.
+        """
+        return self.send_query('search', query_dict, **kwargs)
+                               
+    def send_wget(self, query_dict, **kwargs):
+        """
+        Send a query to the "search" endpoint.  See :meth:`send_query()` for details.
+        """
+        return self.send_query('wget', query_dict, **kwargs)
+                               
+    def send_query(self, endpoint, query_dict, limit=None, offset=None, shards=None):
         """
         Generally not to be called directly by the user but via SearchContext
 	instances.
@@ -69,7 +106,7 @@ class SearchConnection(object):
         full_query = self._build_query(query_dict, limit, offset, shards)
         log.debug('Query dict is %s' % full_query)
 
-        query_url = '%s?%s' % (self.url, urlencode(full_query))
+        query_url = '%s/%s?%s' % (self.url, endpoint, urlencode(full_query))
         log.debug('Query request is %s' % query_url)
 
         response = urllib2.urlopen(query_url)
@@ -121,7 +158,7 @@ class SearchConnection(object):
 
         self._available_shards = {}
 
-        response_json = self.send_query({'facets': [], 'fields': []})
+        response_json = self.send_search({'facets': [], 'fields': []})
         shards = response_json['responseHeader']['params']['shards'].split(',')
         
         # Extract hostname and port from each shard.

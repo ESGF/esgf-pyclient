@@ -168,7 +168,7 @@ class SearchContext(object):
         query_dict = self._build_query()
         query_dict['facets'] = '*'
 
-        response = self.connection.send_query(query_dict, limit=0)
+        response = self.connection.send_search(query_dict, limit=0)
         for facet, counts in (
                 response['facet_counts']['facet_fields'].items()):
             d = self.__facet_counts[facet] = {}
