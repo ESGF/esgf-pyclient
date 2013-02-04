@@ -33,6 +33,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   releases
    concepts
    examples
    search_api

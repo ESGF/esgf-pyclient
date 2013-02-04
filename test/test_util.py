@@ -9,7 +9,7 @@ from pyesgf.search.connection import SearchConnection
 from pyesgf.util import get_manifest
 
 #!TODO: Make this one of the test services.
-CEDA_SERVICE = 'http://esgf-index1.ceda.ac.uk/esg-search/search'
+CEDA_SERVICE = 'http://esgf-index1.ceda.ac.uk/esg-search'
 
 def test_get_manifest():
     conn = SearchConnection(CEDA_SERVICE, distrib=False)

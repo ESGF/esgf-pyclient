@@ -7,6 +7,16 @@ Defines the class representing connections to the ESGF Search API.  To
 perform a search create a :class:`SearchConnection` instance then use
 :meth:`new_context()` to create a search context.
 
+.. warning:: 
+   Prior to v0.1.1 the *url* parameter expected the full URL of the
+   search endpoint up to the query string.  This has now been changed
+   to expect *url* to ommit the final endpoint name,
+   e.g. ``http://pcmdi9.llnl.gov/esg-search/search`` should be changed
+   to ``http://pcmdi9.llnl.gov/esg-search`` in client code.  The
+   current implementation detects the presence of ``/search`` and
+   corrects the URL to retain backward compatibility but this feature
+   may not remain in future versions.
+        
 """
 
 import urllib2, urllib, urlparse
@@ -26,7 +36,7 @@ from pyesgf.util import urlencode
 class SearchConnection(object):
     """
     :ivar url: The URL to the Search API service.  This should be the URL 
-        of the search endpoint excluding the final endpoint name.  
+        of the ESGF search service excluding the final endpoint name.  
         Usually this is http://<hostname>/esg-search
     :ivar distrib: Boolean stating whether searches through this connection are
         distributed.  I.e. whether the Search service distributes the query to
@@ -38,7 +48,7 @@ class SearchConnection(object):
 
     def __init__(self, url, distrib=True, shards=None, 
                  context_class=None):
-	"""
+	"""           
         :param context_class: Override the default SearchContext class.
 
         """
