@@ -40,6 +40,7 @@ import shutil
 from xml.etree import ElementTree
 import urllib2
 import re
+from getpass import getpass
 
 try:
     from myproxy.client import MyProxyClient
@@ -266,7 +267,10 @@ HTTP.SSL.CAPATH={esgf_certs_dir}
                 return ('', '', '')
             config_str = open(self.dap_config).read()
 
-        sections = re.split(r'^# (?:BEGIN|END) {0}$\n'.format(DAP_CONFIG_MARKER), config_str, flags=re.M)
+        #!NOTE: The flags keyword argument to re.split was introduced in Python2.7
+        #   Keep with call non-keyword arguments for compatibility with Python2.6
+        sections = re.split(r'^# (?:BEGIN|END) {0}$\n'.format(DAP_CONFIG_MARKER), 
+                            config_str, re.M)
 
         if len(sections) < 2:
             preamble, managed, postamble = sections[0], '', ''
