@@ -10,8 +10,6 @@ import shutil
 from unittest import TestCase
 import re
 
-import netCDF4
-
 from pyesgf.logon import LogonManager, DAP_CONFIG_MARKER
 from pyesgf.search import SearchConnection
 from test.config import TEST_SERVICE
@@ -101,6 +99,8 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
     
 
     def test_open_url(self):
+        import netCDF4
+
         lm = LogonManager(self.esgf_dir, dap_config=self.dap_config)
         print 'Using dap_config at %s' % self.dap_config
 
@@ -120,5 +120,7 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
 
         ds = netCDF4.Dataset(opendap_url)
         print ds.variables.keys()
+    test_open_url.__test__ = False
+
 
 #!TODO: more corner cases to test for in DAP_CONFIG
