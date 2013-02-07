@@ -164,7 +164,7 @@ class LogonManager(object):
                 print 'Enter myproxy username:',
                 username = raw_input()
             if password is None:
-                password = getpass('Enter password for %s: ' % self.open_id)
+                password = getpass('Enter password for %s: ' % username)
 
         if None in (hostname, username, password):
             raise OpenidResolutionError('Full logon details not available')

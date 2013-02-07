@@ -3,6 +3,7 @@ Utility functions using the pyesgf package.
 
 """
 
+import sys
 from urllib import quote_plus, _is_unicode
 
 from .search.consts import OPERATOR_NEQ
