@@ -46,8 +46,7 @@ class SearchConnection(object):
     # Default limit for queries.  None means use service default.
     default_limit = None
 
-    def __init__(self, url, distrib=True, shards=None, 
-                 context_class=None):
+    def __init__(self, url, distrib=True, context_class=None):
 	"""           
         :param context_class: Override the default SearchContext class.
 
@@ -215,16 +214,30 @@ class SearchConnection(object):
         return self._available_shards
 
     
-    def new_context(self, context_class=None, **constraints):
+    def new_context(self, context_class=None, 
+                    latest=None, facets=None, fields=None,
+                    #!TODO: add once implemented
+                    #from_timestamp=None, to_timestamp=None,
+                    replica=None, shards=None,
+                    **constraints):
         """
-        Returns a :class:`pyesgf.search.context.SearchContext` class for performing
-        faceted searches.
+        Returns a :class:`pyesgf.search.context.SearchContext` class for 
+        performing faceted searches.
+
+        See :meth:`SearchContext.__init__()` for documentation on the 
+        arguments.
 
         """
 	if context_class is None:
             context_class = self.__context_class
 
-	return context_class(self, constraints)
+	return context_class(self, constraints, 
+                             latest=latest, facets=facets, fields=fields,
+                             #!TODO: add once implemented
+                             #from_timestamp=from_timestamp, 
+                             #to_timestamp=to_timestamp,
+                             replica=replica, shards=shards,
+                             )
 
 
 def query_keyword_type(keyword):
