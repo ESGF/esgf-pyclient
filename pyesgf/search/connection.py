@@ -19,12 +19,13 @@ perform a search create a :class:`SearchConnection` instance then use
         
 """
 
-import urllib2, urllib, urlparse
+import urllib2
 import json
 import re
 
 import warnings
 import logging
+
 log = logging.getLogger(__name__)
 
 from .context import DatasetSearchContext
@@ -32,6 +33,7 @@ from .consts import RESPONSE_FORMAT, SHARD_REXP
 from .exceptions import EsgfSearchException
 from pyesgf.multidict import MultiDict
 from pyesgf.util import urlencode
+
 
 class SearchConnection(object):
     """
@@ -47,7 +49,7 @@ class SearchConnection(object):
     default_limit = None
 
     def __init__(self, url, distrib=True, context_class=None):
-	"""           
+        """
         :param context_class: Override the default SearchContext class.
 
         """
@@ -61,12 +63,12 @@ class SearchConnection(object):
         # A value of None means they haven't been retrieved yet.
         # Once set it is a dictionary {'host': [(port, suffix), ...], ...}
         self._available_shards = None
-	
+
         if context_class:
             self.__context_class = context_class
         else:
             self.__context_class = DatasetSearchContext
-        
+
     def __check_url(self):
         """
         Previous versions of the API expected the full URL to be given
@@ -78,7 +80,7 @@ class SearchConnection(object):
         fixes the attribute accordingly, raising a depracation warning.
         
         """
-        
+
         mo = re.match(r'(.*?)(/search)?/*$', self.url)
         assert mo
 
@@ -86,7 +88,7 @@ class SearchConnection(object):
             warnings.warn('Old-style SearchContext URL specified.  '
                           'In future please specify the URL excluding '
                           'the "/search" endpoint.')
-            
+
         self.url = mo.group(1)
 
     def send_search(self, query_dict, limit=None, offset=None, shards=None):
@@ -102,7 +104,6 @@ class SearchConnection(object):
 
         return ret
 
-                               
     def send_wget(self, query_dict, shards=None):
         """
         Send a query to the "search" endpoint.  See :meth:`send_query()` for details.
@@ -120,7 +121,7 @@ class SearchConnection(object):
         script = response.read()
 
         return script
-                               
+
     def _send_query(self, endpoint, full_query):
         """
         Generally not to be called directly by the user but via SearchContext
@@ -130,7 +131,7 @@ class SearchConnection(object):
         :return: the urllib2 response object from the query.
         
         """
-        
+
         log.debug('Query dict is %s' % full_query)
 
         query_url = '%s/%s?%s' % (self.url, endpoint, urlencode(full_query))
@@ -159,14 +160,13 @@ class SearchConnection(object):
         else:
             shard_str = None
 
-
         full_query = MultiDict({
             'format': RESPONSE_FORMAT,
             'limit': limit,
             'distrib': 'true' if self.distrib else 'false',
             'offset': offset,
             'shards': shard_str,
-            })
+        })
         full_query.extend(query_dict)
 
         # Remove all None valued items
@@ -186,7 +186,7 @@ class SearchConnection(object):
 
         response_json = self.send_search({'facets': [], 'fields': []})
         shards = response_json['responseHeader']['params']['shards'].split(',')
-        
+
         # Extract hostname and port from each shard.
         for shard in shards:
             mo = re.match(SHARD_REXP, shard)
@@ -194,12 +194,12 @@ class SearchConnection(object):
                 raise EsgfSearchException('Shard spec %s not recognised' %
                                           shard)
             shard_parts = mo.groupdict()
-            self._available_shards.setdefault(shard_parts['host'], []).append((shard_parts['port'], 
+            self._available_shards.setdefault(shard_parts['host'], []).append((shard_parts['port'],
                                                                                shard_parts['suffix']))
 
 
     def get_shard_list(self):
-	"""
+        """
         return the list of all available shards.  A subset of the returned list can be
         supplied to 'send_query()' to limit the query to selected shards.
 
@@ -213,8 +213,8 @@ class SearchConnection(object):
 
         return self._available_shards
 
-    
-    def new_context(self, context_class=None, 
+
+    def new_context(self, context_class=None,
                     latest=None, facets=None, fields=None,
                     #!TODO: add once implemented
                     #from_timestamp=None, to_timestamp=None,
@@ -228,16 +228,16 @@ class SearchConnection(object):
         arguments.
 
         """
-	if context_class is None:
+        if context_class is None:
             context_class = self.__context_class
 
-	return context_class(self, constraints, 
+        return context_class(self, constraints,
                              latest=latest, facets=facets, fields=fields,
                              #!TODO: add once implemented
                              #from_timestamp=from_timestamp, 
                              #to_timestamp=to_timestamp,
                              replica=replica, shards=shards,
-                             )
+        )
 
 
 def query_keyword_type(keyword):
