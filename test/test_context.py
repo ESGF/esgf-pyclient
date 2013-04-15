@@ -153,3 +153,19 @@ def test_negative_facet():
 
     assert hits1 == hits2 + hits3
     
+
+def test_replica():
+    # Test that we can exclude replicas
+    # This tests assumes the test dataset is replicated
+    conn = SearchConnection(TEST_SERVICE)
+
+    context = conn.new_context(
+        query='cmip5.output1.NIMR-KMA.HadGEM2-AO.rcp60.mon.atmos.Amon.r1i1p1')
+
+    assert context.hit_count > 1
+
+    context = conn.new_context(
+        query='cmip5.output1.NIMR-KMA.HadGEM2-AO.rcp60.mon.atmos.Amon.r1i1p1',
+        replica=False)
+
+    assert context.hit_count == 1

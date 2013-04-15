@@ -25,3 +25,4 @@ generated/
 /.cobertura.ser
 /eclipse
 /backup
+./do_jenkins.sh

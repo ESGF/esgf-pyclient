@@ -40,6 +40,7 @@ import shutil
 from xml.etree import ElementTree
 import urllib2
 import re
+from getpass import getpass
 
 try:
     from myproxy.client import MyProxyClient
@@ -56,7 +57,8 @@ from .exceptions import OpenidResolutionError
 ESGF_DIR = op.join(os.environ['HOME'], '.esg')
 ESGF_CERTS_DIR = 'certificates'
 ESGF_CREDENTIALS = 'credentials.pem'
-DAP_CONFIG = op.join(os.environ['HOME'], '.httprc')
+DAP_CONFIG = op.join(os.environ['HOME'], '.dodsrc')
+DAP_CONFIG_MARKER = '<<< Managed by esgf-pyclient >>>'
 
 XRI_NS = 'xri://$xrd*($v*2.0)'
 MYPROXY_URN = 'urn:esg:security:myproxy-service'
@@ -163,7 +165,7 @@ class LogonManager(object):
                 print 'Enter myproxy username:',
                 username = raw_input()
             if password is None:
-                password = getpass('Enter password for %s: ' % self.open_id)
+                password = getpass('Enter password for %s: ' % username)
 
         if None in (hostname, username, password):
             raise OpenidResolutionError('Full logon details not available')
@@ -225,14 +227,70 @@ class LogonManager(object):
         return username, hostname
             
 
-    def _write_dap_config(self, verbose=False):
-        #!TODO: replace with more sophisticated routine that merges settings
-        with open(DAP_CONFIG, 'w') as fh:
+    def _write_dap_config(self, verbose=False, validate=False):
+        preamble, managed, postamble = self._parse_dap_config()
+
+        with open(self.dap_config, 'w') as fh:
             fh.write("""\
-CURL.VERBOSE={0}
-CURL.COOKIEJAR={1}/.dods_cookies
-CURL.SSL.VALIDATE=1
-CURL.SSL.CERTIFICATE={1}/credentials.pem
-CURL.SSL.KEY={1}/credentials.pem
-CURL.SSL.CAPATH={1}/certificates
-""".format(1 if verbose else 0, self.esgf_certs_dir))
+{preamble}
+# BEGIN {marker}
+HTTP.VERBOSE={verbose}
+HTTP.COOKIEJAR={esgf_dir}/.dods_cookies
+HTTP.SSL.VALIDATE=0
+HTTP.SSL.CERTIFICATE={esgf_dir}/credentials.pem
+HTTP.SSL.KEY={esgf_dir}/credentials.pem
+HTTP.SSL.CAPATH={esgf_certs_dir}
+# END {marker}
+{postamble}
+""".format(verbose=1 if verbose else 0, 
+           validate=1 if validate else 0,
+           esgf_certs_dir=self.esgf_certs_dir, 
+           esgf_dir=self.esgf_dir,
+           marker=DAP_CONFIG_MARKER,
+           preamble=preamble,
+           postamble=postamble,
+           ))
+
+
+    def _parse_dap_config(self, config_str=None):
+        """
+        Read the DAP_CONFIG file and extract the parts not controlled 
+        by esgf-pyclient.
+
+        :return: (preamble, managed, postamble), three strings of 
+            configuration lines before, within and after the esgf-pyclient 
+            controlled block.
+
+        """
+        if config_str is None:
+            if not op.exists(self.dap_config):
+                return ('', '', '')
+            config_str = open(self.dap_config).read()
+
+        #!NOTE: The flags keyword argument to re.split was introduced in Python2.7
+        #   Keep with call non-keyword arguments for compatibility with Python2.6
+        sections = re.split(r'^# (?:BEGIN|END) {0}$\n'.format(DAP_CONFIG_MARKER), 
+                            config_str, re.M)
+
+        if len(sections) < 2:
+            preamble, managed, postamble = sections[0], '', ''
+        elif len(sections) == 2:
+            preamble, managed, postamble = sections + ['']
+        elif len(sections) == 3:
+            preamble, managed, postamble = sections
+        else:
+            # In odd circumstances there might be more than 3 parts of the config 
+            # so assume the final config is the one to keep
+            managed, unmanaged = [], []
+            sections.reverse()
+            while sections:
+                unmanaged.append(sections.pop())
+                if sections:
+                    managed.append(sections.pop())
+
+            preamble = '\n'.join(unmanaged[:-1])
+            postamble = unmanaged[-1]
+            managed = managed[-1]
+
+
+        return preamble.strip(), managed.strip(), postamble.strip()
