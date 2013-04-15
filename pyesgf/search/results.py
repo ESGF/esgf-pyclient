@@ -75,10 +75,10 @@ class ResultSet(Sequence):
         limit = self.batch_size
 
         query_dict = self.context._build_query()
-        response = self.context.connection.send_query(query_dict, limit=limit, 
-                                                      offset=offset,
-                                                      shards=self.context.shards)
-
+        response = self.context.connection.send_search(query_dict, limit=limit, 
+                                                       offset=offset,
+                                                       shards=self.context.shards)
+        
         #!TODO: strip out results
         return response['response']['docs']
 
@@ -139,6 +139,7 @@ class BaseResult(object):
             return None
 
         return index_node
+
 
 class DatasetResult(BaseResult):
     """

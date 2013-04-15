@@ -22,7 +22,13 @@ The package can be downloaded via ``pip`` or ``easy_install``::
   $ pip install esgf-pyclient
   $ easy_install esgf-pyclient
 
-The source code is available on github at https://github.com/stephenpascoe/esgf-pyclient
+You can also download the tarball from http://pypi.python.org/pypi/esgf-pyclient and install manually as follows::
+
+  $ tar zxf esgf-pyclient-*.tar.gz
+  $ cd esgf-pyclient-*.tar.gz
+  $ python setup.py install
+
+If you want to follow the latest code and/or make contributions the source code is available on github at https://github.com/stephenpascoe/esgf-pyclient
 
 Once installed you import the package as the name ``pyesgf``.  See the recipes for examples.
 
@@ -33,6 +39,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   releases
    concepts
    examples
    search_api

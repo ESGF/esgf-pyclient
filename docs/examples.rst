@@ -7,7 +7,7 @@ Prelude
 ::
 
   >>> from pyesgf.search import SearchConnection
-  >>> conn = SearchConnection('http://pcmdi9.llnl.gov/esg-search/search',
+  >>> conn = SearchConnection('http://pcmdi9.llnl.gov/esg-search',
   ...                         distrib=True)
 
 Find how many datasets containing 'humidity' in a given experiment family::

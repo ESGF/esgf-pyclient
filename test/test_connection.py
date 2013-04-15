@@ -15,7 +15,7 @@ from .config import TEST_SERVICE
 
 def test_blank_query():
     conn = SearchConnection(TEST_SERVICE)
-    json = conn.send_query({})
+    json = conn.send_search({})
 
     assert json.keys() == [u'facet_counts', u'responseHeader', u'response']
     
@@ -32,3 +32,11 @@ def test_get_shard_list():
     assert 'esgf-index1.ceda.ac.uk' in shards
     
     
+def test_url_fixing():
+    conn1 = SearchConnection(TEST_SERVICE)
+    conn2 = SearchConnection(TEST_SERVICE+'/')
+    conn3 = SearchConnection(TEST_SERVICE+'///')
+    conn4 = SearchConnection(TEST_SERVICE+'/search')
+    conn5 = SearchConnection(TEST_SERVICE+'/search///')
+
+    assert conn1.url == conn2.url == conn3.url == conn4.url == conn5.url

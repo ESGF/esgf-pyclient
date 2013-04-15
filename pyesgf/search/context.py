@@ -7,16 +7,16 @@ Defines the :class:`SearchContext` class which represents each ESGF search query
 
 """
 
-
 import copy
 
 from pyesgf.multidict import MultiDict
 
 from .constraints import GeospatialConstraint
-from .consts import (TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION, 
+from .consts import (TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION,
                      QUERY_KEYWORD_TYPES)
 from .results import ResultSet
 from .exceptions import EsgfSearchException
+
 
 class SearchContext(object):
     """
@@ -46,31 +46,34 @@ class SearchContext(object):
     DEFAULT_SEARCH_TYPE = NotImplemented
 
     def __init__(self, connection, constraints, search_type=None,
-		 latest=None, facets=None, fields=None,
+                 latest=None, facets=None, fields=None,
                  from_timestamp=None, to_timestamp=None,
-		 replica=None, shards=None):
+                 replica=None, shards=None):
         """
+
         :param connection: The SearchConnection
         :param constraints: A dictionary of initial constraints
-	:param search_type: One of TYPE_* constants defining the document 
+        :param search_type: One of TYPE_* constants defining the document
             type to search for.  Overrides SearchContext.DEFAULT_SEARCH_TYPE
-	:param facets: The list of facets for which counts will be retrieved
-	    and constraints be validated against.  Or None to represent all
-	    facets.
-	:param fields: A list of field names to return in search responses
-	:param replica: A boolean defining whether to return master records
-	    or replicas, or None to return both.
-	:param latest: A boolean defining whether to return only latest verisons
-	    or only non-latest versions, or None to return both.
+        :param facets: The list of facets for which counts will be retrieved
+            and constraints be validated against.  Or None to represent all
+            facets.
+        :param fields: A list of field names to return in search responses
+        :param replica: A boolean defining whether to return master records
+            or replicas, or None to return both.
+        :param latest: A boolean defining whether to return only latest verisons
+            or only non-latest versions, or None to return both.
         :param shards: list of shards to restrict searches to.  Should be from the list
             self.connection.get_shard_list()
+        :param from_timestamp: NotImplemented
+        :param to_timestamp: NotImplemented
 
         """
-        
+
         self.connection = connection
         self.__facet_counts = None
         self.__hit_count = None
-        
+
         if search_type is None:
             search_type = self.DEFAULT_SEARCH_TYPE
 
@@ -82,17 +85,17 @@ class SearchContext(object):
 
         self._update_constraints(constraints)
 
-	# Search configuration parameters
+        # Search configuration parameters
         self.timestamp_range = (from_timestamp, to_timestamp)
 
         search_types = [TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION]
         if search_type not in search_types:
-            raise EsgfSearchException('search_type must be one of %s' 
+            raise EsgfSearchException('search_type must be one of %s'
                                       % ','.join(search_types))
-	self.search_type = search_type
+        self.search_type = search_type
 
-	self.latest = latest
-	self.facets = facets
+        self.latest = latest
+        self.facets = facets
         self.fields = fields
         self.replica = replica
         self.shards = shards
@@ -116,7 +119,7 @@ class SearchContext(object):
             sc = self
 
         self.__update_counts()
-        
+
         return ResultSet(sc)
 
     def constrain(self, **constraints):
@@ -126,8 +129,31 @@ class SearchContext(object):
         """
         new_sc = copy.deepcopy(self)
         new_sc._update_constraints(constraints)
-	return new_sc
+        return new_sc
 
+    def get_download_script(self, **constraints):
+        """
+        Download a script for downloading all files in the set of results.
+
+        :param constraints: Further constraints for this query.  Equivilent
+            to calling self.constrain(**constraints).get_download_script()
+        :return: A string containing the script
+
+        """
+        if constraints:
+            sc = self.constrain(**constraints)
+        else:
+            sc = self
+
+        sc.__update_counts()
+
+        query_dict = sc._build_query()
+
+        #!TODO: allow setting limit
+        script = sc.connection.send_wget(query_dict,
+                                         shards=self.shards)
+
+        return script
 
     @property
     def facet_counts(self):
@@ -162,21 +188,21 @@ class SearchContext(object):
         # If hit_count is set the counts are already retrieved
         if self.__hit_count is not None:
             return
-        
+
         self.__facet_counts = {}
         self.__hit_count = None
         query_dict = self._build_query()
         query_dict['facets'] = '*'
 
-        response = self.connection.send_query(query_dict, limit=0)
+        response = self.connection.send_search(query_dict, limit=0)
         for facet, counts in (
-                response['facet_counts']['facet_fields'].items()):
+            response['facet_counts']['facet_fields'].items()):
             d = self.__facet_counts[facet] = {}
             while counts:
                 d[counts.pop()] = counts.pop()
 
         self.__hit_count = response['response']['numFound']
-                
+
     #-------------------------------------------------------------------------
     # Constraint mutation interface
     # These functions update the instance in-place.
@@ -212,8 +238,7 @@ class SearchContext(object):
             else:
                 if values not in current_values:
                     self.facet_constraints.add(key, values)
-        
-    
+
     def _constrain_freetext(self, query):
         self.freetext_constraint = query
 
@@ -230,11 +255,11 @@ class SearchContext(object):
         self.temporal_constraint = (start, end)
 
     def _constrain_geospatial(self, lat=None, lon=None, bbox=None, location=None,
-                 radius=None, polygon=None):
+                              radius=None, polygon=None):
         self.geospatial_constraint = GeospatialConstraint(lat, lon, bbox, location, radius, polygon)
 
         raise NotImplementedError
-        
+
     #-------------------------------------------------------------------------
 
     def _split_constraints(self, constraints):
@@ -257,7 +282,7 @@ class SearchContext(object):
             constraints_split[constraint_type][kw] = val
 
         return constraints_split
-        
+
     def _build_query(self):
         """
         Build query string parameters as a dictionary.
@@ -265,29 +290,30 @@ class SearchContext(object):
         """
 
         query_dict = MultiDict({"query": self.freetext_constraint,
-                      "type": self.search_type,
-                      "latest": self.latest,
-                      "facets": self.facets,
-                      "fields": self.fields,
-                      "replica": self.replica,
-                      })
+                                "type": self.search_type,
+                                "latest": self.latest,
+                                "facets": self.facets,
+                                "fields": self.fields,
+                                "replica": self.replica,
+        })
 
         query_dict.extend(self.facet_constraints)
-        
+
         #!TODO: encode datetime
         #start, end = self.temporal_constraint
         #query_dict.update(start=start, end=end)
 
         return query_dict
-       
+
 
 class DatasetSearchContext(SearchContext):
     DEFAULT_SEARCH_TYPE = TYPE_DATASET
 
+
 class FileSearchContext(SearchContext):
     DEFAULT_SEARCH_TYPE = TYPE_FILE
 
+
 class AggregationSearchContext(SearchContext):
     DEFAULT_SEARCH_TYPE = TYPE_AGGREGATION
-
 
