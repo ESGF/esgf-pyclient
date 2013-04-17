@@ -22,6 +22,7 @@ perform a search create a :class:`SearchConnection` instance then use
 import urllib2
 import json
 import re
+from urlparse import urlparse
 
 import warnings
 import logging
@@ -194,6 +195,12 @@ class SearchConnection(object):
                 raise EsgfSearchException('Shard spec %s not recognised' %
                                           shard)
             shard_parts = mo.groupdict()
+
+            # Fix the host if it refers to the local server
+            if shard_parts['host'] in ['localhost', '0.0.0.0', '127.0.0.1']:
+                parsed_url = urlparse(self.url)
+                shard_parts['host'] = parsed_url.hostname
+
             self._available_shards.setdefault(shard_parts['host'], []).append((shard_parts['port'],
                                                                                shard_parts['suffix']))
 
