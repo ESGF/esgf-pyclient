@@ -186,7 +186,13 @@ class SearchConnection(object):
         self._available_shards = {}
 
         response_json = self.send_search({'facets': [], 'fields': []})
-        shards = response_json['responseHeader']['params']['shards'].split(',')
+
+        try:
+            shards = response_json['responseHeader']['params']['shards'].split(',')
+        except KeyError:
+            log.debug('_load_available_shards() fails with this exception')
+            log.debug('response_json = %s' % response_json)
+            raise EsgfSearchException('Error loading available shards')
 
         # Extract hostname and port from each shard.
         for shard in shards:
