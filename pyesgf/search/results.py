@@ -161,9 +161,16 @@ class DatasetResult(BaseResult):
         from .context import FileSearchContext
 
         if self.context.connection.distrib:
-            shards=[self.index_node]
+            # If the index node is in the available shards for this connection then
+            # restrict shards to that node.  Otherwise do nothing to handle the case
+            # when the shard is replicated
+            available_shards = self.context.connection.get_shard_list().keys()
+            if self.index_node in available_shards:
+                shards = [self.index_node]
+            else:
+                shards = None
         else:
-            shards=None
+            shards = None
 
         files_context = FileSearchContext(
             connection=self.context.connection,
