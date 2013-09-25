@@ -223,11 +223,17 @@ class FileResult(BaseResult):
 
     @property
     def checksum(self):
-        return self.json['checksum'][0]
+        try:
+            return self.json['checksum'][0]
+        except KeyError:
+            return None
 
     @property
     def checksum_type(self):
-        self.json['checksum_type'][0]
+        try:
+            self.json['checksum_type'][0]
+        except KeyError:
+            return None
 
     @property
     def filename(self):
