@@ -164,9 +164,9 @@ class DatasetResult(BaseResult):
         return self.json['id']
     
     @property
-    def thredds_filecount(self):
+    def number_of_files(self):
         """
-        Returns file count as reported by Thredds.
+        Returns file count as reported by the dataset record.
         """
         return self.json['number_of_files']
 
