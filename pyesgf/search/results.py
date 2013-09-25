@@ -163,6 +163,13 @@ class DatasetResult(BaseResult):
         #!TODO: should we decode this into a tuple?  self.json['id'].split('|')
         return self.json['id']
     
+    @property
+    def thredds_filecount(self):
+        """
+        Returns file count as reported by Thredds.
+        """
+        return self.json['number_of_files']
+
     def file_context(self):
         """
         Return a SearchContext for searching for files within this dataset.
