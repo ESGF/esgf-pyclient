@@ -77,7 +77,8 @@ class ResultSet(Sequence):
         query_dict = self.context._build_query()
         response = self.context.connection.send_search(query_dict, limit=limit, 
                                                        offset=offset,
-                                                       shards=self.context.shards)
+                                                       #shards=self.context.shards)
+                                                       shards=None)
         
         #!TODO: strip out results
         return response['response']['docs']
