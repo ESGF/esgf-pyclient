@@ -77,8 +77,7 @@ class ResultSet(Sequence):
         query_dict = self.context._build_query()
         response = self.context.connection.send_search(query_dict, limit=limit, 
                                                        offset=offset,
-                                                       #shards=self.context.shards)
-                                                       shards=None)
+                                                       shards=self.context.shards)
         
         #!TODO: strip out results
         return response['response']['docs']
@@ -203,9 +202,16 @@ class DatasetResult(BaseResult):
         from .context import AggregationSearchContext
 
         if self.context.connection.distrib:
-            shards=[self.index_node]
+            # If the index node is in the available shards for this connection then
+            # restrict shards to that node.  Otherwise do nothing to handle the case
+            # when the shard is replicated
+            available_shards = self.context.connection.get_shard_list().keys()
+            if self.index_node in available_shards:
+                shards = [self.index_node]
+            else:
+                shards = None
         else:
-            shards=None
+            shards = None
 
         agg_context = AggregationSearchContext(
             connection=self.context.connection,
