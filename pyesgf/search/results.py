@@ -124,6 +124,15 @@ class BaseResult(object):
         return url
 
     @property
+    def las_url(self):
+        try:
+            url, mime = self.urls['LAS'][0]
+        except (KeyError, IndexError):
+            return None
+
+        return url
+
+    @property
     def download_url(self):
         try:
             url, mime = self.urls['HTTPServer'][0]
@@ -155,6 +164,13 @@ class DatasetResult(BaseResult):
         #!TODO: should we decode this into a tuple?  self.json['id'].split('|')
         return self.json['id']
     
+    @property
+    def number_of_files(self):
+        """
+        Returns file count as reported by the dataset record.
+        """
+        return self.json['number_of_files']
+
     def file_context(self):
         """
         Return a SearchContext for searching for files within this dataset.
@@ -215,11 +231,17 @@ class FileResult(BaseResult):
 
     @property
     def checksum(self):
-        return self.json['checksum'][0]
+        try:
+            return self.json['checksum'][0]
+        except KeyError:
+            return None
 
     @property
     def checksum_type(self):
-        self.json['checksum_type'][0]
+        try:
+            self.json['checksum_type'][0]
+        except KeyError:
+            return None
 
     @property
     def filename(self):
