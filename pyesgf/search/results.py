@@ -257,6 +257,13 @@ class FileResult(BaseResult):
     def size(self):
         return int(self.json['size'])
 
+    @property
+    def tracking_id(self):
+        try:
+            return self.json['tracking_id'][0]
+        except KeyError:
+            return None
+
 
 class AggregationResult(BaseResult):
     """
