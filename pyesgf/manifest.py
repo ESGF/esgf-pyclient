@@ -53,7 +53,7 @@ class Manifest(object):
     def add(self, filename, filehash, tracking_id, size):
         if filename in self._contents:
             raise Error('Filename %s occurs multiple times in dataset %s' %
-                        (filename, dataset_result.dataset_id))
+                        (filename, self.drs_id))
 
         self._contents[filename] = (filehash, tracking_id, size)
 
@@ -67,10 +67,11 @@ class Manifest(object):
 
 
 class ManifestExtractor(object):
-    SOLR_BATCH_SIZE = 500
+    pass
 
 
 class SolrManifestExtractor(ManifestExtractor):
+    SOLR_BATCH_SIZE = 500
     SOLR_FIELDS = ['dataset_id', 'title', 'checksum_type', 'checksum',
                    'tracking_id','size']
 
@@ -153,15 +154,55 @@ class SolrManifestExtractor(ManifestExtractor):
             yield current_manifest
 
 
+def cmip5_manifest_partitioner(drs_id):
+    """
+    Split a drs_id into pragmatic components for constructing a directory structure.
+    This partition is designed to balance the need to split a repository between
+    subdirectories with the desire to minimise the depth of the tree.
+
+    """
+    (activity, product, institute, model, experiment, 
+     frequency, realm, table, ensemble, version) = drs_id.split('.')
+
+    parts = ('.'.join((activity, product, institute)),
+             '.'.join((model, experiment, frequency)))
+    
+    return parts
+
+
+
 def extract_from_solr(endpoint, project, target_dir):
     solr_extractor = SolrManifestExtractor(endpoint, project)
 
     for manifest in solr_extractor:
+
+        manifest_path = os.path.join(target_dir,
+                                     *cmip5_manifest_partitioner(manifest.drs_id))
+        if not os.path.exists(manifest_path):
+            log.info('Creating repo directory {0}'.format(manifest_path))
+            os.makedirs(manifest_path)
         
-        manifest_file = os.path.join(target_dir, manifest.drs_id)
+        manifest_file = os.path.join(manifest_path, manifest.drs_id)
+
+
         if os.path.exists(manifest_file):
             raise Error('Manifest {0} already exists'.format(manifest_file))
 
         with open(manifest_file, 'w') as fh:
             log.info('Writing Manifest {0}'.format(manifest_file))
             manifest.write(fh)
+
+
+if __name__ == '__main__':
+    import argparse
+
+    logging.basicConfig(level=logging.INFO)
+
+    parser = argparse.ArgumentParser(description='Extract ESGF datasets from a SOLr index into a manifest repository')
+    parser.add_argument('endpoint', help='SOLr endpoint as http://<host>:<port>')
+    parser.add_argument('project', help='The project to extract')
+    parser.add_argument('repository', help='Path to the manifest repository')
+
+    args = parser.parse_args()
+
+    extract_from_solr(args.endpoint, args.project, args.repository)
