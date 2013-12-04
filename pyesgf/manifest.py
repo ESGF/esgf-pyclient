@@ -6,13 +6,17 @@ Generate ESGF manifest files from ESGF search results
 """
 
 import os
+import urllib2
+import csv
 
 from pyesgf.exceptions import Error
+from pyesgf.util import urlencode
 
 class Manifest(object):
     VERSION = '0.1'
 
-    def __init__(self):
+    def __init__(self, drs_id):
+        self.drs_id = drs_id
         self._contents = {}
 
     @classmethod
@@ -41,7 +45,7 @@ class Manifest(object):
     @classmethod
     def from_mapfile(cls, mapfile):
         #!TODO
-        pass
+        raise NotImplementedError
 
 
     def add(self, filename, filehash, tracking_id, size):
@@ -57,3 +61,85 @@ class Manifest(object):
         for filename in sorted(self._contents):
             filehash, tracking_id, size = self._contents[filename]
             fh.write('{0},{1},{2},{3}'.format(filename, filehash, tracking_id, size)+'\n')
+
+
+
+class ManifestExtractor(object):
+    SOLR_BATCH_SIZE = 500
+
+
+class SolrManifestExtractor(ManifestExtractor):
+    SOLR_FIELDS = ['dataset_id', 'title', 'checksum_type', 'checksum',
+                   'tracking_id','size']
+
+    def __init__(self, endpoint, project):
+        self.endpoint = endpoint
+        self.project = project
+
+    def _query(self, offset):
+        params = (
+            ('q', '*'),
+            ('fq', 'project:{0}'.format(self.project)),
+            ('fl', ','.join(self.SOLR_FIELDS)),
+            ('wt', 'csv'),
+            ('sort', 'title%20asc'),
+            ('start', offset),
+            ('rows', self.SOLR_BATCH_SIZE),
+            )
+        
+        response = urllib2.urlopen('{0}?{1}'.format(self.endpoint,
+                                                    urlencode(query_dict)))
+        
+        return response
+
+    def _check_header(self, header):
+        if header != self.SOLR_FIELDS:
+            raise Error('Unrecognised SOLr CSV header')
+
+
+    def _init_manifest(self, dataset_id):
+        drs_id, datanode = datset_id.split('|')
+
+        return Manifest(drs_id)
+
+
+    def iter(self):
+        """
+        Query the SOLr index until all files for this project have been extracted.
+ 
+        """
+
+        offset = 0
+        current_dataset_id = None
+        current_manifest = None
+        while 1:
+            response = self._query(offset)
+            reader = csv.reader(response)
+
+            # Read first line and check the header
+            header = reader.next()
+            self._check_header()
+
+            empty_batch = True
+            for row in reader:
+                empty_batch = False
+                dataset_id, filename, checksum_type, checksum, tracking_id, size = row
+                if dataset_id != current_dataset_id:
+                    if current_manifest:
+                        yield current_manifest
+                    current_manifest = self._init_manifest(dataset_id)
+                    current_dataset_id = dataset_id
+
+                filehash = '{0}:{1}'.format(checksum_type.lower(), checksum)
+                size = int(size)
+
+                current_manifest.add(filename, filehash, tracking_id, size)
+
+            # Test whether there were any rows.  If not we have reached the end.
+            if empty_batch:
+                break
+            else:
+                offset += self.SOLR_BATCH_SIZE
+
+        if current_manifest:
+            yield current_manifest
