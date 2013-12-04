@@ -109,7 +109,7 @@ class SolrManifestExtractor(ManifestExtractor):
         return Manifest(drs_id)
 
 
-    def iter(self):
+    def __iter__(self):
         """
         Query the SOLr index until all files for this project have been extracted.
  
@@ -151,3 +151,17 @@ class SolrManifestExtractor(ManifestExtractor):
 
         if current_manifest:
             yield current_manifest
+
+
+def extract_from_solr(endpoint, project, target_dir):
+    solr_extractor = SolrManifestExtractor(endpoint, project)
+
+    for manifest in solr_extractor:
+        
+        manifest_file = os.path.join(target_dir, manifest.drs_id)
+        if os.path.exists(manifest_file):
+            raise Error('Manifest {0} already exists'.format(manifest_file))
+
+        with open(manifest_file, 'w') as fh:
+            log.info('Writing Manifest {0}'.format(manifest_file))
+            manifest.write(fh)
