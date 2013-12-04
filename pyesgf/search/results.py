@@ -245,7 +245,7 @@ class FileResult(BaseResult):
     @property
     def checksum_type(self):
         try:
-            self.json['checksum_type'][0]
+            return self.json['checksum_type'][0]
         except KeyError:
             return None
 
