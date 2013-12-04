@@ -10,7 +10,9 @@ import urllib2
 import csv
 
 from pyesgf.exceptions import Error
-from pyesgf.util import urlencode
+
+import logging
+log = logging.getLogger(__name__)
 
 class Manifest(object):
     VERSION = '0.1'
@@ -82,13 +84,16 @@ class SolrManifestExtractor(ManifestExtractor):
             ('fq', 'project:{0}'.format(self.project)),
             ('fl', ','.join(self.SOLR_FIELDS)),
             ('wt', 'csv'),
-            ('sort', 'title%20asc'),
+            ('sort', 'dataset_id%20asc'),
             ('start', offset),
             ('rows', self.SOLR_BATCH_SIZE),
             )
-        
-        response = urllib2.urlopen('{0}?{1}'.format(self.endpoint,
-                                                    urlencode(query_dict)))
+        param_str = '&'.join(('{0}={1}'.format(k, v)) for (k, v) in params)
+
+        url = '{0}/solr/files/select?{1}'.format(self.endpoint,
+                                                 param_str)
+        log.info('SOLR QUERY: {0}'.format(url))
+        response = urllib2.urlopen(url)
         
         return response
 
@@ -98,7 +103,8 @@ class SolrManifestExtractor(ManifestExtractor):
 
 
     def _init_manifest(self, dataset_id):
-        drs_id, datanode = datset_id.split('|')
+        drs_id, datanode = dataset_id.split('|')
+        log.info('Generating manifest {0}'.format(drs_id))
 
         return Manifest(drs_id)
 
@@ -118,16 +124,18 @@ class SolrManifestExtractor(ManifestExtractor):
 
             # Read first line and check the header
             header = reader.next()
-            self._check_header()
+            self._check_header(header)
 
             empty_batch = True
             for row in reader:
                 empty_batch = False
+
+                log.debug('ROW: {0}'.format(row))
                 dataset_id, filename, checksum_type, checksum, tracking_id, size = row
                 if dataset_id != current_dataset_id:
                     if current_manifest:
                         yield current_manifest
-                    current_manifest = self._init_manifest(dataset_id)
+                    current_manifest = self._init_manifest(dataset_id)                    
                     current_dataset_id = dataset_id
 
                 filehash = '{0}:{1}'.format(checksum_type.lower(), checksum)
