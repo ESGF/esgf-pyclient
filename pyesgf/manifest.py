@@ -8,6 +8,8 @@ Generate ESGF manifest files from ESGF search results
 import os
 import urllib2
 import csv
+import re
+import datetime
 
 from pyesgf.exceptions import Error, DuplicateHashError
 
@@ -86,14 +88,19 @@ class SolrManifestExtractor(ManifestExtractor):
     SOLR_FIELDS = ['dataset_id', 'title', 'checksum_type', 'checksum',
                    'tracking_id','size']
 
-    def __init__(self, endpoint, project):
+    def __init__(self, endpoint, project, from_date=None):
         self.endpoint = endpoint
         self.project = project
+        self.from_date = from_date
 
     def _query(self, offset):
+        fq = 'project:{0}'.format(self.project)
+        if self.from_date:
+            fq += ' AND timestamp[{0}Z TO NOW]'.format(self.from_date)
+
         params = (
             ('q', '*'),
-            ('fq', 'project:{0}'.format(self.project)),
+            ('fq', fq),
             ('fl', ','.join(self.SOLR_FIELDS)),
             ('wt', 'csv'),
             ('sort', 'dataset_id%20asc'),
@@ -185,8 +192,8 @@ def cmip5_manifest_partitioner(drs_id):
 
 
 
-def extract_from_solr(endpoint, project, target_dir):
-    solr_extractor = SolrManifestExtractor(endpoint, project)
+def extract_from_solr(endpoint, project, target_dir, from_date=None):
+    solr_extractor = SolrManifestExtractor(endpoint, project, from_date)
 
     for manifest in solr_extractor:
 
@@ -200,13 +207,27 @@ def extract_from_solr(endpoint, project, target_dir):
 
 
         if os.path.exists(manifest_file):
-            log.warn('Manifest {0} already exists, skipping'.format(manifest_file))
-            continue
+            log.warn('Manifest {0} already exists.  This manifest will be overwritten'.format(manifest_file))
 
         with open(manifest_file, 'w') as fh:
             log.info('Writing Manifest {0}'.format(manifest_file))
             manifest.write(fh)
 
+
+def parse_timestamp(timestamp):
+    """
+    Parses a standard ISO timestamp.  This function allows the time to be ommitted but
+    if present it must include hours, minutes and seconds.
+
+    """
+    if re.match(r'\d{4}-\d{2}-\d{2}$', timestamp):
+        timestamp += 'T00:00:00Z'
+    elif timestamp[-1] != 'Z':
+        timestamp += 'Z'
+
+    dt = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
+
+    return dt
 
 if __name__ == '__main__':
     import argparse
@@ -217,7 +238,14 @@ if __name__ == '__main__':
     parser.add_argument('endpoint', help='SOLr endpoint as http://<host>:<port>')
     parser.add_argument('project', help='The project to extract')
     parser.add_argument('repository', help='Path to the manifest repository')
+    parser.add_argument('--from', dest='from_date', action='store', 
+                        help='The minimum timestamp of returned SOLr records')
 
     args = parser.parse_args()
 
-    extract_from_solr(args.endpoint, args.project, args.repository)
+    if args.from_date:
+        from_date = parse_timestamp(args.from_date)
+    else:
+        from_date is None
+
+    extract_from_solr(args.endpoint, args.project, args.repository, from_date=from_date)
