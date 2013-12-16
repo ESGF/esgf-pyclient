@@ -9,7 +9,7 @@ import os
 import urllib2
 import csv
 
-from pyesgf.exceptions import Error
+from pyesgf.exceptions import Error, DuplicateHashError
 
 import logging
 log = logging.getLogger(__name__)
@@ -52,9 +52,20 @@ class Manifest(object):
 
     def add(self, filename, filehash, tracking_id, size):
         if filename in self._contents:
-            raise Error('Filename %s occurs multiple times in dataset %s' %
-                        (filename, self.drs_id))
-
+            old_filehash, old_tracking_id, old_size = self._contents[filename]
+            if old_filehash == filehash:
+                log.warn('Filename {0} occurs multiple times in dataset {1} '
+                         'with the same hash'.format(filename, self.drs_id))
+            elif old_tracking_id == tracking_id:
+                raise DuplicateHashError(
+                    'Filename {0} occurs multiple times in dataset {1} with '
+                    'the same tracking_id and different hash'.format(filename,
+                                                                     self.drs_id))
+            else:
+                raise DuplicateHashError(
+                    'Filename {0} occurs multiple times in '
+                    'dataset {1}'.format(filename, self.drs_id))
+            
         self._contents[filename] = (filehash, tracking_id, size)
 
 
@@ -71,7 +82,7 @@ class ManifestExtractor(object):
 
 
 class SolrManifestExtractor(ManifestExtractor):
-    SOLR_BATCH_SIZE = 500
+    SOLR_BATCH_SIZE = 1000
     SOLR_FIELDS = ['dataset_id', 'title', 'checksum_type', 'checksum',
                    'tracking_id','size']
 
@@ -142,7 +153,10 @@ class SolrManifestExtractor(ManifestExtractor):
                 filehash = '{0}:{1}'.format(checksum_type.lower(), checksum)
                 size = int(size)
 
-                current_manifest.add(filename, filehash, tracking_id, size)
+                try:
+                    current_manifest.add(filename, filehash, tracking_id, size)
+                except DuplicateHashError, e:
+                    log.error(e)
 
             # Test whether there were any rows.  If not we have reached the end.
             if empty_batch:
@@ -186,7 +200,8 @@ def extract_from_solr(endpoint, project, target_dir):
 
 
         if os.path.exists(manifest_file):
-            raise Error('Manifest {0} already exists'.format(manifest_file))
+            log.warn('Manifest {0} already exists, skipping'.format(manifest_file))
+            continue
 
         with open(manifest_file, 'w') as fh:
             log.info('Writing Manifest {0}'.format(manifest_file))
