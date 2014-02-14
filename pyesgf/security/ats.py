@@ -120,3 +120,8 @@ class AttributeServiceResponse(object):
 
         return d
 
+    def get_status(self):
+        fpath = './/{{{0}}}Status/{{{0}}}StatusCode'.format(NS['saml2p'])
+        sc = self.xml.find(fpath)
+        
+        return sc.get('Value')

@@ -18,3 +18,10 @@ def test_ceda_ats():
     assert attrs['urn:esg:first:name'] == 'Stephen'
     assert attrs['urn:esg:last:name'] == 'Pascoe'
     
+def test_unkown_principal():
+    service = AttributeService(CEDA_ATS)
+    openid = 'https://example.com/unknown'
+
+    resp = service.send_request(openid, [])
+
+    assert resp.get_status() == 'urn:oasis:names:tc:SAML:2.0:status:UnknownPrincipal'
