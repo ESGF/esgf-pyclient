@@ -24,9 +24,8 @@ ATS_REQUEST_TMPL = Template('''<?xml version="1.0" encoding="UTF-8"?>
         </saml:Subject>
         {% for attr in attributes -%}
         <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                        FriendlyName="{{ attr.fname }}"
-                        Name="{{ attr.urn }}"
-                        NameFormat="{{ attr.format }}"/>
+                        Name="{{ attr }}"
+                        NameFormat="http://www.w3.org/2001/XMLSchema#string"/>
         {% endfor -%}
      </samlp:AttributeQuery>
   </soap11:Body>
@@ -41,32 +40,6 @@ NS = {
 }
 
 
-class SAMLAttribute(object):
-    def __init__(self, fname, urn, format=None):
-        self.fname = fname
-        self.urn = urn
-        if format:
-            self.format = format
-        else:
-            self.format = 'http://www.w3.org/2001/XMLSchema#string'
-
-class SAMLAttributeStore(dict):
-    def add(self, attribute):
-        self[attribute.urn] = attribute
-
-    def get_by_friendly_name(self, friendly_name):
-        for attr in self.values():
-            if attr.fname == friendly_name:
-                return attr
-        else:
-            raise KeyError('No SAML attribute matches name %s' % repr(friendly_name))
-        
-
-SAML_ATTRS = SAMLAttributeStore()
-SAML_ATTRS.add(SAMLAttribute('FirstName', 'urn:esg:first:name'))
-SAML_ATTRS.add(SAMLAttribute('LastName', 'urn:esg:last:name'))
-SAML_ATTRS.add(SAMLAttribute('EmailAddress', 'urn:esg:email:address'))
-SAML_ATTRS.add(SAMLAttribute('GroupRole', 'urn:esg:group:role', 'groupRole'))
 
 class AttributeService(object):
     ISSUER = 'ats_tool'
@@ -76,15 +49,12 @@ class AttributeService(object):
     def build_request(self, openid, attributes):
         now = datetime.datetime.utcnow()
 
-        # Map attribute urns to classes
-        attrs = [SAML_ATTRS[a] for a in attributes]
-
         return ATS_REQUEST_TMPL.render(
             msg_id=uuid.uuid1(),
             timestamp=now.isoformat()+'Z',
             issuer=self.ISSUER,
             openid=openid,
-            attributes=attrs)
+            attributes=attributes)
 
     def send_request(self, openid, attributes):
         post_body = self.build_request(openid, attributes)
