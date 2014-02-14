@@ -34,6 +34,7 @@ setup(name='esgf-pyclient',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
+        'jinja2',
       ],
       #tests_require=['NoseXUnit'],
       entry_points= {
