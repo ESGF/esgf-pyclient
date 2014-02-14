@@ -25,3 +25,12 @@ def test_unkown_principal():
     resp = service.send_request(openid, [])
 
     assert resp.get_status() == 'urn:oasis:names:tc:SAML:2.0:status:UnknownPrincipal'
+
+def test_multi_attribute():
+    service = AttributeService(CEDA_ATS)
+
+    openid = 'https://ceda.ac.uk/openid/Stephen.Pascoe'
+    resp = service.send_request(openid, ['CMIP5 Research'])
+
+    attrs = resp.get_attributes()
+    assert list(sorted(attrs['CMIP5 Research'])) == ['default', 'user']

@@ -81,12 +81,18 @@ class AttributeServiceResponse(object):
     def get_attributes(self):
         d = {}
         fpath = './/{{{0}}}AttributeStatement/{{{0}}}Attribute'.format(NS['saml'])
+
         for el in self.xml.findall(fpath):
             attr_name = el.get('Name')
             val_el = el.find('./{{{0}}}AttributeValue'.format(NS['saml']))
             attr_value = val_el.text
 
-            d[attr_name] = attr_value
+            d.setdefault(attr_name, []).append(attr_value)
+
+        # Remove list wrapper from single-valued attributes
+        for key in d:
+            if len(d[key]) == 1:
+                d[key] = d[key][0]
 
         return d
 
