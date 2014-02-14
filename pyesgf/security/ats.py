@@ -9,6 +9,9 @@ import datetime
 import urllib2
 from xml.etree import ElementTree as ET
 
+import logging
+log = logging.getLogger(__name__)
+
 ATS_REQUEST_TMPL = Template('''<?xml version="1.0" encoding="UTF-8"?>
 <soap11:Envelope xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/">
   <soap11:Body>
@@ -21,7 +24,7 @@ ATS_REQUEST_TMPL = Template('''<?xml version="1.0" encoding="UTF-8"?>
         </saml:Subject>
         {% for attr in attributes -%}
         <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                        FriendlyName="{{ attr.name }}"
+                        FriendlyName="{{ attr.fname }}"
                         Name="{{ attr.urn }}"
                         NameFormat="{{ attr.format }}"/>
         {% endfor -%}
@@ -88,8 +91,8 @@ class AttributeService(object):
         req = urllib2.Request(self.url, post_body)
         req.add_header('Content-Type', 'text/xml')
         req.add_header('Content-Length', str(len(req.get_data())))
-        print req.headers
-        print req.get_data()
+        log.debug(req.headers)
+        log.debug(req.get_data())
         resp = urllib2.urlopen(req)
 
         return AttributeServiceResponse(resp)
