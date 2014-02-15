@@ -9,6 +9,8 @@ import datetime
 import urllib2
 from xml.etree import ElementTree as ET
 
+from pyesgf.security import NS
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -33,16 +35,9 @@ ATS_REQUEST_TMPL = Template('''<?xml version="1.0" encoding="UTF-8"?>
 ''')
 
 
-NS = {
-    'soap11': "http://schemas.xmlsoap.org/soap/envelope/",
-    'saml2p': "urn:oasis:names:tc:SAML:2.0:protocol",
-    'saml': "urn:oasis:names:tc:SAML:2.0:assertion",
-}
-
-
 
 class AttributeService(object):
-    ISSUER = 'ats_tool'
+    ISSUER = 'esgf-pyclient'
     def __init__(self, url):
         self.url = url
 
