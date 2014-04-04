@@ -9,7 +9,7 @@ from pyesgf.node import ESGFNode
 CEDA_NODE = ESGFNode('https://esgf-index1.ceda.ac.uk')
 
 def test_ceda_ats():
-    service = AttributeService(CEDA_NODE.ats_url)
+    service = AttributeService(CEDA_NODE.ats_url, 'esgf-pyclient')
     openid = 'https://ceda.ac.uk/openid/Stephen.Pascoe'
     resp = service.send_request(openid, ['urn:esg:first:name', 'urn:esg:last:name'])
 
@@ -20,7 +20,7 @@ def test_ceda_ats():
     assert attrs['urn:esg:last:name'] == 'Pascoe'
     
 def test_unkown_principal():
-    service = AttributeService(CEDA_NODE.ats_url)
+    service = AttributeService(CEDA_NODE.ats_url, 'esgf-pyclient')
     openid = 'https://example.com/unknown'
 
     resp = service.send_request(openid, [])
@@ -28,7 +28,7 @@ def test_unkown_principal():
     assert resp.get_status() == 'urn:oasis:names:tc:SAML:2.0:status:UnknownPrincipal'
 
 def test_multi_attribute():
-    service = AttributeService(CEDA_NODE.ats_url)
+    service = AttributeService(CEDA_NODE.ats_url, 'esgf-pyclient')
 
     openid = 'https://ceda.ac.uk/openid/Stephen.Pascoe'
     resp = service.send_request(openid, ['CMIP5 Research'])

@@ -37,9 +37,9 @@ ATS_REQUEST_TMPL = Template('''<?xml version="1.0" encoding="UTF-8"?>
 
 
 class AttributeService(object):
-    ISSUER = 'esgf-pyclient'
-    def __init__(self, url):
+    def __init__(self, url,issuer):
         self.url = url
+        self.ISSUER=issuer
 
     def build_request(self, openid, attributes):
         now = datetime.datetime.utcnow()
