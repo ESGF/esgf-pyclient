@@ -6,8 +6,6 @@ Utility functions using the pyesgf package.
 import sys
 from urllib import quote_plus, _is_unicode
 
-from .search.consts import OPERATOR_NEQ
-
 def get_manifest(drs_id, version, connection):
     """
     Retrieve the filenames, sizes and checksums of a dataset.
@@ -76,6 +74,8 @@ def urlencode(query):
 
 
     def append(k, v, tag, l):
+        from .search.consts import OPERATOR_NEQ
+
         if tag == OPERATOR_NEQ:
             l.append('%s!=%s' % (k, v))
         elif tag is None:

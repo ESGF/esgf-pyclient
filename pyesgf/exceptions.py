@@ -8,3 +8,6 @@ class Error(Exception):
 
 class OpenidResolutionError(Error):
     pass
+
+class DuplicateHashError(Error):
+    pass

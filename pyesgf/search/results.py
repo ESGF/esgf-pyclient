@@ -245,7 +245,7 @@ class FileResult(BaseResult):
     @property
     def checksum_type(self):
         try:
-            self.json['checksum_type'][0]
+            return self.json['checksum_type'][0]
         except KeyError:
             return None
 
@@ -256,6 +256,13 @@ class FileResult(BaseResult):
     @property
     def size(self):
         return int(self.json['size'])
+
+    @property
+    def tracking_id(self):
+        try:
+            return self.json['tracking_id'][0]
+        except KeyError:
+            return None
 
 
 class AggregationResult(BaseResult):

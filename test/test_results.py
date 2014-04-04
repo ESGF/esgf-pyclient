@@ -17,7 +17,7 @@ def test_result1():
     results = ctx.search()
 
     r1 = results[0]
-    assert r1.dataset_id == 'cmip5.output1.IPSL.IPSL-CM5A-LR.1pctCO2.3hr.atmos.3hr.r1i1p1.v20110427|vesg.ipsl.fr'
+    assert re.match(r'cmip5\.output1\.IPSL\..\|vesg.ipsl.fr', r1.dataset_id)
     
 def test_file_context():
     conn = SearchConnection(TEST_SERVICE, distrib=False)

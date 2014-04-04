@@ -29,7 +29,8 @@ def test_get_shard_list():
     #!NOTE: the exact shard list will change depending on the shard replication configuration
     #    on the test server
     assert 'esgf-node.ipsl.fr' in shards
-    assert 'esgf-index1.ceda.ac.uk' in shards
+    # IPSL now replicates all non-local shards.  Just check it has a few shards
+    assert len(shards['esgf-node.ipsl.fr']) > 4
     
     
 def test_url_fixing():
