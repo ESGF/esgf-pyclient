@@ -80,7 +80,7 @@ class SearchContext(object):
         #  Constraints
         self.freetext_constraint = None
         self.facet_constraints = MultiDict()
-        self.temporal_constraint = (None, None)
+        self.temporal_constraint = (from_timestamp, to_timestamp)
         self.geosplatial_constraint = None
 
         self._update_constraints(constraints)
@@ -221,7 +221,8 @@ class SearchContext(object):
             self._constrain_freetext(new_freetext)
 
         #!TODO: implement temporal and geospatial constraints
-        #self._constrain_temporal()
+        #print constraints_split['temporal']
+        self._constrain_temporal(start=self.temporal_constraint[0], end=self.temporal_constraint[1])
         #self._constrain_geospatial()
 
         # reset cached values
@@ -300,8 +301,8 @@ class SearchContext(object):
         query_dict.extend(self.facet_constraints)
 
         #!TODO: encode datetime
-        #start, end = self.temporal_constraint
-        #query_dict.update(start=start, end=end)
+        start, end = self.temporal_constraint
+        query_dict.update(start=start, end=end)
 
         return query_dict
 

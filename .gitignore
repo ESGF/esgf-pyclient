@@ -26,3 +26,4 @@ generated/
 /eclipse
 /backup
 ./do_jenkins.sh
+test/url_cache
