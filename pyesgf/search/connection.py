@@ -126,7 +126,7 @@ class SearchConnection(object):
     def _send_query(self, endpoint, full_query):
         """
         Generally not to be called directly by the user but via SearchContext
-	instances.
+    instances.
         
         :param full_query: dictionary of query string parameers to send.
         :return: the urllib2 response object from the query.
@@ -229,8 +229,7 @@ class SearchConnection(object):
 
     def new_context(self, context_class=None,
                     latest=None, facets=None, fields=None,
-                    #!TODO: add once implemented
-                    #from_timestamp=None, to_timestamp=None,
+                    from_timestamp=None, to_timestamp=None,
                     replica=None, shards=None,
                     **constraints):
         """
@@ -246,9 +245,8 @@ class SearchConnection(object):
 
         return context_class(self, constraints,
                              latest=latest, facets=facets, fields=fields,
-                             #!TODO: add once implemented
-                             #from_timestamp=from_timestamp, 
-                             #to_timestamp=to_timestamp,
+                             from_timestamp=from_timestamp, 
+                             to_timestamp=to_timestamp,
                              replica=replica, shards=shards,
         )
 
