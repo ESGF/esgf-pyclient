@@ -29,7 +29,7 @@ import logging
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 from .context import DatasetSearchContext
 from .consts import RESPONSE_FORMAT, SHARD_REXP

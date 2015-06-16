@@ -52,6 +52,26 @@ Find download URLs for all files in a dataset
   http://esg-datanode.jpl.nasa.gov/thredds/fileServer/esg_dataroot/obs4MIPs/observations/atmos/tro3/mon/grid/NASA-JPL/TES/v20110608/tro3_TES_L3_tbd_200507-200912.nc
   http://esg-datanode.jpl.nasa.gov/thredds/fileServer/esg_dataroot/obs4MIPs/observations/atmos/tro3Stderr/mon/grid/NASA-JPL/TES/v20110608/tro3Stderr_TES_L3_tbd_200507-200912.nc
 
+Define a search for datasets that includes a temporal range:
+
+  >>> conn = SearchConnection('http://esgf-index1.ceda.ac.uk/esg-search',
+                        distrib=False)
+  >>> ctx = conn.new_context(project = "CMIP5", model = "HadGEM2-ES",
+          time_frequency = "mon", realm = "atmos", ensemble = "r1i1p1", latest = True,
+          from_timestamp = "2100-12-30T23:23:59Z", to_timestamp = "2200-01-01T00:00:00Z")
+  >>> ctx.hit_count
+  3
+
+Or do the same thing by searching without temporal constraints and then applying the constraint:
+
+  >>> ctx = conn.new_context(project = "CMIP5", model = "HadGEM2-ES",
+          time_frequency = "mon", realm = "atmos", ensemble = "r1i1p1", latest = True)
+  >>> ctx.hit_count
+  21
+  >>> ctx = ctx.constrain(from_timestamp = "2100-12-30T23:23:59Z", to_timestamp = "2200-01-01T00:00:00Z")
+  >>> ctx.hit_count
+  3
+
 Obtain MyProxy credentials to allow downloading files or using secured OPeNDAP
 
   >>> from pyesgf.logon import LogonManager
