@@ -65,8 +65,10 @@ class SearchContext(object):
             or only non-latest versions, or None to return both.
         :param shards: list of shards to restrict searches to.  Should be from the list
             self.connection.get_shard_list()
-        :param from_timestamp: NotImplemented
-        :param to_timestamp: NotImplemented
+        :param from_timestamp: Date-time string to specify start of search range 
+            (e.g. "2000-01-01T00:00:00Z"). 
+        :param to_timestamp: Date-time string to specify end of search range
+            (e.g. "2100-12-31T23:59:59Z").
 
         """
 
@@ -80,7 +82,7 @@ class SearchContext(object):
         #  Constraints
         self.freetext_constraint = None
         self.facet_constraints = MultiDict()
-        self.temporal_constraint = (from_timestamp, to_timestamp)
+        self.temporal_constraint = [from_timestamp, to_timestamp]
         self.geosplatial_constraint = None
 
         self._update_constraints(constraints)
@@ -221,8 +223,10 @@ class SearchContext(object):
             self._constrain_freetext(new_freetext)
 
         #!TODO: implement temporal and geospatial constraints
-        #print constraints_split['temporal']
-        self._constrain_temporal(start=self.temporal_constraint[0], end=self.temporal_constraint[1])
+        if 'from_timestamp' in constraints_split['temporal']:
+            self.temporal_constraint[0] = constraints_split['temporal']['from_timestamp']
+        if 'to_timestamp' in constraints_split['temporal']:
+            self.temporal_constraint[1] = constraints_split['temporal']['to_timestamp']
         #self._constrain_geospatial()
 
         # reset cached values
@@ -242,18 +246,6 @@ class SearchContext(object):
 
     def _constrain_freetext(self, query):
         self.freetext_constraint = query
-
-    def _constrain_temporal(self, start, end):
-        """
-        :param start: a datetime instance specifying the start of the temporal
-            constraint.
-        :param end: a datetime instance specifying the end of the temporal
-            constraint.
-
-        """
-        #!TODO: support solr date keywords like "NOW" and "NOW-1DAY"
-        #     we will probably need a separate TemporalConstraint object
-        self.temporal_constraint = (start, end)
 
     def _constrain_geospatial(self, lat=None, lon=None, bbox=None, location=None,
                               radius=None, polygon=None):
@@ -278,6 +270,7 @@ class SearchContext(object):
         from .connection import query_keyword_type
 
         constraints_split = dict((kw, MultiDict()) for kw in QUERY_KEYWORD_TYPES)
+
         for kw, val in constraints.items():
             constraint_type = query_keyword_type(kw)
             constraints_split[constraint_type][kw] = val

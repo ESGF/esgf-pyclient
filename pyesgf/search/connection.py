@@ -27,7 +27,9 @@ from urlparse import urlparse
 import warnings
 import logging
 
+logging.basicConfig()
 log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 from .context import DatasetSearchContext
 from .consts import RESPONSE_FORMAT, SHARD_REXP
@@ -138,7 +140,16 @@ class SearchConnection(object):
         query_url = '%s/%s?%s' % (self.url, endpoint, urlencode(full_query))
         log.debug('Query request is %s' % query_url)
 
-        response = urllib2.urlopen(query_url)
+        try:
+            response = urllib2.urlopen(query_url)
+        except urllib2.HTTPError, err:
+            log.warn("HTTP request received error code: %s" % err.code)
+            if err.code == 400:
+                errors = set(re.findall("Invalid HTTP query parameter=(\w+)", err.fp.read()))
+                content = "; ".join([e for e in list(errors)])
+                raise Exception("Invalid query parameter(s): %s" % content)
+            else:
+                raise Exception("Error returned from URL: %s" % query_url)
 
         return response
 
@@ -264,7 +275,7 @@ def query_keyword_type(keyword):
 
     if keyword == 'query':
         return 'freetext'
-    elif keyword in ['start', 'end']:
+    elif keyword in ['start', 'end', 'from_timestamp', 'to_timestamp']:
         return 'temporal'
     elif keyword in ['lat', 'lon', 'bbox', 'location', 'radius', 'polygon']:
         return 'geospatial'
