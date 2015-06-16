@@ -27,18 +27,22 @@ facets       SearchContext     Set in constructor
 fields       SearchContext     Set in constructor
 replica      SearchContext     Set in constructor
 type         SearchContext     Create contexts with the right type using :meth:`ResultSet.file_context`, etc.
-from         SearchContext     Not implemented yet.  Placeholder name "from_timestamp"
-to           SearchContext     Not implemented yet.  Placeholder name "to_timestamp"
+from         SearchContext     Set in constructor. Use "from_timestamp" in the context API.
+to           SearchContext     Set in constructor. Use "to_timestamp" in the context API.
 fields       n/a               Managed internally
 format       n/a               Managed internally
 id           n/a               Managed internally
 ===========  ================  =================================================================================================== 
 
+Temporal keywords
+'''''''''''''''''
 
-Temporal / Spatial keywords
-'''''''''''''''''''''''''''
+Temporal keywords are supported for Dataset search. The terms "from_timestamp" and "to_timestamp" should be used with values following the format "YYYY-MM-DDThh:mm:ssZ".
 
-Temporal and spatial keywords are not yet supported by :mod:`pyesgf.search` however the API does have placeholders for these keywords anticipating future implementation:
+Spatial keywords
+''''''''''''''''
+
+Spatial keywords are not yet supported by :mod:`pyesgf.search` however the API does have placeholders for these keywords anticipating future implementation:
 
 Facet keywords
 ''''''''''''''
