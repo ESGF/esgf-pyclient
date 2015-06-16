@@ -17,7 +17,7 @@ def test_result1():
     results = ctx.search()
 
     r1 = results[0]
-    assert re.match(r'cmip5\.output1\.IPSL\..\|vesg.ipsl.fr', r1.dataset_id)
+    assert re.match(r'cmip5\.output1\.MOHC\..+\|esgf-data2.ceda.ac.uk', r1.dataset_id)
     
 def test_file_context():
     conn = SearchConnection(TEST_SERVICE, distrib=False)
@@ -60,8 +60,7 @@ def test_file_list2():
 
     file_results = f_ctx.search()
     for file_result in file_results:
-        print file_result.download_url
-        assert re.match(r'http://vesg.ipsl.fr/thredds/.*\.nc', file_result.download_url)
+        assert re.search(r'ds/.*\.nc', file_result.download_url)
 
 def test_aggregations():
     conn = SearchConnection(TEST_SERVICE, distrib=False)
