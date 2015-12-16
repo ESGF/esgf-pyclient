@@ -241,7 +241,7 @@ class SearchConnection(object):
     def new_context(self, context_class=None,
                     latest=None, facets=None, fields=None,
                     from_timestamp=None, to_timestamp=None,
-                    replica=None, shards=None,
+                    replica=None, shards=None, search_type=None,
                     **constraints):
         """
         Returns a :class:`pyesgf.search.context.SearchContext` class for 
@@ -259,6 +259,7 @@ class SearchConnection(object):
                              from_timestamp=from_timestamp, 
                              to_timestamp=to_timestamp,
                              replica=replica, shards=shards,
+                             search_type=search_type,
         )
 
 
