@@ -27,3 +27,5 @@ generated/
 /backup
 ./do_jenkins.sh
 test/url_cache
+.esg/
+env/
