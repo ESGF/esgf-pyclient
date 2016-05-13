@@ -10,4 +10,5 @@ DEFAULT_BATCH_SIZE = 50
 
 OPERATOR_NEQ = 'not_equal'
 
-SHARD_REXP = r'(?P<host>.*?):(?P<port>\d*)/solr(?P<suffix>.*)'
+SHARD_REXP = r'^(?P<prefix>https?://)?(?P<host>.+?):?(?P<port>\d+)?/(?P<suffix>.*)$'
+

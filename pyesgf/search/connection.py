@@ -166,7 +166,12 @@ class SearchConnection(object):
                 else:
                     for port, suffix in self._available_shards[shard]:
                         # suffix should be ommited when querying
-                        shard_specs.append('%s:%s/solr' % (shard, port))
+                        if not port:
+                            port_string = ""
+                        else:
+                            port_string = ":%s" % port
+
+                        shard_specs.append('%s%s/solr' % (shard, port_string))
 
             shard_str = ','.join(shard_specs)
         else:
