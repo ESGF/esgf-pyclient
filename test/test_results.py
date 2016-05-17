@@ -17,7 +17,7 @@ def test_result1():
     results = ctx.search()
 
     r1 = results[0]
-    assert re.match(r'cmip5\.output1\.MOHC\..+\|esgf-data2.ceda.ac.uk', r1.dataset_id)
+    assert re.match(r'cmip5\.output1\.MOHC\..+\|esgf-data1.ceda.ac.uk', r1.dataset_id)
     
 def test_file_context():
     conn = SearchConnection(TEST_SERVICE, distrib=False)
@@ -122,6 +122,7 @@ def test_shards_constrain():
     full_query = f_ctx.connection._build_query(query_dict, shards=f_ctx.shards)
 
     #!TODO: Force fail to see whether shards is passed through.
+    # NOTE: 'shards' is NOT even a key in this dictionary. Needs rewrite!!!
     q_shard = full_query['shards']
     # Check it isn't a ',' separated list
     assert ',' not in q_shard
