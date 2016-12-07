@@ -13,7 +13,7 @@ from pyesgf.multidict import MultiDict
 
 from .constraints import GeospatialConstraint
 from .consts import (TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION,
-                     QUERY_KEYWORD_TYPES)
+                     QUERY_KEYWORD_TYPES, DEFAULT_BATCH_SIZE)
 from .results import ResultSet
 from .exceptions import EsgfSearchException
 
@@ -106,10 +106,11 @@ class SearchContext(object):
     # Functional search interface
     # These do not change the constraints on self.
 
-    def search(self, **constraints):
+    def search(self, batch_size=DEFAULT_BATCH_SIZE, ignore_facet_check=False, **constraints):
         """
         Perform the search with current constraints returning a set of results.
 
+        :batch_size: The number of results to get per HTTP request.
         :param constraints: Further constraints for this query.  Equivilent
             to calling self.constrain(**constraints).search()
         :return: A ResultSet for this query
@@ -120,9 +121,9 @@ class SearchContext(object):
         else:
             sc = self
 
-        self.__update_counts()
+        self.__update_counts(ignore_facet_check=ignore_facet_check)
 
-        return ResultSet(sc)
+        return ResultSet(sc, batch_size=batch_size)
 
     def constrain(self, **constraints):
         """
@@ -186,7 +187,7 @@ class SearchContext(object):
 
         return facet_options
 
-    def __update_counts(self):
+    def __update_counts(self, ignore_facet_check=False): 
         # If hit_count is set the counts are already retrieved
         if self.__hit_count is not None:
             return
@@ -194,7 +195,9 @@ class SearchContext(object):
         self.__facet_counts = {}
         self.__hit_count = None
         query_dict = self._build_query()
-        query_dict['facets'] = '*'
+
+        if not ignore_facet_check:
+            query_dict['facets'] = '*'
 
         response = self.connection.send_search(query_dict, limit=0)
         for facet, counts in (
