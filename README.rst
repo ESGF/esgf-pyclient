@@ -6,5 +6,5 @@ github.  Pull requests are always welcome.
 
 Full `documentation`_ is available on ReadTheDocs or in the docs directory.
 
-.. _`ESGF Search API`: http://esgf.org/wiki/ESGF_Search_API
+.. _`ESGF Search API`: https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API
 .. _`documentation`: http://esgf-pyclient.readthedocs.org
