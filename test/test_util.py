@@ -52,14 +52,3 @@ def test_download_url():
     assert re.match(r'http://.*\.nc', download_url)
     
 
-def test_opendap_fail():
-    conn = SearchConnection(CEDA_SERVICE, distrib=False)
-
-    ctx = conn.new_context()
-    results = ctx.search(project='CMIP5', experiment='rcp45', time_frequency='mon',
-                         realm='fx', ensemble='r1i1p1')
-
-    files_ctx = results[0].file_context()
-    hit = files_ctx.search()[0]
-
-    assert hit.opendap_url is None

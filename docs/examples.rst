@@ -37,7 +37,7 @@ Find the OPeNDAP URL for an aggregated dataset::
   >>> print agg.opendap_url
   http://cmip-dn1.badc.rl.ac.uk/thredds/dodsC/cmip5.output1.MOHC.HadCM3.decadal2000.day.ocean.day.r1i2p1.tos.20110708.aggregation.1
 
-Find download URLs for all files in a dataset
+Find download URLs for all files in a dataset::
 
   >>> ctx = conn.new_context(project='obs4MIPs', model='Obs-TES')
   >>> ctx.hit_count
@@ -52,7 +52,7 @@ Find download URLs for all files in a dataset
   http://esg-datanode.jpl.nasa.gov/thredds/fileServer/esg_dataroot/obs4MIPs/observations/atmos/tro3/mon/grid/NASA-JPL/TES/v20110608/tro3_TES_L3_tbd_200507-200912.nc
   http://esg-datanode.jpl.nasa.gov/thredds/fileServer/esg_dataroot/obs4MIPs/observations/atmos/tro3Stderr/mon/grid/NASA-JPL/TES/v20110608/tro3Stderr_TES_L3_tbd_200507-200912.nc
 
-Define a search for datasets that includes a temporal range:
+Define a search for datasets that includes a temporal range::
 
   >>> conn = SearchConnection('http://esgf-index1.ceda.ac.uk/esg-search',
                         distrib=False)
@@ -62,7 +62,7 @@ Define a search for datasets that includes a temporal range:
   >>> ctx.hit_count
   3
 
-Or do the same thing by searching without temporal constraints and then applying the constraint:
+Or do the same thing by searching without temporal constraints and then applying the constraint::
 
   >>> ctx = conn.new_context(project = "CMIP5", model = "HadGEM2-ES",
           time_frequency = "mon", realm = "atmos", ensemble = "r1i1p1", latest = True)
@@ -72,7 +72,7 @@ Or do the same thing by searching without temporal constraints and then applying
   >>> ctx.hit_count
   3
 
-Obtain MyProxy credentials to allow downloading files or using secured OPeNDAP
+Obtain MyProxy credentials to allow downloading files or using secured OPeNDAP::
 
   >>> from pyesgf.logon import LogonManager
   >>> lm = LogonManager()
@@ -83,4 +83,44 @@ Obtain MyProxy credentials to allow downloading files or using secured OPeNDAP
   >>> lm.is_logged_on()
   True
 
+NOTE: you may be prompted for your username if not available via your OpenID.
+
+Obtain MyProxy credentials from your username, password and the MyProxy host::
+
+  >>> myproxy_host = 'slcs1.ceda.ac.uk'
+  >>> lm.logon(userid, password, myproxy_host)
+  >>> lm.is_logged_on()
+  True
+
 See the :mod:`pyesgf.logon` module documentation for details of how to use myproxy username instead of OpenID.
+
+Now download a file using the ESGF wget script extracted from the server::
+
+  >>> fc = ds.file_context()
+  >>> wget_script_content = fc.get_download_script()
+  >>> script_name = 'download.sh'
+  >>> with open(script_name, "w") as writer: 
+  ...    writer.write(wget_script_content)
+  ...
+  >>> import os, commands
+  >>> os.chmod(script_name, 0750)
+  >>> commands.getoutput("./%s" % script_name)
+
+...and the files will be downloaded to the current directory.
+
+If you are doing batch searching and things are running slow, you might be able to 
+achieve a considerable speed up by sending the following argument to the search call::
+
+  >>> ctx.search(ignore_facet_check=True)
+
+This cuts out an extra call that typically takes 2 seconds to return a response. Note that 
+it may mean some of the functionality is affected (such as being able to view the available
+facets and access the hit count) so use this feature with care.
+
+You can also dictate how the search batches up its requests with:
+
+  >>> ctx.search(batch_size=250)
+
+The `batch_size` argument does not affect the final result but may affect the speed of the response. 
+The batch size can also be set as a default in the :mod:`pyesgf.search.consts` module.
+

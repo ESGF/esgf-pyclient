@@ -9,6 +9,8 @@ from urlparse import urlparse
 from pyesgf.search.connection import SearchConnection
 
 from .config import TEST_SERVICE
+PCMDI_NODE = 'https://pcmdi.llnl.gov/esg-search'
+
 
 def test_result1():
     conn = SearchConnection(TEST_SERVICE, distrib=False)
@@ -137,7 +139,7 @@ def test_shards_constrain():
 
 def test_shards_constrain2():
     # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
-    conn = SearchConnection('http://pcmdi9.llnl.gov/esg-search',distrib=True)
+    conn = SearchConnection(PCMDI_NODE,distrib=True)
 
     ctx = conn.new_context(experiment='piControl', time_frequency='day', variable='pr', ensemble='r1i1p1')
     ctx = ctx.constrain(query='cmip5.output1.BCC.bcc-csm1-1-m.piControl.day.atmos.day.r1i1p1')
@@ -155,7 +157,7 @@ def test_shards_constrain2():
 
 def test_shards_constrain3():
     # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
-    conn = SearchConnection('http://pcmdi9.llnl.gov/esg-search',distrib=True)
+    conn = SearchConnection(PCMDI_NODE,distrib=True)
 
     ctx = conn.new_context(query='cmip5.output1.CMCC.CMCC-CESM.historical.mon.atmos.Amon.r1i1p1.v20130416')
     s = ctx.search()
@@ -173,9 +175,9 @@ def test_shards_constrain3():
 
 def test_shards_constrain4():
     # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
-    conn = SearchConnection('http://pcmdi9.llnl.gov/esg-search',distrib=True)
+    conn = SearchConnection(PCMDI_NODE ,distrib=True)
 
-    ctx = conn.new_context(query='cmip5.output1.BCC.bcc-csm1-1-m.historical.mon.atmos.Amon.r1i1p1.v20120709')
+    ctx = conn.new_context(query='id:cmip5.output1.BCC.bcc-csm1-1-m.historical.mon.atmos.Amon.r1i1p1.v20120709*')
     s = ctx.search()
 
     ds = s[0]

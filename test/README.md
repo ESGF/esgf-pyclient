@@ -1,5 +1,9 @@
+Install "pytest":
+
+ pip install pytest
+
 In order to run the tests:
 
- nosetests --tests=test --logging-level=DEBUG # run all
- nosetests --tests=test/test_context.py:test_response_from_bad_parameter --logging-level=DEBUG # run just one
+ py.test         # runs all
+ py.test -k test_response_from_bad_parameter   # runs only this test
 
