@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Release 0.1.7
+Release 0.1.8
 -------------
 
 This release includes the following changes:
