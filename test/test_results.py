@@ -64,6 +64,21 @@ def test_file_list2():
     for file_result in file_results:
         assert re.search(r'ds/.*\.nc', file_result.download_url)
 
+def test_gridftp_url_in_file_result():
+    conn = SearchConnection(TEST_SERVICE, distrib=False)
+
+    ctx = conn.new_context(project='CMIP5')
+    results = ctx.search()
+
+    r1 = results[0]
+    f_ctx = r1.file_context()
+
+    file_results = f_ctx.search()
+    for file_result in file_results:
+        gridftp_url = file_result.gridftp_url
+        assert gridftp_url.split(":")[0] == "gsiftp"
+        assert file_result.gridftp_url.endswith(".nc")
+
 def test_aggregations():
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
