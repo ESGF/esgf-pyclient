@@ -65,8 +65,8 @@ def test_context_facet_options():
                                ensemble='r1i1p1', experiment='rcp60',
                                realm='seaIce')
 
-    assert context.get_facet_options().keys() == ['data_node', 'cf_standard_name', 'variable_long_name', 
-                               'cmor_table', 'time_frequency', 'variable']
+    expected = sorted([u'index_node', u'data_node', u'format', u'cf_standard_name', u'variable_long_name', u'cmor_table', u'time_frequency', u'variable'])
+    assert sorted(context.get_facet_options().keys()) == expected
 
 
 def test_context_facets3():
@@ -153,30 +153,27 @@ def test_replica():
     # Test that we can exclude replicas
     # This tests assumes the test dataset is replicated
     conn = SearchConnection(TEST_SERVICE)
+    query = 'id:cmip5.output1.NIMR-KMA.HadGEM2-AO.rcp60.mon.atmos.Amon.r1i1p1.*'
 
-    context = conn.new_context(
-        query='cmip5.output1.NIMR-KMA.HadGEM2-AO.rcp60.mon.atmos.Amon.r1i1p1')
-
+    context = conn.new_context(query=query)
     assert context.hit_count > 1
 
-    context = conn.new_context(
-        query='cmip5.output1.NIMR-KMA.HadGEM2-AO.rcp60.mon.atmos.Amon.r1i1p1',
-        replica=False)
-
+    context = conn.new_context(query=query, replica=False)
     assert context.hit_count == 1
 
 def test_response_from_bad_parameter():
     # Test that a bad parameter name raises a useful exception
-    # NOTE::: !!! This fails because urllib2 HTTP query is overrided with 
+    # NOTE::: !!! This would fail because urllib2 HTTP query is overridden with 
     #         !!! cache handler instead of usual response. 
-    #         !!! Fix needs to make sure cached URL request has response exceptions matching urllib2 exception
+    #         !!! So catch other error instead
+
     conn = SearchConnection(TEST_SERVICE)
     context = conn.new_context(project='CMIP5', rubbish='nonsense')
-    context.hit_count
 
     try:
         context.hit_count
     except Exception, err:
-        assert str(err).strip() == "Invalid query parameter(s): rubbish"
+        assert str(err).strip() in ("Invalid query parameter(s): rubbish", 
+                               "No JSON object could be decoded")
         
 

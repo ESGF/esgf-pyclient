@@ -10,10 +10,13 @@ import shutil
 
 from pyesgf.logon import LogonManager, ESGF_CREDENTIALS
 
-TEST_USER = 'pyesgf'
-TEST_PASSWORD = 'RetSet1'
-TEST_MYPROXY = 'pcmdi9.llnl.gov'
-TEST_OPENID = 'https://pcmdi9.llnl.gov/esgf-idp/openid/pyesgf'
+TEST_USER = 'arthur'
+TEST_PASSWORD = 'pewtey'
+TEST_MYPROXY = 'slcs1.ceda.ac.uk'
+TEST_OPENID = 'https://ceda.ac.uk/openid/Arthur.Pewtey'
+
+if TEST_PASSWORD == 'pewtey':
+    raise Exception("Update test credentials before testing running tests.")
 
 esgf_dir = None
 test_data_dir = op.join(op.dirname(__file__), 'data')
@@ -88,6 +91,10 @@ def test_logon_openid():
     _clear_creds()
     _load_creds(certificates_tarball='pcmdi9-certs.tar.gz')
     lm = LogonManager(esgf_dir)
+
+    # NOTE: for many users the OpenID lookup might not provide the username
+    #       in which case this test will fail because it needs interactive
+    #       prompting for a username.
     lm.logon_with_openid(TEST_OPENID, TEST_PASSWORD, interactive=False)
 
     assert lm.is_logged_on()

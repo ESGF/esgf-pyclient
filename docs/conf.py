@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ESGF Pyclient'
-copyright = u'2012, Stephen Pascoe'
+copyright = u'2016, STFC CEDA'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -192,7 +192,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'ESGFPyclient.tex', u'ESGF Pyclient Documentation',
-   u'Stephen Pascoe', 'manual'),
+   u'Ag Stephens', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -222,7 +222,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'esgfpyclient', u'ESGF Pyclient Documentation',
-     [u'Stephen Pascoe'], 1)
+     [u'Ag Stephens'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -236,7 +236,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'ESGFPyclient', u'ESGF Pyclient Documentation',
-   u'Stephen Pascoe', 'ESGFPyclient', 'One line description of project.',
+   u'Ag Stephens', 'ESGFPyclient', 'One line description of project.',
    'Miscellaneous'),
 ]
 

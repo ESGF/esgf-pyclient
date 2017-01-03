@@ -81,4 +81,4 @@ Result
 
 :class:`Result` instances represent the result record in the SOLr response.  They are subclassed to represent records of different types: :class:`FileResult` and :class:`DatasetResult`.  Results have various properties exposing information about the objects they represent.  e.g. dataset_id, checksum, filename, size, etc.
 
-.. _`ESGF Search API`: http://esgf.org/wiki/ESGF_Search_REST_API
+.. _`ESGF Search API`: https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API

@@ -33,11 +33,9 @@ setup(name='esgf-pyclient',
       packages=find_packages(exclude=['ez_setup', 'examples', 'test']),
       include_package_data=True,
       zip_safe=False,
-      install_requires=[
-        'jinja2',
-      ],
-      #tests_require=['NoseXUnit'],
+      install_requires=['jinja2'],
+      tests_require=['pytest'],
       entry_points= {
         },
-      test_suite='nose.collector',
+      test_suite='test',
       )

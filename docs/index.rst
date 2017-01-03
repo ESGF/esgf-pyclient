@@ -8,10 +8,9 @@ Welcome to esgf-pyclient  documentation!
 
 ESGF Pyclient is a Python package designed for interacting with the `Earth System Grid Federation`_ system.  Current there are interfaces to the ESGF Search and Security systems.
 
-ESGF Pyclient is currently in development.  Version 0.1 represents the
-first beta-quality release.  Contributions to development are
+ESGF Pyclient is currently in development.  Contributions to development are
 gratefully received.  Anyone wishing to contribute or give feedback
-can do so through the project's `github site`_.
+can do so through the project `github site`_.
 
 
 Getting Started
@@ -28,7 +27,11 @@ You can also download the tarball from http://pypi.python.org/pypi/esgf-pyclient
   $ cd esgf-pyclient-*.tar.gz
   $ python setup.py install
 
-If you want to follow the latest code and/or make contributions the source code is available on github at https://github.com/stephenpascoe/esgf-pyclient
+Or you can install it using conda::
+
+  $ conda install -c birdhouse esgf-pyclient
+
+If you want to follow the latest code and/or make contributions the source code is available on github at https://github.com/ESGF/esgf-pyclient
 
 Once installed you import the package as the name ``pyesgf``.  See the recipes for examples.
 
@@ -55,4 +58,4 @@ Indices and tables
 
 
 .. _`Earth System Grid Federation`: http://esgf.org
-.. _`github site`: https://github.com/stephenpascoe/esgf-pyclient
+.. _`github site`: https://github.com/ESGF/esgf-pyclient
