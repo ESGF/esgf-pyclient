@@ -15,6 +15,8 @@ This release includes the following changes:
     directly sent to it in order to manage how the calls to the API would be separated out into batches. This
     does not affect the final result but may affect the speed of the response. The batch size can also be set
     as a default in the :mod:`pyesgf.search.consts` module.
+ 4. Searches at the file-level now return a `gridftp_url` property along with other existing properties such
+    as `download_url`. 
 
 Release 0.1b1
 -------------
