@@ -97,6 +97,7 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
         assert self.check_postamble(postamble, config1)
     
 
+    @pytest.mark.xfail(reason='Do not install netCDF4 for testing.')
     def test_open_url(self, TEST_SERVICE):
         import netCDF4
 
