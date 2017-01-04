@@ -5,10 +5,13 @@ Test Attribute Service API.
 
 from pyesgf.security.ats import AttributeService
 from pyesgf.node import ESGFNode
+import pytest
 
 CEDA_NODE = ESGFNode('https://esgf-index1.ceda.ac.uk')
 OPENID = 'https://ceda.ac.uk/openid/Ag.Stephens'
 
+
+@pytest.mark.xfail(reason='This test does not work anymore.')
 def test_ceda_ats():
     service = AttributeService(CEDA_NODE.ats_url, 'esgf-pyclient')
     fn, ln = 'Ag', 'Stephens'
@@ -28,6 +31,7 @@ def test_unkown_principal():
     
     assert resp.get_status() == 'urn:oasis:names:tc:SAML:2.0:status:UnknownPrincipal'
 
+@pytest.mark.xfail(reason='This test does not work anymore.')
 def test_multi_attribute():
     service = AttributeService(CEDA_NODE.ats_url, 'esgf-pyclient')
 

@@ -2,6 +2,7 @@
 
 import os
 
+#import pyesgf
 from pyesgf.cache_urllib2 import install_cache
 
 import pytest

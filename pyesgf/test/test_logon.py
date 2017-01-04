@@ -9,14 +9,18 @@ import os.path as op
 import shutil
 
 from pyesgf.logon import LogonManager, ESGF_CREDENTIALS
+import pytest
+try:
+    from myproxy.client import MyProxyClient
+    import OpenSSL
+    _has_myproxy = True
+except ImportError:
+    _has_myproxy = False
 
-TEST_USER = 'flaliberte'
-TEST_PASSWORD = 'Salut1001'
+TEST_USER = os.environ.get('USERNAME')
+TEST_PASSWORD = os.environ.get('PASSWORD')
+TEST_OPENID = os.environ.get('OPENID')
 TEST_MYPROXY = 'slcs1.ceda.ac.uk'
-TEST_OPENID = 'https://ceda.ac.uk/openid/Frederic.Laliberte'
-
-if TEST_PASSWORD == 'pewtey':
-    raise Exception("Update test credentials before testing running tests.")
 
 esgf_dir = None
 test_data_dir = op.join(op.dirname(__file__), 'data')
@@ -58,6 +62,7 @@ def test_expired():
     lm = LogonManager(esgf_dir)
     assert lm.state == lm.STATE_EXPIRED_CREDENTIALS
 
+@pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
 def test_logon():
     _clear_creds()
     _load_creds(certificates_tarball='pcmdi9-certs.tar.gz')
@@ -66,6 +71,7 @@ def test_logon():
 
     assert lm.is_logged_on()
 
+@pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
 def test_bootstrap():
     _clear_creds()
     lm = LogonManager(esgf_dir)
@@ -73,6 +79,7 @@ def test_bootstrap():
 
     assert lm.is_logged_on()
 
+@pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
 def test_logoff():
     lm = LogonManager(esgf_dir)
 
@@ -87,6 +94,7 @@ def test_logoff():
     assert not lm.is_logged_on()
     assert lm.state == lm.STATE_NO_CREDENTIALS
 
+@pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
 def test_logon_openid():
     _clear_creds()
     _load_creds(certificates_tarball='pcmdi9-certs.tar.gz')
