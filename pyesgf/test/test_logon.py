@@ -105,9 +105,9 @@ def test_logoff():
     assert lm.state == lm.STATE_NO_CREDENTIALS
 
 
-@pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
-@pytest.mark.xfail(not _has_myproxy,
-                   reason='Obtaining username from ''openid is not working.')
+# NOTE: This line should replace the xfail if bug is fixed
+# @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
+@pytest.mark.xfail(reason='Obtaining username from ''openid is not working.')
 def test_logon_openid():
     _clear_creds()
     _load_creds(certificates_tarball='pcmdi9-certs.tar.gz')
