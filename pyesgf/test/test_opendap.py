@@ -9,6 +9,7 @@ import os.path as op
 import shutil
 from unittest import TestCase
 import re
+import pytest
 
 from pyesgf.logon import LogonManager, DAP_CONFIG_MARKER
 from pyesgf.search import SearchConnection
