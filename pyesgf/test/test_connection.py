@@ -11,19 +11,18 @@ import nose.tools as nt
 from pyesgf.search.connection import SearchConnection
 import pyesgf.search.exceptions as exc
 
-from .config import TEST_SERVICE
 
-def test_blank_query():
+def test_blank_query(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     json = conn.send_search({})
 
     assert json.keys() == [u'facet_counts', u'responseHeader', u'response']
     
-def test_get_shard_list_fail():
+def test_get_shard_list_fail(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
     nt.assert_raises(exc.EsgfSearchException, conn.get_shard_list)
 
-def test_get_shard_list():
+def test_get_shard_list(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=True)
     shards = conn.get_shard_list()
     #!NOTE: the exact shard list will change depending on the shard replication configuration
@@ -33,7 +32,7 @@ def test_get_shard_list():
     assert len(shards['esgf-index2.ceda.ac.uk']) > 3
     
     
-def test_url_fixing():
+def test_url_fixing(TEST_SERVICE):
     conn1 = SearchConnection(TEST_SERVICE)
     conn2 = SearchConnection(TEST_SERVICE+'/')
     conn3 = SearchConnection(TEST_SERVICE+'///')

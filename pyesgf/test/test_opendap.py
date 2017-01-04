@@ -12,7 +12,6 @@ import re
 
 from pyesgf.logon import LogonManager, DAP_CONFIG_MARKER
 from pyesgf.search import SearchConnection
-from test.config import TEST_SERVICE
 
 class TestOpendap(TestCase):
     def setUp(self):
@@ -98,7 +97,7 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
         assert self.check_postamble(postamble, config1)
     
 
-    def test_open_url(self):
+    def test_open_url(self, TEST_SERVICE):
         import netCDF4
 
         lm = LogonManager(self.esgf_dir, dap_config=self.dap_config)

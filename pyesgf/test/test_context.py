@@ -5,21 +5,20 @@ Test the SearchContext class
 
 from pyesgf.search import SearchConnection, not_equals
 
-from .config import TEST_SERVICE
 
-def test_context_freetext():
+def test_context_freetext(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     context = conn.new_context(query="temperature")
 
     assert context.freetext_constraint == "temperature"
 
-def test_context_facets1():
+def test_context_facets1(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     context = conn.new_context(project='cmip5')
 
     assert context.facet_constraints['project'] == 'cmip5'
     
-def test_context_facets1():
+def test_context_facets2(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     context = conn.new_context(project='CMIP5')
 
@@ -27,7 +26,7 @@ def test_context_facets1():
     assert context2.facet_constraints['project'] == 'CMIP5'
     assert context2.facet_constraints['model'] == 'IPSL-CM5A-LR'
 
-def test_context_facets_multivalue():
+def test_context_facets_multivalue(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     context = conn.new_context(project='CMIP5')
 
@@ -37,7 +36,7 @@ def test_context_facets_multivalue():
     assert context2.facet_constraints['project'] == 'CMIP5'
     assert sorted(context2.facet_constraints.getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
 
-def test_context_facet_multivalue2():
+def test_context_facet_multivalue2(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     context = conn.new_context(project='CMIP5', model='IPSL-CM5A-MR')
     assert context.facet_constraints.getall('model') == ['IPSL-CM5A-MR']
@@ -47,7 +46,7 @@ def test_context_facet_multivalue2():
     assert sorted(context2.facet_constraints.getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
 
 
-def test_context_facet_multivalue3():
+def test_context_facet_multivalue3(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     ctx = conn.new_context(project='CMIP5', query='humidity', experiment='rcp45')
     hits1 = ctx.hit_count
@@ -59,7 +58,7 @@ def test_context_facet_multivalue3():
     assert hits2 > hits1
 
 
-def test_context_facet_options():
+def test_context_facet_options(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR',
                                ensemble='r1i1p1', experiment='rcp60',
@@ -69,7 +68,7 @@ def test_context_facet_options():
     assert sorted(context.get_facet_options().keys()) == expected
 
 
-def test_context_facets3():
+def test_context_facets3(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     
     context = conn.new_context(project='CMIP5')
@@ -81,7 +80,7 @@ def test_context_facets3():
     assert result.json['project'] == ['CMIP5']
     assert result.json['model'] == ['IPSL-CM5A-LR']
 
-def test_facet_count():
+def test_facet_count(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     
     context = conn.new_context(project='CMIP5')
@@ -91,7 +90,7 @@ def test_facet_count():
     assert counts['model'].keys() == ['IPSL-CM5A-LR']
     assert counts['project'].keys() == ['CMIP5']
 
-def test_distrib():
+def test_distrib(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     context = conn.new_context(project='CMIP5')
@@ -103,7 +102,7 @@ def test_distrib():
 
     assert count1 < count2
 
-def test_constrain():
+def test_constrain(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
     
     context = conn.new_context(project='CMIP5')
@@ -114,7 +113,7 @@ def test_constrain():
     assert count1 > count2
 
 
-def test_constrain_freetext():
+def test_constrain_freetext(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
 
     context = conn.new_context(project='CMIP5', query='humidity')
@@ -123,7 +122,7 @@ def test_constrain_freetext():
     context = context.constrain(experiment='historical')
     assert context.freetext_constraint == 'humidity'
 
-def test_constrain_regression1():
+def test_constrain_regression1(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
 
     context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR')
@@ -132,7 +131,7 @@ def test_constrain_regression1():
     context2 = context.constrain(experiment='historical')
     assert 'experiment' not in context.facet_constraints
 
-def test_negative_facet():
+def test_negative_facet(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE)
 
     context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR')
@@ -149,7 +148,7 @@ def test_negative_facet():
 
     assert hits1 == hits2 + hits3
     
-def test_replica():
+def test_replica(TEST_SERVICE):
     # Test that we can exclude replicas
     # This tests assumes the test dataset is replicated
     conn = SearchConnection(TEST_SERVICE)
@@ -161,7 +160,7 @@ def test_replica():
     context = conn.new_context(query=query, replica=False)
     assert context.hit_count == 1
 
-def test_response_from_bad_parameter():
+def test_response_from_bad_parameter(TEST_SERVICE):
     # Test that a bad parameter name raises a useful exception
     # NOTE::: !!! This would fail because urllib2 HTTP query is overridden with 
     #         !!! cache handler instead of usual response. 

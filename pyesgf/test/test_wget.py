@@ -5,9 +5,7 @@ Test downloading wget scripts
 
 from pyesgf.search import SearchConnection, not_equals
 
-from .config import TEST_SERVICE
-
-def test_download_script():
+def test_download_script(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
     ctx = conn.new_context(project='CMIP5', ensemble='r1i1p1', model='IPSL-CM5A-LR', realm='seaIce',
                            experiment='historicalGHG')

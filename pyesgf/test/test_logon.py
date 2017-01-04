@@ -10,10 +10,10 @@ import shutil
 
 from pyesgf.logon import LogonManager, ESGF_CREDENTIALS
 
-TEST_USER = 'arthur'
-TEST_PASSWORD = 'pewtey'
+TEST_USER = 'flaliberte'
+TEST_PASSWORD = 'Salut1001'
 TEST_MYPROXY = 'slcs1.ceda.ac.uk'
-TEST_OPENID = 'https://ceda.ac.uk/openid/Arthur.Pewtey'
+TEST_OPENID = 'https://ceda.ac.uk/openid/Frederic.Laliberte'
 
 if TEST_PASSWORD == 'pewtey':
     raise Exception("Update test credentials before testing running tests.")
@@ -98,5 +98,3 @@ def test_logon_openid():
     lm.logon_with_openid(TEST_OPENID, TEST_PASSWORD, interactive=False)
 
     assert lm.is_logged_on()
-
-    

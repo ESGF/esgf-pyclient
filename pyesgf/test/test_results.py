@@ -8,11 +8,10 @@ from urlparse import urlparse
 
 from pyesgf.search.connection import SearchConnection
 
-from .config import TEST_SERVICE
 PCMDI_NODE = 'https://pcmdi.llnl.gov/esg-search'
 
 
-def test_result1():
+def test_result1(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     ctx = conn.new_context(project='CMIP5')
@@ -21,7 +20,7 @@ def test_result1():
     r1 = results[0]
     assert re.match(r'cmip5\.output1\.MOHC\..+\|esgf-data1.ceda.ac.uk', r1.dataset_id)
     
-def test_file_context():
+def test_file_context(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     ctx = conn.new_context(project='CMIP5')
@@ -32,7 +31,7 @@ def test_file_context():
 
     assert f_ctx.facet_constraints['dataset_id'] == r1.dataset_id
 
-def test_file_list():
+def test_file_list(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     ctx = conn.new_context(project='CMIP5')
@@ -51,7 +50,7 @@ def test_file_list():
     ds_subpath = ds_id.replace('.', '/')
     assert ds_subpath.lower() in download_url.lower()
 
-def test_file_list2():
+def test_file_list2(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     ctx = conn.new_context(project='CMIP5')
@@ -64,7 +63,7 @@ def test_file_list2():
     for file_result in file_results:
         assert re.search(r'ds/.*\.nc', file_result.download_url)
 
-def test_gridftp_url_in_file_result():
+def test_gridftp_url_in_file_result(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     ctx = conn.new_context(project='CMIP5')
@@ -79,7 +78,7 @@ def test_gridftp_url_in_file_result():
         assert gridftp_url.split(":")[0] == "gsiftp"
         assert file_result.gridftp_url.endswith(".nc")
 
-def test_aggregations():
+def test_aggregations(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     ctx = conn.new_context(project='CMIP5')
@@ -98,7 +97,7 @@ def test_aggregations():
     assert '.aggregation' in las_url
 
 
-def test_index_node():
+def test_index_node(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=False)
 
     ctx = conn.new_context(project='CMIP5')
@@ -110,7 +109,7 @@ def test_index_node():
     assert r1.index_node == service.hostname
 
 
-def test_other_index_node():
+def test_other_index_node(TEST_SERVICE):
     conn = SearchConnection(TEST_SERVICE, distrib=True)
 
     ctx = conn.new_context(project='CMIP5', institute='INM')
@@ -123,7 +122,7 @@ def test_other_index_node():
     assert r1.index_node is not None
     assert r1.index_node != service.hostname
 
-def test_shards_constrain():
+def test_shards_constrain(TEST_SERVICE):
     # Test that a file-context constrains the shard list
     
     conn = SearchConnection(TEST_SERVICE, distrib=True)
