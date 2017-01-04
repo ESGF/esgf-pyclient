@@ -14,6 +14,7 @@ import pytest
 from pyesgf.logon import LogonManager, DAP_CONFIG_MARKER
 from pyesgf.search import SearchConnection
 
+
 class TestOpendap(TestCase):
     def setUp(self):
         self.esgf_dir = tempfile.mkdtemp(prefix='pyesgf_tmp')
@@ -34,23 +35,24 @@ class TestOpendap(TestCase):
     def read_config(self):
         return open(self.dap_config).read()
 
-
     def check_preamble(self, preamble, config):
-        return re.match((preamble + 
-                         r'\s*^# BEGIN {0}'.format(DAP_CONFIG_MARKER)), 
+        return re.match((preamble +
+                         r'\s*^# BEGIN {0}'.format(DAP_CONFIG_MARKER)),
                         config, re.M | re.S)
 
     def check_postamble(self, postamble, config):
-        return re.search(r'^# END {0}$\s*{1}'.format(DAP_CONFIG_MARKER, postamble),
+        return re.search(r'^# END {0}$\s*{1}'.format(DAP_CONFIG_MARKER,
+                                                     postamble),
                          config, re.M | re.S)
-    
+
     def test_config1(self):
         # Create the config file from scratch
-        lm = LogonManager(self.esgf_dir, dap_config=self.dap_config)
+        LogonManager(self.esgf_dir, dap_config=self.dap_config)
         config = self.read_config()
-        
-        print config
-        assert re.match(r'\s*^# BEGIN {0}$.*^# END {0}$'.format(DAP_CONFIG_MARKER),
+
+        print(config)
+        assert re.match(r'\s*^# BEGIN {0}$.*^# END {0}$'
+                        .format(DAP_CONFIG_MARKER),
                         config, re.M | re.S)
 
     def test_config2(self):
@@ -59,18 +61,19 @@ class TestOpendap(TestCase):
         preamble = '\n'.join(lines)
         self.init_config(preamble)
 
-        lm = LogonManager(self.esgf_dir, dap_config=self.dap_config)
+        LogonManager(self.esgf_dir, dap_config=self.dap_config)
         config = self.read_config()
 
-        print config
+        print(config)
         assert self.check_preamble(preamble, config)
 
     def test_config3(self):
-        # Create the config when one already exists with the BEGIN section in it
+        # Create the config when one already exists
+        # with the BEGIN section in it
 
         lines = ['# Welcome to my config file', 'SOME_OPT=foo', '']
         preamble = '\n'.join(lines)
-                        
+
         lines = ['', '# Some more config here', 'OTHER_OPT=bar', '']
         postamble = '\n'.join(lines)
 
@@ -87,27 +90,26 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
 
 {1}
 '''.format(preamble, postamble)
-                        
+
         self.init_config(config)
 
-        lm = LogonManager(self.esgf_dir, dap_config=self.dap_config)
+        LogonManager(self.esgf_dir, dap_config=self.dap_config)
         config1 = self.read_config()
-        
-        print config1
+
+        print(config1)
         assert self.check_preamble(preamble, config1)
         assert self.check_postamble(postamble, config1)
-    
 
     @pytest.mark.xfail(reason='Do not install netCDF4 for testing.')
     def test_open_url(self, TEST_SERVICE):
         import netCDF4
 
-        lm = LogonManager(self.esgf_dir, dap_config=self.dap_config)
-        print 'Using dap_config at %s' % self.dap_config
+        LogonManager(self.esgf_dir, dap_config=self.dap_config)
+        print('Using dap_config at %s' % self.dap_config)
 
         conn = SearchConnection(TEST_SERVICE, distrib=False)
 
-        #!TODO: replace with request for specific dataset
+        # !TODO: replace with request for specific dataset
         ctx = conn.new_context(project='CMIP5')
         results = ctx.search()
 
@@ -115,13 +117,13 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
         f_ctx = r1.file_context()
 
         file_results = f_ctx.search()
-        
+
         opendap_url = file_results[0].opendap_url
-        print 'OPeNDAP URL is %s' % opendap_url
+        print('OPeNDAP URL is %s' % opendap_url)
 
         ds = netCDF4.Dataset(opendap_url)
-        print ds.variables.keys()
+        print(ds.variables.keys())
     test_open_url.__test__ = False
 
 
-#!TODO: more corner cases to test for in DAP_CONFIG
+# !TODO: more corner cases to test for in DAP_CONFIG

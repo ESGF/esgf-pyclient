@@ -7,201 +7,210 @@ import re
 from urlparse import urlparse
 
 import pytest
+from unittest import TestCase
 from pyesgf.search.connection import SearchConnection
 
-PCMDI_NODE = 'https://pcmdi.llnl.gov/esg-search'
 
+class TestResults(TestCase):
+    def setUp(self):
+        self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
+        self.test_service_pcmdi = 'https://pcmdi.llnl.gov/esg-search'
 
-def test_result1(TEST_SERVICE):
-    conn = SearchConnection(TEST_SERVICE, distrib=False)
+    def test_result1(self):
+        conn = SearchConnection(self.test_service, distrib=False)
 
-    ctx = conn.new_context(project='CMIP5')
-    results = ctx.search()
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
 
-    r1 = results[0]
-    assert re.match(r'cmip5\.output1\.MOHC\..+\|esgf-data1.ceda.ac.uk', r1.dataset_id)
-    
-def test_file_context(TEST_SERVICE):
-    conn = SearchConnection(TEST_SERVICE, distrib=False)
+        r1 = results[0]
+        assert re.match(r'cmip5\.output1\.MOHC\..+\|esgf-data1.ceda.ac.uk',
+                        r1.dataset_id)
 
-    ctx = conn.new_context(project='CMIP5')
-    results = ctx.search()
+    def test_file_context(self):
+        conn = SearchConnection(self.test_service, distrib=False)
 
-    r1 = results[0]
-    f_ctx = r1.file_context()
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
 
-    assert f_ctx.facet_constraints['dataset_id'] == r1.dataset_id
+        r1 = results[0]
+        f_ctx = r1.file_context()
 
-def test_file_list(TEST_SERVICE):
-    conn = SearchConnection(TEST_SERVICE, distrib=False)
+        assert f_ctx.facet_constraints['dataset_id'] == r1.dataset_id
 
-    ctx = conn.new_context(project='CMIP5')
-    results = ctx.search()
+    def test_file_list(self):
+        conn = SearchConnection(self.test_service, distrib=False)
 
-    r1 = results[0]
-    f_ctx = r1.file_context()
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
 
-    file_results = f_ctx.search()
-    f1 = file_results[0]
+        r1 = results[0]
+        f_ctx = r1.file_context()
 
-    ds_id, shard = r1.dataset_id.split('|')
-    download_url = f1.download_url
+        file_results = f_ctx.search()
+        f1 = file_results[0]
 
-    # Assumes dataset is published with DRS path.
-    ds_subpath = ds_id.replace('.', '/')
-    assert ds_subpath.lower() in download_url.lower()
+        ds_id, shard = r1.dataset_id.split('|')
+        download_url = f1.download_url
 
-def test_file_list2(TEST_SERVICE):
-    conn = SearchConnection(TEST_SERVICE, distrib=False)
+        # Assumes dataset is published with DRS path.
+        ds_subpath = ds_id.replace('.', '/')
+        assert ds_subpath.lower() in download_url.lower()
 
-    ctx = conn.new_context(project='CMIP5')
-    results = ctx.search()
+    def test_file_list2(self):
+        conn = SearchConnection(self.test_service, distrib=False)
 
-    r1 = results[0]
-    f_ctx = r1.file_context()
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
 
-    file_results = f_ctx.search()
-    for file_result in file_results:
-        assert re.search(r'ds/.*\.nc', file_result.download_url)
+        r1 = results[0]
+        f_ctx = r1.file_context()
 
-def test_gridftp_url_in_file_result(TEST_SERVICE):
-    conn = SearchConnection(TEST_SERVICE, distrib=False)
+        file_results = f_ctx.search()
+        for file_result in file_results:
+            assert re.search(r'ds/.*\.nc', file_result.download_url)
 
-    ctx = conn.new_context(project='CMIP5')
-    results = ctx.search()
+    def test_gridftp_url_in_file_result(self):
+        conn = SearchConnection(self.test_service, distrib=False)
 
-    r1 = results[0]
-    f_ctx = r1.file_context()
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
 
-    file_results = f_ctx.search()
-    for file_result in file_results:
-        gridftp_url = file_result.gridftp_url
-        assert gridftp_url.split(":")[0] == "gsiftp"
-        assert file_result.gridftp_url.endswith(".nc")
+        r1 = results[0]
+        f_ctx = r1.file_context()
 
-def test_aggregations(TEST_SERVICE):
-    conn = SearchConnection(TEST_SERVICE, distrib=False)
+        file_results = f_ctx.search()
+        for file_result in file_results:
+            gridftp_url = file_result.gridftp_url
+            assert gridftp_url.split(":")[0] == "gsiftp"
+            assert file_result.gridftp_url.endswith(".nc")
 
-    ctx = conn.new_context(project='CMIP5')
-    results = ctx.search()
+    def test_aggregations(self):
+        conn = SearchConnection(self.test_service, distrib=False)
 
-    r1 = results[0]
-    agg_ctx = r1.aggregation_context()
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
 
-    agg_results = agg_ctx.search()
-    agg1 = agg_results[0]
+        r1 = results[0]
+        agg_ctx = r1.aggregation_context()
 
-    ds_id, shard = r1.dataset_id.split('|')
-    las_url = agg1.urls['LAS'][0][0]
+        agg_results = agg_ctx.search()
+        agg1 = agg_results[0]
 
-    #!FIXME: A pretty dumb test for a correct aggregation
-    assert '.aggregation' in las_url
+        ds_id, shard = r1.dataset_id.split('|')
+        las_url = agg1.urls['LAS'][0][0]
 
+        # !FIXME: A pretty dumb test for a correct aggregation
+        assert '.aggregation' in las_url
 
-def test_index_node(TEST_SERVICE):
-    conn = SearchConnection(TEST_SERVICE, distrib=False)
+    def test_index_node(self):
+        conn = SearchConnection(self.test_service, distrib=False)
 
-    ctx = conn.new_context(project='CMIP5')
-    results = ctx.search()
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
 
-    r1 = results[0]
-    service = urlparse(TEST_SERVICE)
+        r1 = results[0]
+        service = urlparse(self.test_service)
 
-    assert r1.index_node == service.hostname
+        assert r1.index_node == service.hostname
 
+    def test_other_index_node(self):
+        conn = SearchConnection(self.test_service, distrib=True)
 
-def test_other_index_node(TEST_SERVICE):
-    conn = SearchConnection(TEST_SERVICE, distrib=True)
+        ctx = conn.new_context(project='CMIP5', institute='INM')
+        results = ctx.search()
 
-    ctx = conn.new_context(project='CMIP5', institute='INM')
-    results = ctx.search()
+        r1 = results[0]
+        service = urlparse(self.test_service)
+        print('index_node = %s' % r1.index_node)
 
-    r1 = results[0]
-    service = urlparse(TEST_SERVICE)
-    print 'index_node = %s' % r1.index_node
-    
-    assert r1.index_node is not None
-    assert r1.index_node != service.hostname
+        assert r1.index_node is not None
+        assert r1.index_node != service.hostname
 
-@pytest.mark.xfail(reason='This test does not work anymore')
-def test_shards_constrain(TEST_SERVICE):
-    # Test that a file-context constrains the shard list
-    
-    conn = SearchConnection(TEST_SERVICE, distrib=True)
+    @pytest.mark.xfail(reason='This test does not work anymore')
+    def test_shards_constrain(self):
+        # Test that a file-context constrains the shard list
 
-    ctx = conn.new_context(project='CMIP5')
-    results = ctx.search()
+        conn = SearchConnection(self.test_service, distrib=True)
 
-    r1 = results[0]
-    f_ctx = r1.file_context()
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
 
-    #!TODO: white-box test.  Refactor.
-    query_dict = f_ctx._build_query()
-    full_query = f_ctx.connection._build_query(query_dict, shards=f_ctx.shards)
+        r1 = results[0]
+        f_ctx = r1.file_context()
 
-    #!TODO: Force fail to see whether shards is passed through.
-    # NOTE: 'shards' is NOT even a key in this dictionary. Needs rewrite!!!
-    q_shard = full_query['shards']
-    # Check it isn't a ',' separated list
-    assert ',' not in q_shard
-    q_shard_host = q_shard.split(':')[0]
-    assert q_shard_host == r1.json['index_node']
+        # !TODO: white-box test.  Refactor.
+        query_dict = f_ctx._build_query()
+        full_query = f_ctx.connection._build_query(query_dict,
+                                                   shards=f_ctx.shards)
 
-    # Now make the query to make sure it returns data from the right index_node
-    f_results = f_ctx.search()
-    f_r1 = f_results[0]
-    assert f_r1.json['index_node'] == r1.json['index_node']
+        # !TODO: Force fail to see whether shards is passed through.
+        # NOTE: 'shards' is NOT even a key in this dictionary. Needs rewrite!!!
+        q_shard = full_query['shards']
+        # Check it isn't a ',' separated list
+        assert ',' not in q_shard
+        q_shard_host = q_shard.split(':')[0]
+        assert q_shard_host == r1.json['index_node']
 
+        # Now make the query to make sure it returns data from
+        # the right index_node
+        f_results = f_ctx.search()
+        f_r1 = f_results[0]
+        assert f_r1.json['index_node'] == r1.json['index_node']
 
-def test_shards_constrain2():
-    # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
-    conn = SearchConnection(PCMDI_NODE,distrib=True)
+    def test_shards_constrain2(self):
+        # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
+        conn = SearchConnection(self.test_service_pcmdi, distrib=True)
 
-    ctx = conn.new_context(experiment='piControl', time_frequency='day', variable='pr', ensemble='r1i1p1')
-    ctx = ctx.constrain(query='cmip5.output1.BCC.bcc-csm1-1-m.piControl.day.atmos.day.r1i1p1')
-    s = ctx.search()
+        ctx = conn.new_context(experiment='piControl', time_frequency='day',
+                               variable='pr', ensemble='r1i1p1')
+        ctx = ctx.constrain(query=('cmip5.output1.BCC.bcc-csm1-1-m.piControl.'
+                                   'day.atmos.day.r1i1p1'))
+        s = ctx.search()
 
-    ds = s[0]
+        ds = s[0]
 
-    publicationDataset, server = ds.dataset_id.split('|')
-    print publicationDataset, server, ds.json['replica']
-    
-    searchContext = ds.file_context()
-    searchContext=searchContext.constrain(variable='pr')
-    for j in searchContext.search():
-        print j.download_url, j.checksum, j.checksum_type, j.size
+        publicationDataset, server = ds.dataset_id.split('|')
+        print(publicationDataset, server, ds.json['replica'])
 
-def test_shards_constrain3():
-    # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
-    conn = SearchConnection(PCMDI_NODE,distrib=True)
+        searchContext = ds.file_context()
+        searchContext = searchContext.constrain(variable='pr')
+        for j in searchContext.search():
+            print(j.download_url, j.checksum, j.checksum_type, j.size)
 
-    ctx = conn.new_context(query='cmip5.output1.CMCC.CMCC-CESM.historical.mon.atmos.Amon.r1i1p1.v20130416')
-    s = ctx.search()
+    def test_shards_constrain3(self):
+        # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
+        conn = SearchConnection(self.test_service_pcmdi, distrib=True)
 
-    ds = s[0]
+        ctx = conn.new_context(query=('cmip5.output1.CMCC.CMCC-CESM.'
+                                      'historical.mon.atmos.Amon.r1i1p1.'
+                                      'v20130416'))
+        s = ctx.search()
 
-    publicationDataset, server = ds.dataset_id.split('|')
-    print publicationDataset, server, ds.json['replica']
-    
-    searchContext = ds.file_context()
-    searchContext=searchContext.constrain(variable='pr')
-    for j in searchContext.search():
-        print j.download_url, j.checksum, j.checksum_type, j.size
+        ds = s[0]
 
+        publicationDataset, server = ds.dataset_id.split('|')
+        print(publicationDataset, server, ds.json['replica'])
 
-def test_shards_constrain4():
-    # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
-    conn = SearchConnection(PCMDI_NODE ,distrib=True)
+        searchContext = ds.file_context()
+        searchContext = searchContext.constrain(variable='pr')
+        for j in searchContext.search():
+            print(j.download_url, j.checksum, j.checksum_type, j.size)
 
-    ctx = conn.new_context(query='id:cmip5.output1.BCC.bcc-csm1-1-m.historical.mon.atmos.Amon.r1i1p1.v20120709*')
-    s = ctx.search()
+    def test_shards_constrain4(self):
+        # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
+        conn = SearchConnection(self.test_service_pcmdi, distrib=True)
 
-    ds = s[0]
+        ctx = conn.new_context(query=('id:cmip5.output1.BCC.bcc-csm1-1-m.'
+                                      'historical.mon.atmos.Amon.r1i1p1.'
+                                      'v20120709*'))
+        s = ctx.search()
 
-    publicationDataset, server = ds.dataset_id.split('|')
-    print publicationDataset, server, ds.json['replica']
-    
-    searchContext = ds.file_context()
-    searchContext=searchContext.constrain(variable='tas')
-    for j in searchContext.search():
-        print j.download_url, j.checksum, j.checksum_type, j.size
+        ds = s[0]
+
+        publicationDataset, server = ds.dataset_id.split('|')
+        print(publicationDataset, server, ds.json['replica'])
+
+        searchContext = ds.file_context()
+        searchContext = searchContext.constrain(variable='tas')
+        for j in searchContext.search():
+            print(j.download_url, j.checksum, j.checksum_type, j.size)
