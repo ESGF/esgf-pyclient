@@ -55,11 +55,13 @@ class TestLogon(TestCase):
         if op.exists(self.esgf_dir):
             shutil.rmtree(self.esgf_dir)
 
+    @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
     def test_no_logon(self):
         _clear_creds(self.esgf_dir)
         lm = LogonManager(self.esgf_dir)
         assert not lm.is_logged_on()
 
+    @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
     def test_expired(self):
         _load_creds(self.esgf_dir, credentials_file='expired.pem')
         lm = LogonManager(self.esgf_dir)

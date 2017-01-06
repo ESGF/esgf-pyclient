@@ -5,12 +5,15 @@
 """
 Gives a multi-value dictionary object (MultiDict) plus several wrappers
 """
-import cgi, copy, sys, warnings, urllib
-from UserDict import DictMixin
-
+import cgi, copy, sys, warnings
+try:
+    from UserDict import DictMixin
+except ImportError:
+    from collections import MutableMapping as DictMixin
 
 __all__ = ['MultiDict', 'UnicodeMultiDict', 'NestedMultiDict', 'NoVars',
            'TrackableMultiDict']
+
 
 class MultiDict(DictMixin):
     """
@@ -26,7 +29,7 @@ class MultiDict(DictMixin):
             if hasattr(args[0], 'iteritems'):
                 items = list(args[0].iteritems())
             elif hasattr(args[0], 'items'):
-                items = args[0].items()
+                items = list(args[0].items())
             else:
                 items = list(args[0])
             self._items = items
@@ -168,8 +171,8 @@ class MultiDict(DictMixin):
 
     def pop(self, key, *args):
         if len(args) > 1:
-            raise TypeError, "pop expected at most 2 arguments, got "\
-                              + repr(1 + len(args))
+            raise TypeError("pop expected at most 2 arguments, got " +
+                            repr(1 + len(args)))
         for i in range(len(self._items)):
             if self._items[i][0] == key:
                 v = self._items[i][1]

@@ -6,7 +6,8 @@ Interface to the ESGF SAML Attribute Service.
 from jinja2 import Template
 import uuid
 import datetime
-import urllib2
+from six.moves.urllib.request import urlopen, Request
+import six
 from xml.etree import ElementTree as ET
 
 from pyesgf.security import NS
@@ -53,12 +54,17 @@ class AttributeService(object):
 
     def send_request(self, openid, attributes):
         post_body = self.build_request(openid, attributes)
-        req = urllib2.Request(self.url, post_body)
+        req = Request(self.url, post_body.encode('ascii'))
+
         req.add_header('Content-Type', 'text/xml')
-        req.add_header('Content-Length', str(len(req.get_data())))
+        if six.PY3:
+            data = req.data
+        else:
+            data = req.get_data()
+        req.add_header('Content-Length', str(len(data)))
         log.debug(req.headers)
-        log.debug(req.get_data())
-        resp = urllib2.urlopen(req)
+        log.debug(data)
+        resp = urlopen(req)
 
         return AttributeServiceResponse(resp)
 

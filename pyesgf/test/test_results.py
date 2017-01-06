@@ -4,7 +4,7 @@ Test the Results classes
 """
 
 import re
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 import pytest
 from unittest import TestCase

@@ -19,10 +19,13 @@ perform a search create a :class:`SearchConnection` instance then use
         
 """
 
-import urllib2
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.error import HTTPError
+from six.moves.urllib.parse import urlparse
+import six
+import codecs
 import json
 import re
-from urlparse import urlparse
 
 import warnings
 import logging
@@ -102,9 +105,8 @@ class SearchConnection(object):
 
         """
         full_query = self._build_query(query_dict, limit, offset, shards)
-        response = self._send_query('search', full_query)
-        ret = json.load(response)
-
+        response, reader = self._send_query('search', full_query)
+        ret = json.load(reader(response))
         return ret
 
     def send_wget(self, query_dict, shards=None):
@@ -120,8 +122,8 @@ class SearchConnection(object):
         if 'format' in full_query:
             del full_query['format']
 
-        response = self._send_query('wget', full_query)
-        script = response.read()
+        response, reader = self._send_query('wget', full_query)
+        script = reader(response).read()
 
         return script
 
@@ -131,7 +133,7 @@ class SearchConnection(object):
     instances.
         
         :param full_query: dictionary of query string parameers to send.
-        :return: the urllib2 response object from the query.
+        :return: the urllib2 response object from the query and a reader object
         
         """
 
@@ -141,17 +143,24 @@ class SearchConnection(object):
         log.debug('Query request is %s' % query_url)
 
         try:
-            response = urllib2.urlopen(query_url)
-        except urllib2.HTTPError, err:
+            response = urlopen(query_url)
+        except HTTPError as err:
             log.warn("HTTP request received error code: %s" % err.code)
             if err.code == 400:
-                errors = set(re.findall("Invalid HTTP query parameter=(\w+)", err.fp.read()))
+                errors = set(re.findall("Invalid HTTP query parameter=(\w+)",
+                                        str(err.fp.read())))
                 content = "; ".join([e for e in list(errors)])
                 raise Exception("Invalid query parameter(s): %s" % content)
             else:
                 raise Exception("Error returned from URL: %s" % query_url)
 
-        return response
+        if six.PY3:
+            response_encoding = response.headers.get_content_charset()
+        else:
+            response_encoding = response.headers.getparam('charset')
+        reader = codecs.getreader(response_encoding)
+
+        return response, reader
 
 
     def _build_query(self, query_dict, limit=None, offset=None, shards=None):

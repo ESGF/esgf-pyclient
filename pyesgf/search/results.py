@@ -35,12 +35,12 @@ class ResultSet(Sequence):
         """
         self.context = context
         self.__batch_size = batch_size
-        self.__batch_cache = [None] * ((len(self) / batch_size) + 1)
+        self.__batch_cache = [None] * ((len(self) // batch_size) + 1)
         if eager and len(self)>0:
             self.__batch_cache[0] = self.__get_batch(0)
 
     def __getitem__(self, index):
-        batch_i = index / self.batch_size
+        batch_i = index // self.batch_size
         offset = index % self.batch_size
         if self.__batch_cache[batch_i] is None:
             self.__batch_cache[batch_i] = self.__get_batch(batch_i)

@@ -95,8 +95,8 @@ class TestContext(TestCase):
         context2 = context.constrain(model="IPSL-CM5A-LR")
 
         counts = context2.facet_counts
-        assert counts['model'].keys() == ['IPSL-CM5A-LR']
-        assert counts['project'].keys() == ['CMIP5']
+        assert list(counts['model'].keys()) == ['IPSL-CM5A-LR']
+        assert list(counts['project'].keys()) == ['CMIP5']
 
     def test_distrib(self):
         conn = SearchConnection(self.test_service, distrib=False)
@@ -179,6 +179,6 @@ class TestContext(TestCase):
 
         try:
             context.hit_count
-        except Exception, err:
+        except Exception as err:
             assert str(err).strip() in ("Invalid query parameter(s): rubbish",
                                         "No JSON object could be decoded")

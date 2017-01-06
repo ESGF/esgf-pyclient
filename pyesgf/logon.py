@@ -38,7 +38,7 @@ import os.path as op
 import datetime
 import shutil
 from xml.etree import ElementTree
-import urllib2
+from six.moves.urllib.request import urlopen
 import re
 from getpass import getpass
 
@@ -159,10 +159,10 @@ class LogonManager(object):
         """
         if interactive:
             if hostname is None:
-                print 'Enter myproxy hostname:',
+                print('Enter myproxy hostname:'),
                 hostname = raw_input()
             if username is None:
-                print 'Enter myproxy username:',
+                print('Enter myproxy username:'),
                 username = raw_input()
             if password is None:
                 password = getpass('Enter password for %s: ' % username)
@@ -193,7 +193,7 @@ class LogonManager(object):
             shutil.rmtree(self.esgf_certs_dir)
 
     def _get_logon_details(self, openid):
-        openid_doc = urllib2.urlopen(openid).read()
+        openid_doc = urlopen(openid).read()
         xml = ElementTree.fromstring(openid_doc)
 
         hostname = None

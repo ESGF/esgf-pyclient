@@ -17,6 +17,7 @@ class TestWget(TestCase):
                                model='IPSL-CM5A-LR', realm='seaIce',
                                experiment='historicalGHG')
         script = ctx.get_download_script()
+        print(script)
 
         assert '# ESG Federation download script' in script
         assert '# Search URL: %s' % self.test_service in script

@@ -13,6 +13,11 @@ import pytest
 
 from pyesgf.logon import LogonManager, DAP_CONFIG_MARKER
 from pyesgf.search import SearchConnection
+try:
+    from myproxy.client import MyProxyClient
+    _has_myproxy = True
+except ImportError:
+    _has_myproxy = False
 
 
 class TestOpendap(TestCase):
@@ -45,6 +50,7 @@ class TestOpendap(TestCase):
                                                      postamble),
                          config, re.M | re.S)
 
+    @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
     def test_config1(self):
         # Create the config file from scratch
         LogonManager(self.esgf_dir, dap_config=self.dap_config)
@@ -55,6 +61,7 @@ class TestOpendap(TestCase):
                         .format(DAP_CONFIG_MARKER),
                         config, re.M | re.S)
 
+    @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
     def test_config2(self):
         # Create the config when one already exists.  Check it is retained.
         lines = ['# Welcome to my config file', 'SOME_OPT=foo', '']
@@ -67,6 +74,7 @@ class TestOpendap(TestCase):
         print(config)
         assert self.check_preamble(preamble, config)
 
+    @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
     def test_config3(self):
         # Create the config when one already exists
         # with the BEGIN section in it
