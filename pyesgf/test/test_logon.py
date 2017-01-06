@@ -14,7 +14,7 @@ from unittest import TestCase
 try:
     from myproxy.client import MyProxyClient
     _has_myproxy = True
-except ImportError:
+except ImportError, SyntaxError:
     _has_myproxy = False
 
 TEST_USER = os.environ.get('USERNAME')
