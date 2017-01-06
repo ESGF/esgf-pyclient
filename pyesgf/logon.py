@@ -46,7 +46,7 @@ try:
     from myproxy.client import MyProxyClient
     import OpenSSL
     _has_myproxy = True
-except ImportError:
+except (ImportError, SyntaxError):
     _has_myproxy = False
 
 from .exceptions import OpenidResolutionError
