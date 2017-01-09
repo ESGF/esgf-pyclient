@@ -26,6 +26,6 @@ generated/
 /eclipse
 /backup
 ./do_jenkins.sh
-test/url_cache
+pyesgf/test/url_cache
 .esg/
 env/
