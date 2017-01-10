@@ -4,7 +4,7 @@ Module :mod:`pyesgf.search.results`
 ===================================
 
 Search results are retrieved through the :class:`ResultSet` class.  This class
-hides paging of large result sets behind a client-side cache.  Subclasses of 
+hides paging of large result sets behind a client-side cache.  Subclasses of
 :class:`Result` represent results of different SOLr record type.
 
 """
@@ -12,9 +12,9 @@ hides paging of large result sets behind a client-side cache.  Subclasses of
 from collections import Sequence, defaultdict
 import re
 
-from .consts import (DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE, 
+from .consts import (DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE,
                      TYPE_AGGREGATION)
-from .exceptions import EsgfSearchException
+
 
 class ResultSet(Sequence):
     """
@@ -26,17 +26,17 @@ class ResultSet(Sequence):
     """
     def __init__(self, context, batch_size=DEFAULT_BATCH_SIZE, eager=True):
         """
-        :param context: The search context object used to generate this resultset
+        :param context: The search context object used to generate this
+                        resultset
         :param batch_size: The number of results that will be requested from
             esgf-search as one call.
         :param eager: Boolean specifying whether to retrieve the first batch on
             instantiation.
-            
         """
         self.context = context
         self.__batch_size = batch_size
         self.__batch_cache = [None] * ((len(self) // batch_size) + 1)
-        if eager and len(self)>0:
+        if eager and len(self) > 0:
             self.__batch_cache[0] = self.__get_batch(0)
 
     def __getitem__(self, index):
@@ -49,9 +49,8 @@ class ResultSet(Sequence):
         search_type = self.context.search_type
         ResultClass = _result_classes[search_type]
 
-        #!TODO: should probably wrap the json inside self.__batch_cache
+        # !TODO: should probably wrap the json inside self.__batch_cache
         return ResultClass(batch[offset], self.context)
-            
 
     def __len__(self):
         return self.context.hit_count
@@ -66,7 +65,7 @@ class ResultSet(Sequence):
 
         This method is designed to be overridden in subclasses if desired.
         The default implementation simply returns the json.
-        
+
         """
         return result
 
@@ -75,11 +74,11 @@ class ResultSet(Sequence):
         limit = self.batch_size
 
         query_dict = self.context._build_query()
-        response = self.context.connection.send_search(query_dict, limit=limit, 
-                                                       offset=offset,
-                                                       shards=self.context.shards)
-        
-        #!TODO: strip out results
+        response = (self.context.connection
+                    .send_search(query_dict, limit=limit, offset=offset,
+                                 shards=self.context.shards))
+
+        # !TODO: strip out results
         return response['response']['docs']
 
 
@@ -91,19 +90,23 @@ class BaseResult(object):
 
     :ivar json: The oroginial json representation of the result.
     :ivar context: The SearchContext which generated this result.
-    :property urls: a dictionary of the form {service: [(url, mime_type), ...], ...}
-    :property opendap_url: The url of an OPeNDAP endpoint for this result if available
+    :property urls: a dictionary of the form
+                    {service: [(url, mime_type), ...], ...}
+    :property opendap_url: The url of an OPeNDAP endpoint for this result
+                           if available
     :property las_url: The url of an LAS endpoint for this result if available
-    :property download_url: The url for downloading the result by HTTP if available
-    :property gridftp_url: The url for downloading the result by Globus if available
-    :property index_node: The index node from where the metadata is stored.  
+    :property download_url: The url for downloading the result by HTTP
+                            if available
+    :property gridftp_url: The url for downloading the result by Globus
+                           if available
+    :property index_node: The index node from where the metadata is stored.
         Calls to *_context() will optimise queries to only address this node.
 
     """
     def __init__(self, json, context):
         self.json = json
         self.context = context
-        
+
     @property
     def urls(self):
         url_dict = defaultdict(list)
@@ -119,7 +122,7 @@ class BaseResult(object):
             url, mime = self.urls['OPENDAP'][0]
         except (KeyError, IndexError):
             return None
-        
+
         url = re.sub(r'.html$', '', url)
 
         return url
@@ -165,15 +168,17 @@ class DatasetResult(BaseResult):
     """
     A result object for ESGF datasets.
 
-    :property dataset_id: The solr dataset_id which is unique throughout the system.
+    :property dataset_id: The solr dataset_id which is unique throughout the
+                          system.
 
     """
 
     @property
     def dataset_id(self):
-        #!TODO: should we decode this into a tuple?  self.json['id'].split('|')
+        # !TODO: should we decode this into a tuple?
+        # self.json['id'].split('|')
         return self.json['id']
-    
+
     @property
     def number_of_files(self):
         """
@@ -188,9 +193,9 @@ class DatasetResult(BaseResult):
         from .context import FileSearchContext
 
         if self.context.connection.distrib:
-            # If the index node is in the available shards for this connection then
-            # restrict shards to that node.  Otherwise do nothing to handle the case
-            # when the shard is replicated
+            # If the index node is in the available shards for this connection
+            # then restrict shards to that node.  Otherwise do nothing to
+            # handle the case when the shard is replicated
             available_shards = self.context.connection.get_shard_list().keys()
             if self.index_node in available_shards:
                 shards = [self.index_node]
@@ -208,14 +213,15 @@ class DatasetResult(BaseResult):
 
     def aggregation_context(self):
         """
-        Return a SearchContext for searching for aggregations within this dataset.
+        Return a SearchContext for searching for aggregations within this
+        dataset.
         """
         from .context import AggregationSearchContext
 
         if self.context.connection.distrib:
-            # If the index node is in the available shards for this connection then
-            # restrict shards to that node.  Otherwise do nothing to handle the case
-            # when the shard is replicated
+            # If the index node is in the available shards for this connection
+            # then restrict shards to that node.  Otherwise do nothing to
+            # handle the case  when the shard is replicated
             available_shards = self.context.connection.get_shard_list().keys()
             if self.index_node in available_shards:
                 shards = [self.index_node]
@@ -231,9 +237,11 @@ class DatasetResult(BaseResult):
             )
         return agg_context
 
+
 class FileResult(BaseResult):
     """
-    A result object for ESGF files.  Properties from :class:`BaseResult` are inherited.
+    A result object for ESGF files.  Properties from :class:`BaseResult` are
+                                     inherited.
 
     :property file_id: The identifier for the file
     :property checksum: The checksum of the file
@@ -278,7 +286,8 @@ class FileResult(BaseResult):
 
 class AggregationResult(BaseResult):
     """
-    A result object for ESGF aggregations.  Properties from :class:`BaseResult` are inherited.
+    A result object for ESGF aggregations.  Properties from :class:`BaseResult`
+                                            are inherited.
 
     :property aggregation_id: The aggregation id
     """

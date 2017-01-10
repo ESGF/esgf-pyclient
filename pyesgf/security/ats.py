@@ -18,10 +18,12 @@ log = logging.getLogger(__name__)
 ATS_REQUEST_TMPL = Template('''<?xml version="1.0" encoding="UTF-8"?>
 <soap11:Envelope xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/">
   <soap11:Body>
-     <samlp:AttributeQuery xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
-                           ID="{{ msg_id }}" 
+     <samlp:AttributeQuery xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                           ID="{{ msg_id }}"
                            IssueInstant="{{timestamp}}" Version="2.0">
-        <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Format="urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName">{{ issuer }}</saml:Issuer>
+        <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Format\
+="urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName">{{ issuer }}\
+</saml:Issuer>
         <saml:Subject xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
            <saml:NameID Format="urn:esg:openid">{{ openid }}</saml:NameID>
         </saml:Subject>
@@ -36,18 +38,17 @@ ATS_REQUEST_TMPL = Template('''<?xml version="1.0" encoding="UTF-8"?>
 ''')
 
 
-
 class AttributeService(object):
-    def __init__(self, url,issuer):
+    def __init__(self, url, issuer):
         self.url = url
-        self.ISSUER=issuer
+        self.ISSUER = issuer
 
     def build_request(self, openid, attributes):
         now = datetime.datetime.utcnow()
 
         return ATS_REQUEST_TMPL.render(
             msg_id=uuid.uuid1(),
-            timestamp=now.isoformat()+'Z',
+            timestamp=now.isoformat() + 'Z',
             issuer=self.ISSUER,
             openid=openid,
             attributes=attributes)
@@ -81,7 +82,8 @@ class AttributeServiceResponse(object):
 
     def get_attributes(self):
         d = {}
-        fpath = './/{{{0}}}AttributeStatement/{{{0}}}Attribute'.format(NS['saml'])
+        fpath = ('.//{{{0}}}AttributeStatement/{{{0}}}Attribute'
+                 .format(NS['saml']))
 
         for el in self.xml.findall(fpath):
             attr_name = el.get('Name')
@@ -100,5 +102,4 @@ class AttributeServiceResponse(object):
     def get_status(self):
         fpath = './/{{{0}}}Status/{{{0}}}StatusCode'.format(NS['saml2p'])
         sc = self.xml.find(fpath)
-        
         return sc.get('Value')

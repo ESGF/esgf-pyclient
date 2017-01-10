@@ -16,6 +16,7 @@ from pyesgf.exceptions import Error, DuplicateHashError
 import logging
 log = logging.getLogger(__name__)
 
+
 class Manifest(object):
     VERSION = '0.1'
 
@@ -26,16 +27,17 @@ class Manifest(object):
     @classmethod
     def from_result(cls, dataset_result):
         """
-        Instantiate a Manifest instance from a :class:`search.results:DatasetResult`.
-        
+        Instantiate a Manifest instance from a
+        :class:`search.results:DatasetResult`.
+
         """
 
         ctx = dataset_result.file_context()
         obj = cls()
         for file_result in ctx.search():
             filename = file_result.filename
-            #!TODO: trap exceptions here
-            filehash = '%s:%s' % (file_result.checksum_type.lower(), 
+            # !TODO: trap exceptions here
+            filehash = '%s:%s' % (file_result.checksum_type.lower(),
                                   file_result.checksum)
             tracking_id = file_result.tracking_id
             if tracking_id is None:
@@ -48,9 +50,8 @@ class Manifest(object):
 
     @classmethod
     def from_mapfile(cls, mapfile):
-        #!TODO
+        # !TODO
         raise NotImplementedError
-
 
     def add(self, filename, filehash, tracking_id, size):
         if filename in self._contents:
@@ -61,22 +62,21 @@ class Manifest(object):
             elif old_tracking_id == tracking_id:
                 raise DuplicateHashError(
                     'Filename {0} occurs multiple times in dataset {1} with '
-                    'the same tracking_id and different hash'.format(filename,
-                                                                     self.drs_id))
+                    'the same tracking_id and different hash'
+                    .format(filename, self.drs_id))
             else:
                 raise DuplicateHashError(
                     'Filename {0} occurs multiple times in '
                     'dataset {1}'.format(filename, self.drs_id))
-            
-        self._contents[filename] = (filehash, tracking_id, size)
 
+        self._contents[filename] = (filehash, tracking_id, size)
 
     def write(self, fh):
         fh.write('#%esgf-manifest {0}\n'.format(self.VERSION))
         for filename in sorted(self._contents):
             filehash, tracking_id, size = self._contents[filename]
-            fh.write('{0},{1},{2},{3}'.format(filename, filehash, tracking_id, size)+'\n')
-
+            fh.write(('{0},{1},{2},{3}'
+                      .format(filename, filehash, tracking_id, size)) + '\n')
 
 
 class ManifestExtractor(object):
@@ -86,7 +86,7 @@ class ManifestExtractor(object):
 class SolrManifestExtractor(ManifestExtractor):
     SOLR_BATCH_SIZE = 1000
     SOLR_FIELDS = ['dataset_id', 'title', 'checksum_type', 'checksum',
-                   'tracking_id','size']
+                   'tracking_id', 'size']
 
     def __init__(self, endpoint, project, from_date=None):
         self.endpoint = endpoint
@@ -113,13 +113,12 @@ class SolrManifestExtractor(ManifestExtractor):
                                                  param_str)
         log.info('SOLR QUERY: {0}'.format(url))
         response = urllib2.urlopen(url)
-        
+
         return response
 
     def _check_header(self, header):
         if header != self.SOLR_FIELDS:
             raise Error('Unrecognised SOLr CSV header')
-
 
     def _init_manifest(self, dataset_id):
         drs_id, datanode = dataset_id.split('|')
@@ -127,11 +126,11 @@ class SolrManifestExtractor(ManifestExtractor):
 
         return Manifest(drs_id)
 
-
     def __iter__(self):
         """
-        Query the SOLr index until all files for this project have been extracted.
- 
+        Query the SOLr index until all files for this project have been
+        extracted.
+
         """
 
         offset = 0
@@ -150,11 +149,12 @@ class SolrManifestExtractor(ManifestExtractor):
                 empty_batch = False
 
                 log.debug('ROW: {0}'.format(row))
-                dataset_id, filename, checksum_type, checksum, tracking_id, size = row
+                (dataset_id, filename, checksum_type,
+                 checksum, tracking_id, size) = row
                 if dataset_id != current_dataset_id:
                     if current_manifest:
                         yield current_manifest
-                    current_manifest = self._init_manifest(dataset_id)                    
+                    current_manifest = self._init_manifest(dataset_id)
                     current_dataset_id = dataset_id
 
                 filehash = '{0}:{1}'.format(checksum_type.lower(), checksum)
@@ -165,7 +165,8 @@ class SolrManifestExtractor(ManifestExtractor):
                 except DuplicateHashError, e:
                     log.error(e)
 
-            # Test whether there were any rows.  If not we have reached the end.
+            # Test whether there were any rows.
+            # If not we have reached the end.
             if empty_batch:
                 break
             else:
@@ -177,19 +178,20 @@ class SolrManifestExtractor(ManifestExtractor):
 
 def cmip5_manifest_partitioner(drs_id):
     """
-    Split a drs_id into pragmatic components for constructing a directory structure.
-    This partition is designed to balance the need to split a repository between
-    subdirectories with the desire to minimise the depth of the tree.
+    Split a drs_id into pragmatic components for constructing a
+    directory structure.
+    This partition is designed to balance the need to split a
+    repository between subdirectories with the desire to minimise
+    the depth of the tree.
 
     """
-    (activity, product, institute, model, experiment, 
+    (activity, product, institute, model, experiment,
      frequency, realm, table, ensemble, version) = drs_id.split('.')
 
     parts = ('.'.join((activity, product, institute)),
              '.'.join((model, experiment, frequency)))
-    
-    return parts
 
+    return parts
 
 
 def extract_from_solr(endpoint, project, target_dir, from_date=None):
@@ -197,17 +199,19 @@ def extract_from_solr(endpoint, project, target_dir, from_date=None):
 
     for manifest in solr_extractor:
 
-        manifest_path = os.path.join(target_dir,
-                                     *cmip5_manifest_partitioner(manifest.drs_id))
+        manifest_path = os.path.join(
+                                 target_dir,
+                                 *cmip5_manifest_partitioner(manifest.drs_id))
         if not os.path.exists(manifest_path):
             log.info('Creating repo directory {0}'.format(manifest_path))
             os.makedirs(manifest_path)
-        
+
         manifest_file = os.path.join(manifest_path, manifest.drs_id)
 
-
         if os.path.exists(manifest_file):
-            log.warn('Manifest {0} already exists.  This manifest will be overwritten'.format(manifest_file))
+            log.warn(('Manifest {0} already exists. '
+                      'This manifest will be '
+                      'overwritten').format(manifest_file))
 
         with open(manifest_file, 'w') as fh:
             log.info('Writing Manifest {0}'.format(manifest_file))
@@ -216,8 +220,8 @@ def extract_from_solr(endpoint, project, target_dir, from_date=None):
 
 def parse_timestamp(timestamp):
     """
-    Parses a standard ISO timestamp.  This function allows the time to be ommitted but
-    if present it must include hours, minutes and seconds.
+    Parses a standard ISO timestamp.  This function allows the time to be
+    ommitted but if present it must include hours, minutes and seconds.
 
     """
     if re.match(r'\d{4}-\d{2}-\d{2}$', timestamp):
@@ -234,11 +238,14 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO)
 
-    parser = argparse.ArgumentParser(description='Extract ESGF datasets from a SOLr index into a manifest repository')
-    parser.add_argument('endpoint', help='SOLr endpoint as http://<host>:<port>')
+    parser = argparse.ArgumentParser(description='Extract ESGF datasets from a'
+                                                 ' SOLr index into a manifest'
+                                                 ' repository')
+    parser.add_argument('endpoint', help='SOLr endpoint as '
+                                         'http://<host>:<port>')
     parser.add_argument('project', help='The project to extract')
     parser.add_argument('repository', help='Path to the manifest repository')
-    parser.add_argument('--from', dest='from_date', action='store', 
+    parser.add_argument('--from', dest='from_date', action='store',
                         help='The minimum timestamp of returned SOLr records')
 
     args = parser.parse_args()
@@ -248,4 +255,5 @@ if __name__ == '__main__':
     else:
         from_date is None
 
-    extract_from_solr(args.endpoint, args.project, args.repository, from_date=from_date)
+    extract_from_solr(args.endpoint, args.project, args.repository,
+                      from_date=from_date)

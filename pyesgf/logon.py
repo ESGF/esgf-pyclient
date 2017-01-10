@@ -3,12 +3,13 @@
 Module :mod:`pyesgf.logon`
 ==========================
 
-Manage the client's interaction with ESGF's security system.  Using this module requires installing the MyProxyClient_ library.
+Manage the client's interaction with ESGF's security system.  Using this
+module requires installing the MyProxyClient_ library.
 
 .. _MyProxyClient: http://pypi.python.org/pypi/MyProxyClient
 
-To obtain ESGF credentials create a :class:`LogonManager` instance and supply it with logon
-details::
+To obtain ESGF credentials create a :class:`LogonManager` instance and supply
+it with logon details::
 
   >>> lm = LogonManager()
   >>> lm.is_logged_on()
@@ -18,8 +19,8 @@ details::
   True
 
 Logon parameters that aren't specified will be prompted for at the terminal
-by default.  The :class:`LogonManager` object also writes a ``.httprc`` file configuring
-OPeNDAP access through the NetCDF API.
+by default.  The :class:`LogonManager` object also writes a ``.httprc`` file
+configuring OPeNDAP access through the NetCDF API.
 
 You can use your OpenID to logon instead.  The logon details will be deduced
 from the OpenID where possible::
@@ -35,7 +36,6 @@ from the OpenID where possible::
 
 import os
 import os.path as op
-import datetime
 import shutil
 from xml.etree import ElementTree
 from six.moves.urllib.request import urlopen
@@ -51,7 +51,7 @@ except (ImportError, SyntaxError):
 
 from .exceptions import OpenidResolutionError
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Constants
 
 ESGF_DIR = op.join(os.environ['HOME'], '.esg')
@@ -65,15 +65,16 @@ MYPROXY_URN = 'urn:esg:security:myproxy-service'
 ESGF_OPENID_REXP = r'https://.*/esgf-idp/openid/(.*)'
 MYPROXY_URI_REXP = r'socket://([^:]*):?(\d+)?'
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # classes
+
 
 class LogonManager(object):
     """
     Manages ESGF crendentials and security configuration files.
 
     Also integrates with NetCDF's secure OPeNDAP configuration.
-    
+
     """
     STATE_LOGGED_ON = 0
     STATE_NO_CREDENTIALS = 1
@@ -85,9 +86,9 @@ class LogonManager(object):
         :param esgf_dir: Root directory of ESGF state.  Default ~/.esg
         :param dap_config: Set the location of .httprc.  Defaults to ~/.httprc
 
-        Note if dap_config is defined your current working directory must be the
-        same as the location as the dap_config file when OPeNDAP is initiallised.
-
+        Note if dap_config is defined your current working directory must be
+        the same as the location as the dap_config file when OPeNDAP is
+        initialised.
         """
         if not _has_myproxy:
             raise ImportError('pyesgf.logon requires MyProxyClient')
@@ -106,19 +107,18 @@ class LogonManager(object):
         else:
             with open(self.esgf_credentials) as fh:
                 data = fh.read()
-                cert = OpenSSL.crypto.load_certificate(OpenSSL.SSL.FILETYPE_PEM, data)
+                cert = OpenSSL.crypto.load_certificate(
+                                        OpenSSL.SSL.FILETYPE_PEM, data)
 
             if cert.has_expired():
                 return self.STATE_EXPIRED_CREDENTIALS
 
-            #!TODO: check credentials against certificates
+            # !TODO: check credentials against certificates
 
             return self.STATE_LOGGED_ON
 
-
     def is_logged_on(self):
         return self.state == self.STATE_LOGGED_ON
-
 
     def logon_with_openid(self, openid, password=None,
                           bootstrap=False, update_trustroots=True,
@@ -139,7 +139,6 @@ class LogonManager(object):
                           update_trustroots=update_trustroots,
                           interactive=interactive)
 
-
     def logon(self, username=None, password=None, hostname=None,
               bootstrap=False, update_trustroots=True,
               interactive=True):
@@ -148,7 +147,7 @@ class LogonManager(object):
 
         If ``interactive == True`` then any missing parameters of ``password``,
         ``username`` or ``hostname`` will be prompted for at the terminal.
-        
+
         :param interactive: Whether to ask for input at the terminal for
             any missing information.  I.e. username, password or hostname.
         :param bootstrap: Whether to bootstrap the trustroots for this
@@ -173,18 +172,18 @@ class LogonManager(object):
         c = MyProxyClient(hostname=hostname, caCertDir=self.esgf_certs_dir)
 
         creds = c.logon(username, password,
-                        bootstrap=bootstrap, updateTrustRoots=update_trustroots)
+                        bootstrap=bootstrap,
+                        updateTrustRoots=update_trustroots)
         with open(self.esgf_credentials, 'w') as fh:
             for cred in creds:
                 fh.write(cred)
-                
 
     def logoff(self, clear_trustroots=False):
         """
         Remove any obtained credentials from the ESGF environment.
-        
+
         :param clear_trustroots: If True also remove trustroots.
-    
+
         """
         if op.exists(self.esgf_credentials):
             os.remove(self.esgf_credentials)
@@ -219,46 +218,42 @@ class LogonManager(object):
         mo = re.match(ESGF_OPENID_REXP, openid)
         if mo:
             username = mo.group(1)
-                
-        #!TODO maybe support different myproxy port
+
+        # !TODO maybe support different myproxy port
         if port is not None:
             assert int(port) == 7512
-            
+
         return username, hostname
-            
 
     def _write_dap_config(self, verbose=False, validate=False):
         preamble, managed, postamble = self._parse_dap_config()
 
         with open(self.dap_config, 'w') as fh:
-            fh.write("""\
-{preamble}
-# BEGIN {marker}
-HTTP.VERBOSE={verbose}
-HTTP.COOKIEJAR={esgf_dir}/.dods_cookies
-HTTP.SSL.VALIDATE=0
-HTTP.SSL.CERTIFICATE={esgf_dir}/credentials.pem
-HTTP.SSL.KEY={esgf_dir}/credentials.pem
-HTTP.SSL.CAPATH={esgf_certs_dir}
-# END {marker}
-{postamble}
-""".format(verbose=1 if verbose else 0, 
-           validate=1 if validate else 0,
-           esgf_certs_dir=self.esgf_certs_dir, 
-           esgf_dir=self.esgf_dir,
-           marker=DAP_CONFIG_MARKER,
-           preamble=preamble,
-           postamble=postamble,
-           ))
-
+            fh.write(('{preamble}\n'
+                      '# BEGIN {marker}\n'
+                      'HTTP.VERBOSE={verbose}\n'
+                      'HTTP.COOKIEJAR={esgf_dir}/.dods_cookies\n'
+                      'HTTP.SSL.VALIDATE=0\n'
+                      'HTTP.SSL.CERTIFICATE={esgf_dir}/credentials.pem\n'
+                      'HTTP.SSL.KEY={esgf_dir}/credentials.pem\n'
+                      'HTTP.SSL.CAPATH={esgf_certs_dir}\n'
+                      '# END {marker}\n'
+                      '{postamble}\n')
+                     .format(verbose=1 if verbose else 0,
+                             validate=1 if validate else 0,
+                             esgf_certs_dir=self.esgf_certs_dir,
+                             esgf_dir=self.esgf_dir,
+                             marker=DAP_CONFIG_MARKER,
+                             preamble=preamble,
+                             postamble=postamble))
 
     def _parse_dap_config(self, config_str=None):
         """
-        Read the DAP_CONFIG file and extract the parts not controlled 
+        Read the DAP_CONFIG file and extract the parts not controlled
         by esgf-pyclient.
 
-        :return: (preamble, managed, postamble), three strings of 
-            configuration lines before, within and after the esgf-pyclient 
+        :return: (preamble, managed, postamble), three strings of
+            configuration lines before, within and after the esgf-pyclient
             controlled block.
 
         """
@@ -267,9 +262,12 @@ HTTP.SSL.CAPATH={esgf_certs_dir}
                 return ('', '', '')
             config_str = open(self.dap_config).read()
 
-        #!NOTE: The flags keyword argument to re.split was introduced in Python2.7
-        #   Keep with call non-keyword arguments for compatibility with Python2.6
-        sections = re.split(r'^# (?:BEGIN|END) {0}$\n'.format(DAP_CONFIG_MARKER), 
+        # !NOTE: The flags keyword argument to re.split was introduced
+        #        in Python2.7
+        #        Keep with call non-keyword arguments for compatibility with
+        #        Python2.6
+        sections = re.split(r'^# (?:BEGIN|END) {0}$\n'
+                            .format(DAP_CONFIG_MARKER),
                             config_str, re.M)
 
         if len(sections) < 2:
@@ -279,8 +277,8 @@ HTTP.SSL.CAPATH={esgf_certs_dir}
         elif len(sections) == 3:
             preamble, managed, postamble = sections
         else:
-            # In odd circumstances there might be more than 3 parts of the config 
-            # so assume the final config is the one to keep
+            # In odd circumstances there might be more than 3 parts of the
+            # config so assume the final config is the one to keep
             managed, unmanaged = [], []
             sections.reverse()
             while sections:
@@ -291,6 +289,5 @@ HTTP.SSL.CAPATH={esgf_certs_dir}
             preamble = '\n'.join(unmanaged[:-1])
             postamble = unmanaged[-1]
             managed = managed[-1]
-
 
         return preamble.strip(), managed.strip(), postamble.strip()

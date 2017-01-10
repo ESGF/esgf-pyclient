@@ -1,11 +1,17 @@
-# (c) 2005 Ian Bicking and contributors; written for Paste (http://pythonpaste.org)
-# Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+# (c) 2005 Ian Bicking and contributors; written for Paste
+# (http://pythonpaste.org)
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/mit-license.php
 #
-# Taken verbatim from https://bitbucket.org/ianb/webob/src/tip/webob/multidict.py
+# Taken verbatim from
+# https://bitbucket.org/ianb/webob/src/tip/webob/multidict.py
 """
 Gives a multi-value dictionary object (MultiDict) plus several wrappers
 """
-import cgi, copy, sys, warnings
+import cgi
+import copy
+import sys
+import warnings
 try:
     from UserDict import DictMixin
 except ImportError:
@@ -24,7 +30,8 @@ class MultiDict(DictMixin):
 
     def __init__(self, *args, **kw):
         if len(args) > 1:
-            raise TypeError("MultiDict can only be called with one positional argument")
+            raise TypeError("MultiDict can only be called with one positional "
+                            "argument")
         if args:
             if hasattr(args[0], 'iteritems'):
                 items = list(args[0].iteritems())
@@ -131,7 +138,8 @@ class MultiDict(DictMixin):
 
     def dict_of_lists(self):
         """
-        Returns a dictionary where each key is associated with a list of values.
+        Returns a dictionary where each key is associated with a list of
+        values.
         """
         r = {}
         for key, val in self.iteritems():
@@ -193,8 +201,8 @@ class MultiDict(DictMixin):
                 # this does not catch the cases where we overwrite existing
                 # keys, but those would produce too many warning
                 msg = ("Behavior of MultiDict.update() has changed "
-                    "and overwrites duplicate keys. Consider using .extend()"
-                )
+                       "and overwrites duplicate keys. "
+                       "Consider using .extend()")
                 warnings.warn(msg, UserWarning, stacklevel=2)
         DictMixin.update(self, *args, **kw)
 
@@ -219,10 +227,6 @@ class MultiDict(DictMixin):
     def __len__(self):
         return len(self._items)
 
-    ##
-    ## All the iteration:
-    ##
-
     def keys(self):
         return [k for k, v in self._items]
 
@@ -244,6 +248,7 @@ class MultiDict(DictMixin):
     def itervalues(self):
         for k, v in self._items:
             yield v
+
 
 class UnicodeMultiDict(DictMixin):
     """
@@ -314,10 +319,12 @@ class UnicodeMultiDict(DictMixin):
         return value
 
     def __getitem__(self, key):
-        return self._decode_value(self.multi.__getitem__(self._encode_key(key)))
+        return self._decode_value(self.multi
+                                  .__getitem__(self._encode_key(key)))
 
     def __setitem__(self, key, value):
-        self.multi.__setitem__(self._encode_key(key), self._encode_value(value))
+        self.multi.__setitem__(self._encode_key(key),
+                               self._encode_value(value))
 
     def add(self, key, value):
         """
@@ -329,7 +336,8 @@ class UnicodeMultiDict(DictMixin):
         """
         Return a list of all values matching the key (may be an empty list)
         """
-        return map(self._decode_value, self.multi.getall(self._encode_key(key)))
+        return map(self._decode_value,
+                   self.multi.getall(self._encode_key(key)))
 
     def getone(self, key):
         """
@@ -399,10 +407,6 @@ class UnicodeMultiDict(DictMixin):
     def __len__(self):
         return self.multi.__len__()
 
-    ##
-    ## All the iteration:
-    ##
-
     def keys(self):
         return [self._decode_key(k) for k in self.multi.iterkeys()]
 
@@ -429,48 +433,62 @@ class UnicodeMultiDict(DictMixin):
 
 _dummy = object()
 
+
 class TrackableMultiDict(MultiDict):
     tracker = None
     name = None
+
     def __init__(self, *args, **kw):
         if '__tracker' in kw:
             self.tracker = kw.pop('__tracker')
         if '__name' in kw:
             self.name = kw.pop('__name')
         MultiDict.__init__(self, *args, **kw)
+
     def __setitem__(self, key, value):
         MultiDict.__setitem__(self, key, value)
         self.tracker(self, key, value)
+
     def add(self, key, value):
         MultiDict.add(self, key, value)
         self.tracker(self, key, value)
+
     def __delitem__(self, key):
         MultiDict.__delitem__(self, key)
         self.tracker(self, key)
+
     def clear(self):
         MultiDict.clear(self)
         self.tracker(self)
+
     def setdefault(self, key, default=None):
         result = MultiDict.setdefault(self, key, default)
         self.tracker(self, key, result)
         return result
+
     def pop(self, key, *args):
         result = MultiDict.pop(self, key, *args)
         self.tracker(self, key)
         return result
+
     def popitem(self):
         result = MultiDict.popitem(self)
         self.tracker(self)
         return result
+
     def update(self, *args, **kwargs):
         MultiDict.update(self, *args, **kwargs)
         self.tracker(self)
+
     def __repr__(self):
         items = map('(%r, %r)'.__mod__, _hide_passwd(self.iteritems()))
-        return '%s([%s])' % (self.name or self.__class__.__name__, ', '.join(items))
+        return '%s([%s])' % (self.name or self.__class__.__name__,
+                             ', '.join(items))
+
     def copy(self):
         # Copies shouldn't be tracked
         return MultiDict(self)
+
 
 class NestedMultiDict(MultiDict):
     """
@@ -558,6 +576,7 @@ class NestedMultiDict(MultiDict):
 
     iterkeys = __iter__
 
+
 class NoVars(object):
     """
     Represents no variables; used when no variables
@@ -617,6 +636,7 @@ class NoVars(object):
 
     def keys(self):
         return []
+
     def iterkeys(self):
         return iter([])
     __iter__ = iterkeys
@@ -626,13 +646,11 @@ class NoVars(object):
     itervalues = iterkeys
 
 
-
 def _hide_passwd(items):
     for k, v in items:
-        if ('password' in k
-            or 'passwd' in k
-            or 'pwd' in k
-        ):
+        if ('password' in k or
+            'passwd' in k or
+           'pwd' in k):
             yield k, '******'
         else:
             yield k, v

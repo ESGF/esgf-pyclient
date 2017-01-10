@@ -6,13 +6,13 @@
 # the full license text.
 
 from setuptools import setup, find_packages
-import sys, os
-
+import sys
+import os
 
 # Import version from the top-level package
-sys.path[:0] = os.path.dirname(__file__)
 from pyesgf import __version__
 from pyesgf import __doc__ as long_description
+sys.path[:0] = os.path.dirname(__file__)
 
 setup(name='esgf-pyclient',
       version=__version__,
@@ -22,8 +22,13 @@ setup(name='esgf-pyclient',
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: BSD License',
         'Topic :: Scientific/Engineering',
-        'Programming Language :: Python :: 2.6',
-        ], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+        'Programming Language :: Python :: 2.6'
+        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 3.3'
+        'Programming Language :: Python :: 3.4'
+        'Programming Language :: Python :: 3.5'
+        ],
+      # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='',
       author='Ag Stephens',
       author_email='Ag.Stephens@stfc.ac.uk',
@@ -34,9 +39,9 @@ setup(name='esgf-pyclient',
       include_package_data=True,
       zip_safe=False,
       install_requires=['jinja2'],
-      extras_require={'testing': ['myproxyclient']},
+      extras_require={'testing': ['myproxyclient', 'flake8']},
       tests_require=['pytest'],
-      entry_points= {
+      entry_points={
         },
       test_suite='test',
       )
