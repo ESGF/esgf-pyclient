@@ -454,7 +454,9 @@ class NoVars(object):
 
     if PY2:
         def __cmp__(self, other):
-            return cmp({}, other)
+            def _cmp(a, b):
+                return (a > b) - (a < b)
+            return _cmp({}, other)
 
         def keys(self):
             return []
