@@ -19,12 +19,6 @@ class TestContext(TestCase):
 
         assert context.freetext_constraint == "temperature"
 
-    def test_context_facets1(self):
-        conn = SearchConnection(self.test_service, cache=self.cache)
-        context = conn.new_context(project='cmip5')
-
-        assert context.facet_constraints['project'] == 'cmip5'
-
     def test_context_facets2(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
         context = conn.new_context(project='CMIP5')
