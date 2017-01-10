@@ -2,7 +2,7 @@
 # Taken verbatim from
 # https://github.com/Pylons/webob/blob/master/tests/test_multidict.py
 #
-# With the GetDict test removed
+# With the GetDict tests removed
 
 import unittest
 from pyesgf import multidict
@@ -63,7 +63,7 @@ class BaseDictTests(object):
         d = self._get_instance()
         self.assertTrue('a' in d)
         del d['a']
-        self.assertTrue(not 'a' in d)
+        self.assertTrue('a' not in d)
 
     def test_pop(self):
         d = self._get_instance()
@@ -128,114 +128,40 @@ class BaseDictTests(object):
         self.assertTrue(repr(self._get_instance()))
 
     def test_too_many_args(self):
-        from webob.multidict import MultiDict
+        from pyesgf.multidict import MultiDict
         self.assertRaises(TypeError, MultiDict, '1', 2)
 
     def test_no_args(self):
-        from webob.multidict import MultiDict
+        from pyesgf.multidict import MultiDict
         md = MultiDict()
         self.assertEqual(md._items, [])
 
     def test_kwargs(self):
-        from webob.multidict import MultiDict
+        from pyesgf.multidict import MultiDict
         md = MultiDict(kw1='val1')
-        self.assertEqual(md._items, [('kw1','val1')])
+        self.assertEqual(md._items, [('kw1', 'val1')])
 
     def test_view_list_not_list(self):
-        from webob.multidict import MultiDict
+        from pyesgf.multidict import MultiDict
         d = MultiDict()
         self.assertRaises(TypeError, d.view_list, 42)
 
     def test_view_list(self):
-        from webob.multidict import MultiDict
+        from pyesgf.multidict import MultiDict
         d = MultiDict()
-        self.assertEqual(d.view_list([1,2])._items, [1,2])
+        self.assertEqual(d.view_list([1, 2])._items, [1, 2])
 
     def test_from_fieldstorage_with_filename(self):
-        from webob.multidict import MultiDict
+        from pyesgf.multidict import MultiDict
         d = MultiDict()
         fs = DummyFieldStorage('a', '1', 'file')
-        self.assertEqual(d.from_fieldstorage(fs), MultiDict({'a':fs.list[0]}))
+        self.assertEqual(d.from_fieldstorage(fs), MultiDict({'a': fs.list[0]}))
 
     def test_from_fieldstorage_without_filename(self):
-        from webob.multidict import MultiDict
+        from pyesgf.multidict import MultiDict
         d = MultiDict()
         fs = DummyFieldStorage('a', '1')
-        self.assertEqual(d.from_fieldstorage(fs), MultiDict({'a':'1'}))
-
-    def test_from_fieldstorage_with_charset(self):
-        from cgi import FieldStorage
-        from webob.request import BaseRequest
-        from webob.multidict import MultiDict
-        multipart_type = 'multipart/form-data; boundary=foobar'
-        from io import BytesIO
-        body = (
-            b'--foobar\r\n'
-            b'Content-Disposition: form-data; name="title"\r\n'
-            b'Content-type: text/plain; charset="ISO-2022-JP"\r\n'
-            b'\r\n'
-            b'\x1b$B$3$s$K$A$O\x1b(B'
-            b'\r\n'
-            b'--foobar--')
-        multipart_body = BytesIO(body)
-        environ = BaseRequest.blank('/').environ
-        environ.update(CONTENT_TYPE=multipart_type)
-        environ.update(REQUEST_METHOD='POST')
-        environ.update(CONTENT_LENGTH=len(body))
-        fs = FieldStorage(multipart_body, environ=environ)
-        vars = MultiDict.from_fieldstorage(fs)
-        self.assertEqual(vars['title'].encode('utf8'),
-                         text_('こんにちは', 'utf8').encode('utf8'))
-
-    def test_from_fieldstorage_with_base64_encoding(self):
-        from cgi import FieldStorage
-        from webob.request import BaseRequest
-        from webob.multidict import MultiDict
-        multipart_type = 'multipart/form-data; boundary=foobar'
-        from io import BytesIO
-        body = (
-            b'--foobar\r\n'
-            b'Content-Disposition: form-data; name="title"\r\n'
-            b'Content-type: text/plain; charset="ISO-2022-JP"\r\n'
-            b'Content-Transfer-Encoding: base64\r\n'
-            b'\r\n'
-            b'GyRCJDMkcyRLJEEkTxsoQg=='
-            b'\r\n'
-            b'--foobar--')
-        multipart_body = BytesIO(body)
-        environ = BaseRequest.blank('/').environ
-        environ.update(CONTENT_TYPE=multipart_type)
-        environ.update(REQUEST_METHOD='POST')
-        environ.update(CONTENT_LENGTH=len(body))
-        fs = FieldStorage(multipart_body, environ=environ)
-        vars = MultiDict.from_fieldstorage(fs)
-        self.assertEqual(vars['title'].encode('utf8'),
-                         text_('こんにちは', 'utf8').encode('utf8'))
-
-    def test_from_fieldstorage_with_quoted_printable_encoding(self):
-        from cgi import FieldStorage
-        from webob.request import BaseRequest
-        from webob.multidict import MultiDict
-        multipart_type = 'multipart/form-data; boundary=foobar'
-        from io import BytesIO
-        body = (
-            b'--foobar\r\n'
-            b'Content-Disposition: form-data; name="title"\r\n'
-            b'Content-type: text/plain; charset="ISO-2022-JP"\r\n'
-            b'Content-Transfer-Encoding: quoted-printable\r\n'
-            b'\r\n'
-            b'=1B$B$3$s$K$A$O=1B(B'
-            b'\r\n'
-            b'--foobar--')
-        multipart_body = BytesIO(body)
-        environ = BaseRequest.blank('/').environ
-        environ.update(CONTENT_TYPE=multipart_type)
-        environ.update(REQUEST_METHOD='POST')
-        environ.update(CONTENT_LENGTH=len(body))
-        fs = FieldStorage(multipart_body, environ=environ)
-        vars = MultiDict.from_fieldstorage(fs)
-        self.assertEqual(vars['title'].encode('utf8'),
-                         text_('こんにちは', 'utf8').encode('utf8'))
+        self.assertEqual(d.from_fieldstorage(fs), MultiDict({'a': '1'}))
 
 
 class MultiDictTestCase(BaseDictTests, unittest.TestCase):
@@ -243,6 +169,7 @@ class MultiDictTestCase(BaseDictTests, unittest.TestCase):
 
     def test_update_behavior_warning(self):
         import warnings
+
         class Foo(dict):
             def __len__(self):
                 return 0
@@ -262,7 +189,7 @@ class NestedMultiDictTestCase(BaseDictTests, unittest.TestCase):
     klass = multidict.NestedMultiDict
 
     def test_getitem(self):
-        d = self.klass({'a':1})
+        d = self.klass({'a': 1})
         self.assertEqual(d['a'], 1)
 
     def test_getitem_raises(self):
