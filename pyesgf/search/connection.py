@@ -52,7 +52,8 @@ class SearchConnection(object):
         other search peers.
     :ivar cache: Path to `sqlite` cache file. Cache expires every hours.
     :ivar timeout: Time (in seconds) before query returns an error.
-    :ivar expire_after: Time delta after cache expires
+                   Default: 120s.
+    :ivar expire_after: Time delta after cache expires. Default: 1 hour.
     :ivar session: requests.session object. optional.
     :ivar verify: boolean, determines if query should be sent over a verified
                   channel.
@@ -89,15 +90,18 @@ class SearchConnection(object):
         else:
             self.__context_class = DatasetSearchContext
 
+        self._isopen = False
+
     def open(self):
         if (isinstance(self._passed_session, requests.Session) or
             isinstance(self._passed_session,
                        requests_cache.core.CachedSession)):
-            self.session = self.passed_session
+            self.session = self._passed_session
         else:
             self.session = create_single_session(
                                         cache=self.cache,
                                         expire_after=self.expire_after)
+        self._isopen = True
         return
 
     def __enter__(self):
@@ -114,6 +118,7 @@ class SearchConnection(object):
                 isinstance(self._passed_session,
                            requests_cache.core.CachedSession)):
             self.session.close()
+        self._isopen = False
         return
 
     def __check_url(self):
@@ -147,7 +152,8 @@ class SearchConnection(object):
 
         """
         full_query = self._build_query(query_dict, limit, offset, shards)
-        self.open()
+        if not self._isopen:
+            self.open()
         response = self._send_query('search', full_query)
         ret = response.json()
         response.close()
