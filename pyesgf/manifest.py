@@ -162,7 +162,7 @@ class SolrManifestExtractor(ManifestExtractor):
 
                 try:
                     current_manifest.add(filename, filehash, tracking_id, size)
-                except DuplicateHashError, e:
+                except DuplicateHashError as e:
                     log.error(e)
 
             # Test whether there were any rows.
@@ -232,6 +232,7 @@ def parse_timestamp(timestamp):
     dt = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
     return dt
+
 
 if __name__ == '__main__':
     import argparse

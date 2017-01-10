@@ -11,5 +11,5 @@ if __name__ == '__main__':
     urls = sys.argv[1:]
 
     for url in urls:
-        print 'Removing %s' % url
+        print('Removing %s' % url)
         remove_from_cache(url, full_cache_dir)
