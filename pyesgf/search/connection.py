@@ -26,8 +26,6 @@ import datetime
 import os
 
 import re
-from six.moves.urllib.request import urlopen
-from six.moves.urllib.error import HTTPError
 from six.moves.urllib.parse import urlparse
 
 import warnings
@@ -198,14 +196,10 @@ class SearchConnection(object):
                                     timeout=self.timeout)
         if response.status_code == 400:
             # If error code 400, use urllib to find the errors:
-            try:
-                response = urlopen(query_url)
-            except HTTPError as err:
-                errors = set(re.findall("Invalid HTTP query "
-                                        "parameter=(\w+)",
-                             err.fp.read()))
-                content = "; ".join([e for e in list(errors)])
-                raise Exception("Invalid query parameter(s): %s" % content)
+            errors = set(re.findall("Invalid HTTP query parameter=(\w+)",
+                         response.text))
+            content = "; ".join([e for e in list(errors)])
+            raise Exception("Invalid query parameter(s): %s" % content)
 
         # Raise if query was unsucessful:
         response.raise_for_status()
@@ -243,7 +237,6 @@ class SearchConnection(object):
             'shards': shard_str,
         })
         full_query.extend(query_dict)
-        print(full_query)
 
         # Remove all None valued items
         full_query = MultiDict(item for item in full_query.items()
