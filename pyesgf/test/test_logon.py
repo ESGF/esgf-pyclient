@@ -24,6 +24,10 @@ TEST_MYPROXY = 'slcs1.ceda.ac.uk'
 
 TEST_DATA_DIR = op.join(op.dirname(__file__), 'data')
 
+if None in [TEST_USER, TEST_PASSWORD, TEST_OPENID]:
+    _has_login_info = False
+else:
+    _has_login_info = True
 
 def _load_creds(esgf_dir, credentials_file=None, certificates_tarball=None):
     if credentials_file:
@@ -47,6 +51,7 @@ def _clear_certs(esgf_dir):
         shutil.rmtree(cert_path)
 
 
+@pytest.mark.skipif(not _has_login_info, reason='Must have specified login info as environment variables.')
 class TestLogon(TestCase):
     def setUp(self):
         self.esgf_dir = tempfile.mkdtemp(prefix='pyesgf_tmp')
