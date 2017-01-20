@@ -11,7 +11,7 @@ import csv
 import re
 import datetime
 
-from pyesgf.exceptions import Error, DuplicateHashError
+from .exceptions import Error, DuplicateHashError
 
 import logging
 log = logging.getLogger(__name__)

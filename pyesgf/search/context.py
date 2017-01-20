@@ -10,7 +10,7 @@ query.
 
 import copy
 
-from pyesgf.multidict import MultiDict
+from ..multidict import MultiDict
 
 from .constraints import GeospatialConstraint
 from .consts import (TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION,

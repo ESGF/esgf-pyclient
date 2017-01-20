@@ -31,11 +31,11 @@ from six.moves.urllib.parse import urlparse
 import warnings
 import logging
 
-from pyesgf.search.context import DatasetSearchContext
-from pyesgf.search.consts import RESPONSE_FORMAT, SHARD_REXP
-from pyesgf.search.exceptions import EsgfSearchException
-from pyesgf.multidict import MultiDict
-from pyesgf.util import urlencode
+from .context import DatasetSearchContext
+from .consts import RESPONSE_FORMAT, SHARD_REXP
+from .exceptions import EsgfSearchException
+from ..multidict import MultiDict
+from ..util import urlencode
 
 logging.basicConfig()
 log = logging.getLogger(__name__)

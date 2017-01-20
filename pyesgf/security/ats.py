@@ -10,7 +10,7 @@ from six.moves.urllib.request import urlopen, Request
 import six
 from xml.etree import ElementTree as ET
 
-from pyesgf.security import NS
+from . import NS
 
 import logging
 log = logging.getLogger(__name__)
