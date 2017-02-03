@@ -82,13 +82,15 @@ class LogonManager(object):
     STATE_EXPIRED_CREDENTIALS = 2
     STATE_INVALID_CREDENTIALS = 3
 
-    def __init__(self, esgf_dir=ESGF_DIR, dap_config=DAP_CONFIG, ssl_verify=True):
+    def __init__(self, esgf_dir=ESGF_DIR, dap_config=DAP_CONFIG,
+                 ssl_verify=True):
         """
         :param esgf_dir: Root directory of ESGF state.  Default ~/.esg
         :param dap_config: Set the location of .httprc.  Defaults to ~/.httprc
         :param ssl_verify: SSL verification option. Default ``True``.
 
-        See the ``requests`` documenation to configure the ``ssl_verify`` option:
+        See the ``requests`` documenation to configure the
+        ``ssl_verify`` option:
 
         http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
 
