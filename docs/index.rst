@@ -29,7 +29,7 @@ You can also download the tarball from http://pypi.python.org/pypi/esgf-pyclient
 
 Or you can install it using conda::
 
-  $ conda install -c birdhouse esgf-pyclient
+  $ conda install -c conda-forge esgf-pyclient
 
 If you want to follow the latest code and/or make contributions the source code is available on github at https://github.com/ESGF/esgf-pyclient
 
