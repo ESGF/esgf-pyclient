@@ -38,7 +38,7 @@ import os
 import os.path as op
 import shutil
 from xml.etree import ElementTree
-from six.moves.urllib.request import urlopen
+import requests
 from six.moves import input
 import re
 from getpass import getpass
@@ -82,10 +82,16 @@ class LogonManager(object):
     STATE_EXPIRED_CREDENTIALS = 2
     STATE_INVALID_CREDENTIALS = 3
 
-    def __init__(self, esgf_dir=ESGF_DIR, dap_config=DAP_CONFIG):
+    def __init__(self, esgf_dir=ESGF_DIR, dap_config=DAP_CONFIG, ssl_verify=True):
         """
         :param esgf_dir: Root directory of ESGF state.  Default ~/.esg
         :param dap_config: Set the location of .httprc.  Defaults to ~/.httprc
+        :param ssl_verify: SSL verification option. Default ``True``.
+
+        See the ``requests`` documenation to configure the ``ssl_verify`` option:
+
+        http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
+
 
         Note if dap_config is defined your current working directory must be
         the same as the location as the dap_config file when OPeNDAP is
@@ -98,6 +104,7 @@ class LogonManager(object):
         self.esgf_credentials = op.join(self.esgf_dir, ESGF_CREDENTIALS)
         self.esgf_certs_dir = op.join(self.esgf_dir, ESGF_CERTS_DIR)
         self.dap_config = dap_config
+        self.ssl_verify = ssl_verify
 
         self._write_dap_config()
 
@@ -109,7 +116,7 @@ class LogonManager(object):
             with open(self.esgf_credentials) as fh:
                 data = fh.read()
                 cert = OpenSSL.crypto.load_certificate(
-                                        OpenSSL.SSL.FILETYPE_PEM, data)
+                    OpenSSL.SSL.FILETYPE_PEM, data)
 
             if cert.has_expired():
                 return self.STATE_EXPIRED_CREDENTIALS
@@ -193,8 +200,8 @@ class LogonManager(object):
             shutil.rmtree(self.esgf_certs_dir)
 
     def _get_logon_details(self, openid):
-        openid_doc = urlopen(openid).read()
-        xml = ElementTree.fromstring(openid_doc)
+        response = requests.get(openid, verify=self.ssl_verify)
+        xml = ElementTree.fromstring(response.content)
 
         hostname = None
         port = None
