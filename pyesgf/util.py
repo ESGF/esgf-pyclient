@@ -7,6 +7,7 @@ import sys
 from six.moves.urllib.parse import quote_plus
 from six import string_types
 
+
 def get_manifest(drs_id, version, connection):
     """
     Retrieve the filenames, sizes and checksums of a dataset.
@@ -28,7 +29,7 @@ def get_manifest(drs_id, version, connection):
     results = context.search()
 
     if len(results) > 1:
-        raise ValueError("Search for dataset %s.v%s returns multiple hits" % 
+        raise ValueError("Search for dataset %s.v%s returns multiple hits" %
                          (drs_id, version))
 
     file_context = results[0].file_context()
@@ -41,20 +42,22 @@ def get_manifest(drs_id, version, connection):
                 }
 
     return manifest
-            
+
 
 def urlencode(query):
-    """Encode a sequence of two-element tuples or dictionary into a URL query string.
+    """
+    Encode a sequence of two-element tuples or dictionary into a URL query
+    string.
 
-    This version is adapted from the standard library to understand operators in the
-    pyesgf.search.constraints module.
+    This version is adapted from the standard library to understand operators
+    in the pyesgf.search.constraints module.
 
     If the query arg is a sequence of two-element tuples, the order of the
     parameters in the output will match the order of parameters in the
     input.
     """
 
-    if hasattr(query,"items"):
+    if hasattr(query, "items"):
         # mapping objects
         query = query.items()
     else:
@@ -70,9 +73,9 @@ def urlencode(query):
             # allowed empty dicts that type of behavior probably should be
             # preserved for consistency
         except TypeError:
-            ty,va,tb = sys.exc_info()
-            raise TypeError("not a valid non-string sequence or mapping object", tb)
-
+            ty, va, tb = sys.exc_info()
+            raise TypeError("not a valid non-string sequence "
+                            "or mapping object", tb)
 
     def append(k, v, tag, l):
         from .search.consts import OPERATOR_NEQ
@@ -89,7 +92,7 @@ def urlencode(query):
             tag, v = v
         else:
             tag = None
-            
+
         return tag, v
 
     l = []

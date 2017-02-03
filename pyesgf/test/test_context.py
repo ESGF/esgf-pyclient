@@ -5,26 +5,22 @@ Test the SearchContext class
 
 from pyesgf.search import SearchConnection, not_equals
 from unittest import TestCase
+import os
 
 
 class TestContext(TestCase):
     def setUp(self):
         self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
+        self.cache = os.path.join(os.path.dirname(__file__), 'url_cache')
 
     def test_context_freetext(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
         context = conn.new_context(query="temperature")
 
         assert context.freetext_constraint == "temperature"
 
-    def test_context_facets1(self):
-        conn = SearchConnection(self.test_service)
-        context = conn.new_context(project='cmip5')
-
-        assert context.facet_constraints['project'] == 'cmip5'
-
     def test_context_facets2(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
         context = conn.new_context(project='CMIP5')
 
         context2 = context.constrain(model="IPSL-CM5A-LR")
@@ -32,7 +28,7 @@ class TestContext(TestCase):
         assert context2.facet_constraints['model'] == 'IPSL-CM5A-LR'
 
     def test_context_facets_multivalue(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
         context = conn.new_context(project='CMIP5')
 
         context2 = context.constrain(model=['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
@@ -44,7 +40,7 @@ class TestContext(TestCase):
                       .getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
 
     def test_context_facet_multivalue2(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
         context = conn.new_context(project='CMIP5', model='IPSL-CM5A-MR')
         assert context.facet_constraints.getall('model') == ['IPSL-CM5A-MR']
 
@@ -54,7 +50,7 @@ class TestContext(TestCase):
                       .getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR']
 
     def test_context_facet_multivalue3(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
         ctx = conn.new_context(project='CMIP5', query='humidity',
                                experiment='rcp45')
         hits1 = ctx.hit_count
@@ -66,7 +62,7 @@ class TestContext(TestCase):
         assert hits2 > hits1
 
     def test_context_facet_options(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
         context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR',
                                    ensemble='r1i1p1', experiment='rcp60',
                                    realm='seaIce')
@@ -77,7 +73,7 @@ class TestContext(TestCase):
         assert sorted(context.get_facet_options().keys()) == expected
 
     def test_context_facets3(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
 
         context = conn.new_context(project='CMIP5')
         context2 = context.constrain(model="IPSL-CM5A-LR")
@@ -89,7 +85,7 @@ class TestContext(TestCase):
         assert result.json['model'] == ['IPSL-CM5A-LR']
 
     def test_facet_count(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
 
         context = conn.new_context(project='CMIP5')
         context2 = context.constrain(model="IPSL-CM5A-LR")
@@ -99,19 +95,21 @@ class TestContext(TestCase):
         assert list(counts['project'].keys()) == ['CMIP5']
 
     def test_distrib(self):
-        conn = SearchConnection(self.test_service, distrib=False)
+        conn = SearchConnection(self.test_service, cache=self.cache,
+                                distrib=False)
 
         context = conn.new_context(project='CMIP5')
         count1 = context.hit_count
 
-        conn2 = SearchConnection(self.test_service, distrib=True)
+        conn2 = SearchConnection(self.test_service, cache=self.cache,
+                                 distrib=True)
         context = conn2.new_context(project='CMIP5')
         count2 = context.hit_count
 
         assert count1 < count2
 
     def test_constrain(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
 
         context = conn.new_context(project='CMIP5')
         count1 = context.hit_count
@@ -121,7 +119,7 @@ class TestContext(TestCase):
         assert count1 > count2
 
     def test_constrain_freetext(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
 
         context = conn.new_context(project='CMIP5', query='humidity')
         assert context.freetext_constraint == 'humidity'
@@ -130,7 +128,7 @@ class TestContext(TestCase):
         assert context.freetext_constraint == 'humidity'
 
     def test_constrain_regression1(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
 
         context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR')
         assert 'experiment' not in context.facet_constraints
@@ -139,7 +137,7 @@ class TestContext(TestCase):
         assert 'experiment' in context2.facet_constraints
 
     def test_negative_facet(self):
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
 
         context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR')
         hits1 = context.hit_count
@@ -157,7 +155,7 @@ class TestContext(TestCase):
     def test_replica(self):
         # Test that we can exclude replicas
         # This tests assumes the test dataset is replicated
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
         query = ('id:cmip5.output1.NIMR-KMA.'
                  'HadGEM2-AO.rcp60.mon.atmos.Amon.r1i1p1.*')
 
@@ -174,7 +172,7 @@ class TestContext(TestCase):
         #         !!! cache handler instead of usual response.
         #         !!! So catch other error instead
 
-        conn = SearchConnection(self.test_service)
+        conn = SearchConnection(self.test_service, cache=self.cache)
         context = conn.new_context(project='CMIP5', rubbish='nonsense')
 
         try:

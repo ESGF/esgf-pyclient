@@ -3,13 +3,14 @@
 Module :mod:`pyesgf.search.context`
 ===================================
 
-Defines the :class:`SearchContext` class which represents each ESGF search query.
+Defines the :class:`SearchContext` class which represents each ESGF search
+query.
 
 """
 
 import copy
 
-from pyesgf.multidict import MultiDict
+from ..multidict import MultiDict
 
 from .constraints import GeospatialConstraint
 from .consts import (TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION,
@@ -23,24 +24,24 @@ class SearchContext(object):
     Instances of this class represent the state of a current search.
     It exposes what facets are available to select and the facet counts
     if they are available.
-    
+
     Subclasses of this class can restrict the search options.  For instance
     FileSearchContext, DatasetSerachContext or CMIP5SearchContext
-    
+
     SearchContext instances are connected to SearchConnection instances.  You
     normally create SearchContext instances via one of:
     1. Calling SearchConnection.new_context()
     2. Calling SearchContext.constrain()
-    
+
     :ivar constraints: A dictionary of facet constraints currently in effect.
         ``constraint[facet_name] = [value, value, ...]``
-    :property facet_counts: A dictionary of available hits with each 
+    :property facet_counts: A dictionary of available hits with each
         facet value for the search as currently constrained.
-        This property returns a dictionary of dictionaries where 
+        This property returns a dictionary of dictionaries where
         ``facet_counts[facet][facet_value] == hit_count``
-    :property hit_count: The total number of hits available with current constraints.
+    :property hit_count: The total number of hits available with current
+                         constraints.
 
-        
     """
 
     DEFAULT_SEARCH_TYPE = NotImplemented
@@ -61,12 +62,12 @@ class SearchContext(object):
         :param fields: A list of field names to return in search responses
         :param replica: A boolean defining whether to return master records
             or replicas, or None to return both.
-        :param latest: A boolean defining whether to return only latest verisons
-            or only non-latest versions, or None to return both.
-        :param shards: list of shards to restrict searches to.  Should be from the list
-            self.connection.get_shard_list()
-        :param from_timestamp: Date-time string to specify start of search range 
-            (e.g. "2000-01-01T00:00:00Z"). 
+        :param latest: A boolean defining whether to return only latest
+            versions or only non-latest versions, or None to return both.
+        :param shards: list of shards to restrict searches to.  Should be from
+            the list self.connection.get_shard_list()
+        :param from_timestamp: Date-time string to specify start of search
+            range (e.g. "2000-01-01T00:00:00Z").
         :param to_timestamp: Date-time string to specify end of search range
             (e.g. "2100-12-31T23:59:59Z").
 
@@ -102,11 +103,12 @@ class SearchContext(object):
         self.replica = replica
         self.shards = shards
 
-    #-------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Functional search interface
     # These do not change the constraints on self.
 
-    def search(self, batch_size=DEFAULT_BATCH_SIZE, ignore_facet_check=False, **constraints):
+    def search(self, batch_size=DEFAULT_BATCH_SIZE, ignore_facet_check=False,
+               **constraints):
         """
         Perform the search with current constraints returning a set of results.
 
@@ -128,7 +130,7 @@ class SearchContext(object):
     def constrain(self, **constraints):
         """
         Return a *new* instance with the additional constraints.
-        
+
         """
         new_sc = copy.deepcopy(self)
         new_sc._update_constraints(constraints)
@@ -152,7 +154,7 @@ class SearchContext(object):
 
         query_dict = sc._build_query()
 
-        #!TODO: allow setting limit
+        # !TODO: allow setting limit
         script = sc.connection.send_wget(query_dict,
                                          shards=self.shards)
 
@@ -174,7 +176,7 @@ class SearchContext(object):
         facets that are completely constrained.  This method is
         similar to the property ``facet_counts`` except facet values
         which are not relevant for further constraining are removed.
-        
+
         """
         facet_options = {}
         hits = self.hit_count
@@ -187,7 +189,7 @@ class SearchContext(object):
 
         return facet_options
 
-    def __update_counts(self, ignore_facet_check=False): 
+    def __update_counts(self, ignore_facet_check=False):
         # If hit_count is set the counts are already retrieved
         if self.__hit_count is not None:
             return
@@ -200,15 +202,15 @@ class SearchContext(object):
             query_dict['facets'] = '*'
 
         response = self.connection.send_search(query_dict, limit=0)
-        for facet, counts in (
-            response['facet_counts']['facet_fields'].items()):
+        for facet, counts in (response['facet_counts']['facet_fields']
+                              .items()):
             d = self.__facet_counts[facet] = {}
             while counts:
                 d[counts.pop()] = counts.pop()
 
         self.__hit_count = response['response']['numFound']
 
-    #-------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Constraint mutation interface
     # These functions update the instance in-place.
     # Use constrain() and search() to generate new contexts with tighter
@@ -217,7 +219,7 @@ class SearchContext(object):
     def _update_constraints(self, constraints):
         """
         Update the constraints in-place by calling _constrain_*() methods.
-        
+
         """
         constraints_split = self._split_constraints(constraints)
         self._constrain_facets(constraints_split['facet'])
@@ -225,12 +227,14 @@ class SearchContext(object):
             new_freetext = constraints_split['freetext']['query']
             self._constrain_freetext(new_freetext)
 
-        #!TODO: implement temporal and geospatial constraints
+        # !TODO: implement temporal and geospatial constraints
         if 'from_timestamp' in constraints_split['temporal']:
-            self.temporal_constraint[0] = constraints_split['temporal']['from_timestamp']
+            self.temporal_constraint[0] = (constraints_split['temporal']
+                                           ['from_timestamp'])
         if 'to_timestamp' in constraints_split['temporal']:
-            self.temporal_constraint[1] = constraints_split['temporal']['to_timestamp']
-        #self._constrain_geospatial()
+            self.temporal_constraint[1] = (constraints_split['temporal']
+                                           ['to_timestamp'])
+        # self._constrain_geospatial()
 
         # reset cached values
         self.__hit_count = None
@@ -250,13 +254,15 @@ class SearchContext(object):
     def _constrain_freetext(self, query):
         self.freetext_constraint = query
 
-    def _constrain_geospatial(self, lat=None, lon=None, bbox=None, location=None,
-                              radius=None, polygon=None):
-        self.geospatial_constraint = GeospatialConstraint(lat, lon, bbox, location, radius, polygon)
+    def _constrain_geospatial(self, lat=None, lon=None, bbox=None,
+                              location=None, radius=None, polygon=None):
+        self.geospatial_constraint = GeospatialConstraint(
+                                            lat, lon, bbox, location,
+                                            radius, polygon)
 
         raise NotImplementedError
 
-    #-------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     def _split_constraints(self, constraints):
         """
@@ -267,12 +273,13 @@ class SearchContext(object):
         4. Geospatial constraints
 
         :return: A dictionary of the 4 types of constraint.
-        
+
         """
         # local import to prevent circular importing
         from .connection import query_keyword_type
 
-        constraints_split = dict((kw, MultiDict()) for kw in QUERY_KEYWORD_TYPES)
+        constraints_split = dict((kw, MultiDict()) for kw
+                                 in QUERY_KEYWORD_TYPES)
 
         for kw, val in constraints.items():
             constraint_type = query_keyword_type(kw)
@@ -291,12 +298,11 @@ class SearchContext(object):
                                 "latest": self.latest,
                                 "facets": self.facets,
                                 "fields": self.fields,
-                                "replica": self.replica,
-        })
+                                "replica": self.replica})
 
         query_dict.extend(self.facet_constraints)
 
-        #!TODO: encode datetime
+        # !TODO: encode datetime
         start, end = self.temporal_constraint
         query_dict.update(start=start, end=end)
 
@@ -313,4 +319,3 @@ class FileSearchContext(SearchContext):
 
 class AggregationSearchContext(SearchContext):
     DEFAULT_SEARCH_TYPE = TYPE_AGGREGATION
-

@@ -3,6 +3,7 @@ Convenience interface for defining service URL endpoints for ESGF nodes
 
 """
 
+
 class ESGFNode(object):
     def __init__(self, base_url):
         # Strip '/' from url as necessary
@@ -32,6 +33,3 @@ class ESGFNode(object):
         """
         return '/'.join([self.base_url,
                         'esgf-orp/saml/soap/secure/authorizationService.htm'])
-
-    
-        

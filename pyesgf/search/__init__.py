@@ -12,11 +12,9 @@ from .constraints import GeospatialConstraint, any_of, not_equals
 from .results import ResultSet
 from .consts import TYPE_DATASET, TYPE_FILE
 
+__all__ = [SearchConnection, SearchContext, GeospatialConstraint, any_of,
+           not_equals, ResultSet, TYPE_DATASET, TYPE_FILE]
 
-#!TODO: ResultFormatter class.  process response json to specialise the result json.  Default is None
-#!TODO: pipe results to new process.  Command-line interface.
-
-    
-    
-
-    
+# !TODO: ResultFormatter class.  process response json to specialise the result
+#        json.  Default is None
+# !TODO: pipe results to new process.  Command-line interface.
