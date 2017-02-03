@@ -18,6 +18,17 @@ Find how many datasets containing 'humidity' in a given experiment family::
   >>> ctx.facet_counts['experiment_family']
   {u'All': 20372, u'Atmos-only': 1658, u'Control': 493, u'Decadal': 12922, u'ESM': 410, u'Historical': 2292, u'Idealized': 982, u'Paleo': 125, u'RCP': 1927}
 
+Search using a partial ESGF dataset ID (and get first download URL)::
+
+  >>> from pyesgf.search.connection import SearchConnection
+  >>> conn = SearchConnection('http://esgf-index1.ceda.ac.uk/esg-search', distrib=True)
+  >>> ctx = conn.new_context()
+  >>> dataset_id_pattern = "cordex.output.WAS-44.IITM.CCCma-CanESM2.historical.r1i1p1.*"
+  >>> results = ctx.search(query="id:%s" % dataset_id_pattern)
+  >>> files = results[0].file_context().search()
+  >>> download_url = files[0].download_url
+  >>> print download_url
+  http://esg-cccr.tropmet.res.in/thredds/fileServer/esg_dataroot1/cordex_noncommercial/cordex/output/WAS-44/IITM/CCCma-CanESM2/historical/r1i1p1/IITM-RegCM4-4/v5/sem/mrro/v20160824/mrro_WAS-44_CCCma-CanESM2_historical_r1i1p1_IITM-RegCM4-4_v5_sem_198012-198511.nc 
 
 Find the OPeNDAP URL for an aggregated dataset::
 

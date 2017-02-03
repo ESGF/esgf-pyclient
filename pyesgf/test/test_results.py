@@ -129,7 +129,6 @@ class TestResults(TestCase):
     @pytest.mark.xfail(reason='This test does not work anymore')
     def test_shards_constrain(self):
         # Test that a file-context constrains the shard list
-
         conn = SearchConnection(self.test_service, distrib=True)
 
         ctx = conn.new_context(project='CMIP5')
