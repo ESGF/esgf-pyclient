@@ -123,7 +123,7 @@ class SearchContext(object):
         else:
             sc = self
 
-        self.__update_counts(ignore_facet_check=ignore_facet_check)
+        sc.__update_counts(ignore_facet_check=ignore_facet_check)
 
         return ResultSet(sc, batch_size=batch_size)
 
