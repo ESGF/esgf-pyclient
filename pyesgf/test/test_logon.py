@@ -75,13 +75,23 @@ class TestLogon(TestCase):
         assert lm.state == lm.STATE_EXPIRED_CREDENTIALS
 
     @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
-    def test_logon(self):
+    def test_logon(self, extra_args=None):
         _clear_creds(self.esgf_dir)
         _load_creds(self.esgf_dir, certificates_tarball='pcmdi9-certs.tar.gz')
-        lm = LogonManager(self. esgf_dir)
+
+        if not extra_args: extra_args = {}
+        lm = LogonManager(self.esgf_dir, **extra_args)
         lm.logon(TEST_USER, TEST_PASSWORD, TEST_MYPROXY)
 
         assert lm.is_logged_on()
+
+    @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
+    def test_logon_with_verify_true(self):
+        self.test_logon({'verify': True})
+
+    @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
+    def test_logon_with_verify_false(self):
+        self.test_logon({'verify': False})
 
     @pytest.mark.skipif(not _has_myproxy, reason='Cannot work.')
     def test_bootstrap(self):
