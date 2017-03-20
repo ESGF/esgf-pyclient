@@ -201,6 +201,9 @@ class SearchContext(object):
         if not ignore_facet_check:
             query_dict['facets'] = '*'
 
+        if self.facets:
+            query_dict['facets'] = self.facets
+
         response = self.connection.send_search(query_dict, limit=0)
         for facet, counts in (response['facet_counts']['facet_fields']
                               .items()):
