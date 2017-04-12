@@ -156,15 +156,15 @@ class TestContext(TestCase):
         # Test that we can exclude replicas
         # This tests assumes the test dataset is replicated
         conn = SearchConnection(self.test_service, cache=self.cache)
-        query = 'id:cmip5.output1.MOHC.HadGEM2-ES.rcp45.mon.atmos.Amon.r1i1p1.*'
-        version='20111128'
+        qry = 'id:cmip5.output1.MOHC.HadGEM2-ES.rcp45.mon.atmos.Amon.r1i1p1.*'
+        version = '20111128'
 
         # Search for all replicas
-        context = conn.new_context(query=query, version=version)
+        context = conn.new_context(query=qry, version=version)
         assert context.hit_count == 2
 
         # Search for only one replicant
-        context = conn.new_context(query=query, replica=False, version=version)
+        context = conn.new_context(query=qry, replica=False, version=version)
         assert context.hit_count == 1
 
     def test_response_from_bad_parameter(self):
@@ -182,5 +182,3 @@ class TestContext(TestCase):
         except Exception as err:
             assert str(err).strip() in ("Invalid query parameter(s): rubbish",
                                         "No JSON object could be decoded")
-
-
