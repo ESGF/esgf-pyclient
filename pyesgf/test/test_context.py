@@ -67,7 +67,7 @@ class TestContext(TestCase):
                                    ensemble='r1i1p1', experiment='rcp60',
                                    realm='seaIce')
 
-        expected = sorted([u'index_node', u'data_node', u'format',
+        expected = sorted([u'access', u'index_node', u'data_node', u'format',
                            u'cf_standard_name', u'variable_long_name',
                            u'cmor_table', u'time_frequency', u'variable'])
         assert sorted(context.get_facet_options().keys()) == expected
@@ -156,13 +156,15 @@ class TestContext(TestCase):
         # Test that we can exclude replicas
         # This tests assumes the test dataset is replicated
         conn = SearchConnection(self.test_service, cache=self.cache)
-        query = ('id:cmip5.output1.NIMR-KMA.'
-                 'HadGEM2-AO.rcp60.mon.atmos.Amon.r1i1p1.*')
+        query = 'id:cmip5.output1.MOHC.HadGEM2-ES.rcp45.mon.atmos.Amon.r1i1p1.*'
+        version='20111128'
 
-        context = conn.new_context(query=query)
-        assert context.hit_count > 1
+        # Search for all replicas
+        context = conn.new_context(query=query, version=version)
+        assert context.hit_count == 2
 
-        context = conn.new_context(query=query, replica=False)
+        # Search for only one replicant
+        context = conn.new_context(query=query, replica=False, version=version)
         assert context.hit_count == 1
 
     def test_response_from_bad_parameter(self):
@@ -180,3 +182,5 @@ class TestContext(TestCase):
         except Exception as err:
             assert str(err).strip() in ("Invalid query parameter(s): rubbish",
                                         "No JSON object could be decoded")
+
+

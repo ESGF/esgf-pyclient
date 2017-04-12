@@ -34,9 +34,9 @@ This release will include wget script download support.
    The expected value of the *url* parameter to :meth:`SearchConnection()` has changed in this release. 
    Prior to v0.1.1 the *url* parameter expected the full URL of the
    search endpoint up to the query string.  This has now been changed
-   to expect *url* to ommit the final endpoint name,
-   e.g. ``http://pcmdi9.llnl.gov/esg-search/search`` should be changed
-   to ``http://pcmdi9.llnl.gov/esg-search`` in client code.  The
+   to expect *url* to omit the final endpoint name,
+   e.g. ``https://esgf-node.llnl.gov/esg-search/search`` should be changed
+   to ``https://esgf-node.llnl.gov/esg-search`` in client code.  The
    current implementation detects the presence of ``/search`` and
    corrects the URL to retain backward compatibility but this feature
    may not remain in future versions.

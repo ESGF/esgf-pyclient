@@ -29,3 +29,4 @@ generated/
 pyesgf/test/url_cache
 .esg/
 env/
+*.sqlite

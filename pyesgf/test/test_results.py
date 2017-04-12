@@ -14,7 +14,7 @@ from pyesgf.search.connection import SearchConnection
 class TestResults(TestCase):
     def setUp(self):
         self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
-        self.test_service_pcmdi = 'https://pcmdi.llnl.gov/esg-search'
+        self.test_service_pcmdi = 'https://esgf-node.llnl.gov/esg-search'
 
     def test_result1(self):
         conn = SearchConnection(self.test_service, distrib=False)
