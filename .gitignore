@@ -30,3 +30,5 @@ pyesgf/test/url_cache
 .esg/
 env/
 *.sqlite
+
+my_settings.sh

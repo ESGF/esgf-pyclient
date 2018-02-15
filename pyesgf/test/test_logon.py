@@ -22,6 +22,7 @@ TEST_PASSWORD = os.environ.get('PASSWORD')
 TEST_OPENID = os.environ.get('OPENID')
 TEST_MYPROXY = 'slcs1.ceda.ac.uk'
 
+
 TEST_DATA_DIR = op.join(op.dirname(__file__), 'data')
 
 if None in [TEST_USER, TEST_PASSWORD, TEST_OPENID]:
