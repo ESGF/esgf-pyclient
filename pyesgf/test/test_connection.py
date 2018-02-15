@@ -45,11 +45,15 @@ class TestConnection(TestCase):
         assert len(shards['esgf-index2.ceda.ac.uk']) > 3
 
     def test_url_fixing(self):
+        # Switch off warnings just for this case because we are testing that issue
+        import warnings
+        warnings.simplefilter("ignore")
         conn1 = SearchConnection(self.test_service)
         conn2 = SearchConnection(self.test_service+'/')
         conn3 = SearchConnection(self.test_service+'///')
         conn4 = SearchConnection(self.test_service+'/search')
         conn5 = SearchConnection(self.test_service+'/search///')
+        warnings.resetwarnings()
 
         assert conn1.url == conn2.url == conn3.url == conn4.url == conn5.url
 

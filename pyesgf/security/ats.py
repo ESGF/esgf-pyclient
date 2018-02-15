@@ -53,7 +53,7 @@ class AttributeService(object):
             openid=openid,
             attributes=attributes)
 
-    def send_request(self, openid, attributes,cafile=None):
+    def send_request(self, openid, attributes, cafile=None):
         post_body = self.build_request(openid, attributes)
         req = Request(self.url, post_body.encode('ascii'))
 
@@ -65,7 +65,7 @@ class AttributeService(object):
         req.add_header('Content-Length', str(len(data)))
         log.debug(req.headers)
         log.debug(data)
-        resp = urlopen(req,cafile=cafile)
+        resp = urlopen(req, cafile=cafile)
 
         return AttributeServiceResponse(resp)
 
