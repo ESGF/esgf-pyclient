@@ -183,7 +183,7 @@ class LogonManager(object):
         creds = c.logon(username, password,
                         bootstrap=bootstrap,
                         updateTrustRoots=update_trustroots)
-        with open(self.esgf_credentials, 'w') as fh:
+        with open(self.esgf_credentials, 'wb') as fh:
             for cred in creds:
                 fh.write(cred)
 
