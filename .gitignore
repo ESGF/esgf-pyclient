@@ -32,3 +32,4 @@ env/
 *.sqlite
 
 my_settings.sh
+setup_env.sh
