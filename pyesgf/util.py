@@ -95,12 +95,14 @@ def urlencode(query):
 
         return tag, v
 
-    l = []
+    lst = []
     for k, v in query:
         tag, v = strip_tag(v)
         k = quote_plus(str(k))
+
         if isinstance(v, string_types):
             # string_types -> unicode or str
+
             if hasattr(v, 'encode'):
                 # is there a reasonable way to convert to ASCII?
                 # encode generates a string, but "replace" or "ignore"
@@ -108,7 +110,8 @@ def urlencode(query):
                 v = quote_plus(v.encode("ASCII", "replace"))
             else:
                 v = quote_plus(v)
-            append(k, v, tag, l)
+            append(k, v, tag, lst)
+
         else:
             try:
                 # is this a sufficient test for sequence-ness?
@@ -116,9 +119,10 @@ def urlencode(query):
             except TypeError:
                 # not a sequence
                 v = quote_plus(str(v))
-                append(k, v, tag, l)
+                append(k, v, tag, lst)
             else:
                 # loop over the sequence
                 for elt in v:
-                    append(k, quote_plus(str(elt)), tag, l)
-    return '&'.join(l)
+                    append(k, quote_plus(str(elt)), tag, lst)
+
+    return '&'.join(lst)

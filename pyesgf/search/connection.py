@@ -368,7 +368,7 @@ def create_single_session(cache=None, expire_after=datetime.timedelta(hours=1),
             # Corrupted cache:
             try:
                 os.remove(cache)
-            except:
+            except Exception as exc:
                 pass
             session = (requests_cache.core
                        .CachedSession(cache, expire_after=expire_after))
