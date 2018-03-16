@@ -6,7 +6,6 @@ Test the SearchContext class
 from pyesgf.search import SearchConnection, not_equals
 from unittest import TestCase
 import os
-from wheel.signatures import assertTrue
 
 
 class TestContext(TestCase):
@@ -36,9 +35,8 @@ class TestContext(TestCase):
         self.assertTrue(context2.hit_count > 0)
 
         self.assertTrue(context2.facet_constraints['project'] == 'CMIP5')
-        self.assertTrue(sorted(context2
-                      .facet_constraints
-                      .getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
+        self.assertTrue(sorted(context2.facet_constraints.getall('model'))
+                        == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
 
     def test_context_facet_multivalue2(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
@@ -47,9 +45,8 @@ class TestContext(TestCase):
             context.facet_constraints.getall('model') == ['IPSL-CM5A-MR'])
 
         context2 = context.constrain(model=['IPSL-CM5A-MR', 'IPSL-CM5A-LR'])
-        self.assertTrue(sorted(context2
-                      .facet_constraints
-                      .getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
+        self.assertTrue(sorted(context2.facet_constraints.getall('model'))
+                        == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
 
     def test_context_facet_multivalue3(self):
         conn = SearchConnection(self.test_service, cache=self.cache)

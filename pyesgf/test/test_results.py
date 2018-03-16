@@ -126,7 +126,7 @@ class TestResults(TestCase):
         assert r1.index_node is not None
         assert r1.index_node != service.hostname
 
-    @pytest.mark.xfail(reason='This test does not work anymore - to be removed?')
+    @pytest.mark.xfail(reason='This test does not work - to be removed?')
     def test_shards_constrain(self):
         # Test that a file-context constrains the shard list
         conn = SearchConnection(self.test_service, distrib=True)

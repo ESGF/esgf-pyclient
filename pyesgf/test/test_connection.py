@@ -45,7 +45,7 @@ class TestConnection(TestCase):
         assert len(shards['esgf-index2.ceda.ac.uk']) > 3
 
     def test_url_fixing(self):
-        # Switch off warnings just for this case because we are testing that issue
+        # Switch off warnings for this case because we are testing that issue
         import warnings
         warnings.simplefilter("ignore")
         conn1 = SearchConnection(self.test_service)

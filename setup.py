@@ -39,9 +39,7 @@ setup(name='esgf-pyclient',
       include_package_data=True,
       zip_safe=False,
       install_requires=['jinja2', 'requests', 'requests_cache', 'six'],
-      extras_require={'testing': ['myproxyclient', 'flake8']},
+      extras_require={'testing': ['myproxyclient', 'pytest', 'nose']},
       tests_require=['pytest'],
-      entry_points={
-        },
-      test_suite='test',
-      )
+      entry_points={},
+      test_suite='test')

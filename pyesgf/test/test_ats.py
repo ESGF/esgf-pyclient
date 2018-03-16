@@ -7,7 +7,6 @@ import os
 
 from pyesgf.security.ats import AttributeService
 from pyesgf.node import ESGFNode
-import pytest
 from unittest import TestCase
 
 ESGF_NODE = ESGFNode('https://esgf-node.llnl.gov')
@@ -21,7 +20,7 @@ class TestATS(TestCase):
         service = AttributeService(ESGF_NODE.ats_url, 'esgf-pyclient')
         fn, ln = TEST_USER_DETAILS
         resp = service.send_request(TEST_OPENID, ['urn:esg:first:name',
-                                             'urn:esg:last:name'])
+                                                  'urn:esg:last:name'])
 
         assert resp.get_subject() == TEST_OPENID
 

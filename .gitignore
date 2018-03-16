@@ -33,3 +33,7 @@ env/
 
 my_settings.sh
 setup_env.sh
+setup_env_conda.sh
+setup_env_virtualenv.sh
+.idea
+.pytest_cache
