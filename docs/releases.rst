@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Release 0.2.1
+-------------
+
+This release includes the following features:
+
+ - The library now supports **Python 3**.
+ - `verify` option in `LogonManager` has been added.
+ - Works with Python 3 version of `MyProxyClient`.
+ - Testing structure with `pytest` has been improved.
+
 Release 0.1.8
 -------------
 
