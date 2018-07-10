@@ -184,3 +184,14 @@ class TestContext(TestCase):
             self.assertTrue(str(err).strip() in (
                 "Invalid query parameter(s): rubbish",
                 "No JSON object could be decoded"))
+
+    def test_context_project_cmip6(self):
+        test_service = 'https://esgf-node.ipsl.upmc.fr/esg-search'
+        conn = SearchConnection(test_service)
+
+        context = conn.new_context(project='CMIP6')
+        self.assertEqual(context.hit_count, 1973)
+
+        context2 = context.constrain(realm="atmosChem")
+        self.assertEqual(context2.hit_count, 10)
+
