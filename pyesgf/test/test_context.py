@@ -35,8 +35,7 @@ class TestContext(TestCase):
         self.assertTrue(context2.hit_count > 0)
 
         self.assertTrue(context2.facet_constraints['project'] == 'CMIP5')
-        self.assertTrue(sorted(context2.facet_constraints.getall('model'))
-                        == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
+        self.assertTrue(sorted(context2.facet_constraints.getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
 
     def test_context_facet_multivalue2(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
@@ -45,8 +44,7 @@ class TestContext(TestCase):
             context.facet_constraints.getall('model') == ['IPSL-CM5A-MR'])
 
         context2 = context.constrain(model=['IPSL-CM5A-MR', 'IPSL-CM5A-LR'])
-        self.assertTrue(sorted(context2.facet_constraints.getall('model'))
-                        == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
+        self.assertTrue(sorted(context2.facet_constraints.getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
 
     def test_context_facet_multivalue3(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
@@ -186,15 +184,14 @@ class TestContext(TestCase):
                 "No JSON object could be decoded"))
 
     def test_context_project_cmip6(self):
-        test_service = 'https://esgf-node.ipsl.upmc.fr/esg-search'
+        test_service = 'https://esgf-node.llnl.gov/esg-search'
         conn = SearchConnection(test_service)
 
-        context = conn.new_context(project='CMIP6')
-        self.assertEqual(context.hit_count, 1973)
+        context = conn.new_context(project='CMIP6', institution_id='AWI', distrib=False)
+        self.assertTrue(context.hit_count > 100)
 
-        context2 = context.constrain(realm="atmosChem")
-        self.assertEqual(context2.hit_count, 10)
-
+        context2 = context.constrain(variable='tas')
+        self.assertTrue(context2.hit_count > 10)
 
     def test_context_project_c3s_cmip5(self):
         test_service = 'https://cp4cds-index1.ceda.ac.uk/esg-search'
@@ -202,5 +199,3 @@ class TestContext(TestCase):
 
         context = conn.new_context(project='c3s-cmip5')
         self.assertTrue(context.hit_count > 20000)
-
-

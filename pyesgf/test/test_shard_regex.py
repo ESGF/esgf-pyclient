@@ -5,8 +5,8 @@ Test regular expression for matching shard end points.
 import re
 from unittest import TestCase
 
-R = re.compile("^(?P<prefix>https?://)?(?P<host>.+?)"
-               ":?(?P<port>\d+)?/(?P<suffix>.+)$")
+R = re.compile(r"^(?P<prefix>https?://)?(?P<host>.+?)"
+               r":?(?P<port>\d+)?/(?P<suffix>.+)$")
 
 
 class TestShardRegex(TestCase):

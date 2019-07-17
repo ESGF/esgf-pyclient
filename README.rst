@@ -1,3 +1,15 @@
+.. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
+   :target: https://esgf-pyclient.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
+.. image:: https://travis-ci.org/ESGF/esgf-pyclient.svg?branch=master
+   :target: https://travis-ci.org/ESGF/esgf-pyclient
+   :alt: Travis Build
+
+.. image:: https://img.shields.io/github/license/ESGF/esgf-pyclient.svg
+   :target: https://github.com/ESGF/esgf-pyclient/blob/master/LICENSE
+   :alt: GitHub license
+
 This package contains API code for calling the `ESGF Search API`_ within
 client code.  The initial implementation is in Python.
 
