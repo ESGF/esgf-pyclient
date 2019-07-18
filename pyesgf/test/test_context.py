@@ -5,7 +5,6 @@ Test the SearchContext class
 
 from pyesgf.search import SearchConnection, not_equals
 from unittest import TestCase
-import pytest
 import os
 
 
