@@ -362,6 +362,8 @@ class NestedMultiDict(MultiDict):
                 return True
         return False
 
+    __bool__ = __nonzero__
+
     def iteritems(self):
         for d in self.dicts:
             for item in iteritems_(d):
