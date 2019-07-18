@@ -9,7 +9,8 @@ hides paging of large result sets behind a client-side cache.  Subclasses of
 
 """
 
-from collections import Sequence, defaultdict
+from collections import defaultdict
+from collections.abc import Sequence
 import re
 
 from .consts import (DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE,

@@ -104,7 +104,7 @@ class TestContext(TestCase):
 
         assert count1 < count2
 
-    @pytest.mark.skip(reason="cache fails on python 3.7")
+    # @pytest.mark.skip(reason="cache fails on python 3.7")
     def test_distrib_with_cache(self):
         conn = SearchConnection(self.test_service, cache=self.cache, distrib=False)
 
