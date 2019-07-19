@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Release 0.2.2
+-------------
+
+- Fixed test suite (#33)
+- Added badges for RTD and Travis CI to Readme.
+
 Release 0.2.1
 -------------
 
@@ -17,7 +23,7 @@ Release 0.1.8
 This release includes the following changes:
 
  1. The tests have been updated and various fixes made to make them match the up-to-date ESGF Search API.
- 2. Following problems with the search being slow in certain scenarios an extra call to the Search service 
+ 2. Following problems with the search being slow in certain scenarios an extra call to the Search service
     was made optional through the :meth:`SearchContext.search()` method. If you send the argument and value
     of `ignore_facet_check=True` then this hidden call to the service will be avoided. This typically saves
     2 seconds of wait time which can be very important in some iterative search scenarios.
@@ -26,7 +32,7 @@ This release includes the following changes:
     does not affect the final result but may affect the speed of the response. The batch size can also be set
     as a default in the :mod:`pyesgf.search.consts` module.
  4. Searches at the file-level now return a `gridftp_url` property along with other existing properties such
-    as `download_url`. 
+    as `download_url`.
 
 Release 0.1b1
 -------------
@@ -41,7 +47,7 @@ Release 0.1.1
 This release will include wget script download support.
 
 .. warning::
-   The expected value of the *url* parameter to :meth:`SearchConnection()` has changed in this release. 
+   The expected value of the *url* parameter to :meth:`SearchConnection()` has changed in this release.
    Prior to v0.1.1 the *url* parameter expected the full URL of the
    search endpoint up to the query string.  This has now been changed
    to expect *url* to omit the final endpoint name,
