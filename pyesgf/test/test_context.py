@@ -158,7 +158,7 @@ class TestContext(TestCase):
         context3 = context.constrain(experiment=not_equals('historical'))
         hits3 = context3.hit_count
 
-        self.assertTrue(hits1 == hits2 + hits3)
+        assert hits1 == hits2 + hits3
 
     def test_replica(self):
         # Test that we can exclude replicas
