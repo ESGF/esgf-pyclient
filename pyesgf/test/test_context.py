@@ -10,7 +10,7 @@ import os
 
 class TestContext(TestCase):
     def setUp(self):
-        self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
+        self.test_service = 'http://esgf-data.dkrz.de/esg-search'
         self.cache = os.path.join(os.path.dirname(__file__), 'url_cache')
 
     def test_context_freetext(self):
