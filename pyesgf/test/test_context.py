@@ -10,7 +10,7 @@ import os
 
 class TestContext(TestCase):
     def setUp(self):
-        self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
+        self.test_service = 'http://esgf-data.dkrz.de/esg-search'
         self.cache = os.path.join(os.path.dirname(__file__), 'url_cache')
 
     def test_context_freetext(self):
@@ -35,8 +35,7 @@ class TestContext(TestCase):
         self.assertTrue(context2.hit_count > 0)
 
         self.assertTrue(context2.facet_constraints['project'] == 'CMIP5')
-        self.assertTrue(sorted(context2.facet_constraints.getall('model'))
-                        == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
+        self.assertTrue(sorted(context2.facet_constraints.getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
 
     def test_context_facet_multivalue2(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
@@ -45,8 +44,7 @@ class TestContext(TestCase):
             context.facet_constraints.getall('model') == ['IPSL-CM5A-MR'])
 
         context2 = context.constrain(model=['IPSL-CM5A-MR', 'IPSL-CM5A-LR'])
-        self.assertTrue(sorted(context2.facet_constraints.getall('model'))
-                        == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
+        self.assertTrue(sorted(context2.facet_constraints.getall('model')) == ['IPSL-CM5A-LR', 'IPSL-CM5A-MR'])
 
     def test_context_facet_multivalue3(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
@@ -94,18 +92,29 @@ class TestContext(TestCase):
         self.assertTrue(list(counts['project'].keys()) == ['CMIP5'])
 
     def test_distrib(self):
-        conn = SearchConnection(self.test_service, cache=self.cache,
-                                distrib=False)
+        conn = SearchConnection(self.test_service, distrib=False)
 
         context = conn.new_context(project='CMIP5')
         count1 = context.hit_count
 
-        conn2 = SearchConnection(self.test_service, cache=self.cache,
-                                 distrib=True)
+        conn2 = SearchConnection(self.test_service, distrib=True)
         context = conn2.new_context(project='CMIP5')
         count2 = context.hit_count
 
-        self.assertTrue(count1 < count2)
+        assert count1 < count2
+
+    # @pytest.mark.skip(reason="cache fails on python 3.7")
+    def test_distrib_with_cache(self):
+        conn = SearchConnection(self.test_service, cache=self.cache, distrib=False)
+
+        context = conn.new_context(project='CMIP5')
+        count1 = context.hit_count
+
+        conn2 = SearchConnection(self.test_service, cache=self.cache, distrib=True)
+        context = conn2.new_context(project='CMIP5')
+        count2 = context.hit_count
+
+        assert count1 < count2
 
     def test_constrain(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
@@ -149,24 +158,24 @@ class TestContext(TestCase):
         context3 = context.constrain(experiment=not_equals('historical'))
         hits3 = context3.hit_count
 
-        self.assertTrue(hits1 == hits2 + hits3)
+        assert hits1 == hits2 + hits3
 
     def test_replica(self):
         # Test that we can exclude replicas
         # This tests assumes the test dataset is replicated
-        conn = SearchConnection(self.test_service, cache=self.cache)
+        conn = SearchConnection(self.test_service)
         qry = 'id:cmip5.output1.MOHC.HadGEM2-ES.rcp45.mon.atmos.Amon.r1i1p1.*'
         version = '20111128'
 
         # Search for all replicas
         context = conn.new_context(query=qry, version=version)
-        self.assertTrue(context.hit_count > 2,
-                        'Expecting more than 2 search hits for replicas')
+        # Expecting more than 2 search hits for replicas
+        assert context.hit_count > 2
 
         # Search for only one replicant
         context = conn.new_context(query=qry, replica=False, version=version)
-        self.assertTrue(context.hit_count == 1,
-                        'Expecting one search replica')
+        # Expecting one search replica
+        assert context.hit_count == 1
 
     def test_response_from_bad_parameter(self):
         # Test that a bad parameter name raises a useful exception
@@ -186,15 +195,14 @@ class TestContext(TestCase):
                 "No JSON object could be decoded"))
 
     def test_context_project_cmip6(self):
-        test_service = 'https://esgf-node.ipsl.upmc.fr/esg-search'
+        test_service = 'https://esgf-node.llnl.gov/esg-search'
         conn = SearchConnection(test_service)
 
-        context = conn.new_context(project='CMIP6')
-        self.assertEqual(context.hit_count, 1973)
+        context = conn.new_context(project='CMIP6', institution_id='AWI', distrib=False)
+        self.assertTrue(context.hit_count > 100)
 
-        context2 = context.constrain(realm="atmosChem")
-        self.assertEqual(context2.hit_count, 10)
-
+        context2 = context.constrain(variable='tas')
+        self.assertTrue(context2.hit_count > 10)
 
     def test_context_project_c3s_cmip5(self):
         test_service = 'https://cp4cds-index1.ceda.ac.uk/esg-search'
@@ -202,5 +210,3 @@ class TestContext(TestCase):
 
         context = conn.new_context(project='c3s-cmip5')
         self.assertTrue(context.hit_count > 20000)
-
-

@@ -23,7 +23,7 @@ class TestResults(TestCase):
         results = ctx.search()
 
         r1 = results[0]
-        assert re.match(r'cmip5\.output1\.MOHC\..+\|esgf-data1.ceda.ac.uk',
+        assert re.match(r'cmip5\.output1\..+\|esgf-data1.ceda.ac.uk',
                         r1.dataset_id)
 
     def test_file_context(self):

@@ -93,14 +93,13 @@ class SearchConnection(object):
         self._isopen = False
 
     def open(self):
-        if (isinstance(self._passed_session, requests.Session) or
-            isinstance(self._passed_session,
-                       requests_cache.core.CachedSession)):
+        if (isinstance(self._passed_session, requests.Session) or isinstance(
+                self._passed_session, requests_cache.core.CachedSession)):
             self.session = self._passed_session
         else:
             self.session = create_single_session(
-                                        cache=self.cache,
-                                        expire_after=self.expire_after)
+                cache=self.cache,
+                expire_after=self.expire_after)
         self._isopen = True
         return
 
@@ -114,9 +113,8 @@ class SearchConnection(object):
 
     def close(self):
         # Close the session
-        if not (isinstance(self._passed_session, requests.Session) or
-                isinstance(self._passed_session,
-                           requests_cache.core.CachedSession)):
+        if not (isinstance(self._passed_session, requests.Session) or isinstance(
+                self._passed_session, requests_cache.core.CachedSession)):
             self.session.close()
         self._isopen = False
         return
@@ -202,7 +200,7 @@ class SearchConnection(object):
                                     timeout=self.timeout)
         if response.status_code == 400:
             # If error code 400, use urllib to find the errors:
-            errors = set(re.findall("Invalid HTTP query parameter=(\w+)",
+            errors = set(re.findall(r"Invalid HTTP query parameter=(\w+)",
                          response.text))
             content = "; ".join([e for e in list(errors)])
             raise Exception("Invalid query parameter(s): %s" % content)
