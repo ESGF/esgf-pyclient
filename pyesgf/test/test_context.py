@@ -64,9 +64,9 @@ class TestContext(TestCase):
                                    ensemble='r1i1p1', experiment='rcp60',
                                    realm='seaIce')
 
-        expected = sorted([u'access', u'index_node', u'data_node', u'format',
-                           u'cf_standard_name', u'variable_long_name',
-                           u'cmor_table', u'time_frequency', u'variable'])
+        expected = sorted(['access', 'index_node', 'data_node', 'format',
+                           'cf_standard_name', 'variable_long_name',
+                           'cmor_table', 'time_frequency', 'variable'])
         self.assertTrue(sorted(context.get_facet_options().keys()) == expected)
 
     def test_context_facets3(self):
@@ -150,7 +150,7 @@ class TestContext(TestCase):
         context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR')
         hits1 = context.hit_count
 
-        print(context.facet_counts['experiment'])
+        print((context.facet_counts['experiment']))
 
         context2 = context.constrain(experiment='historical')
         hits2 = context2.hit_count

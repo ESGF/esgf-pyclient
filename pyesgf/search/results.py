@@ -9,7 +9,8 @@ hides paging of large result sets behind a client-side cache.  Subclasses of
 
 """
 
-from collections import Sequence, defaultdict
+from collections import defaultdict
+from collections.abc import Sequence
 import re
 
 from .consts import (DEFAULT_BATCH_SIZE, TYPE_DATASET, TYPE_FILE,
@@ -196,7 +197,7 @@ class DatasetResult(BaseResult):
             # If the index node is in the available shards for this connection
             # then restrict shards to that node.  Otherwise do nothing to
             # handle the case when the shard is replicated
-            available_shards = self.context.connection.get_shard_list().keys()
+            available_shards = list(self.context.connection.get_shard_list().keys())
             if self.index_node in available_shards:
                 shards = [self.index_node]
             else:
@@ -222,7 +223,7 @@ class DatasetResult(BaseResult):
             # If the index node is in the available shards for this connection
             # then restrict shards to that node.  Otherwise do nothing to
             # handle the case  when the shard is replicated
-            available_shards = self.context.connection.get_shard_list().keys()
+            available_shards = list(self.context.connection.get_shard_list().keys())
             if self.index_node in available_shards:
                 shards = [self.index_node]
             else:

@@ -42,9 +42,9 @@ class TestUtil(TestCase):
         # Take first aggregation
         agg = aggs[0]
 
-        print(agg.aggregation_id)
-        print(agg.json['cf_standard_name'])
-        print(agg.urls)
+        print((agg.aggregation_id))
+        print((agg.json['cf_standard_name']))
+        print((agg.urls))
 
         opendap_url = agg.opendap_url
         print(opendap_url)

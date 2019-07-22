@@ -26,7 +26,7 @@ import datetime
 import os
 
 import re
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 import warnings
 import logging
@@ -243,7 +243,7 @@ class SearchConnection(object):
         full_query.extend(query_dict)
 
         # Remove all None valued items
-        full_query = MultiDict(item for item in full_query.items()
+        full_query = MultiDict(item for item in list(full_query.items())
                                if item[1] is not None)
 
         return full_query
