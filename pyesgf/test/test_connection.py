@@ -24,8 +24,8 @@ class TestConnection(TestCase):
         conn = SearchConnection(self.test_service, cache=self.cache)
         json = conn.send_search({})
 
-        assert sorted(json.keys()) == sorted([u'facet_counts',
-                                              u'responseHeader', u'response'])
+        assert sorted(json.keys()) == sorted(['facet_counts',
+                                              'responseHeader', 'response'])
 
     def test_get_shard_list_fail(self):
         conn = SearchConnection(self.test_service, cache=self.cache,

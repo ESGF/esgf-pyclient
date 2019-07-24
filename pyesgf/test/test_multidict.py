@@ -51,12 +51,12 @@ class BaseDictTests(object):
 
     def test_dict_api(self):
         self.assertTrue('a' in self.d.mixed())
-        self.assertTrue('a' in self.d.keys())
-        self.assertTrue('a' in self.d.iterkeys())
-        self.assertTrue(('b', '1') in self.d.items())
-        self.assertTrue(('b', '1') in self.d.iteritems())
-        self.assertTrue('1' in self.d.values())
-        self.assertTrue('1' in self.d.itervalues())
+        self.assertTrue('a' in list(self.d.keys()))
+        self.assertTrue('a' in iter(self.d.iterkeys()))
+        self.assertTrue(('b', '1') in list(self.d.items()))
+        self.assertTrue(('b', '1') in iter(self.d.iteritems()))
+        self.assertTrue('1' in list(self.d.values()))
+        self.assertTrue('1' in iter(self.d.itervalues()))
         self.assertEqual(len(self.d), 4)
 
     def test_set_del_item(self):
@@ -118,7 +118,7 @@ class BaseDictTests(object):
         d.clear()
         self.assertEqual(len(d), 0)
 
-    def test_nonzero(self):
+    def test_bool(self):
         d = self._get_instance()
         self.assertTrue(d)
         d.clear()
@@ -237,11 +237,11 @@ class NestedMultiDictTestCase(BaseDictTests, unittest.TestCase):
         d = self._get_instance()
         self.assertRaises(KeyError, d.clear)
 
-    def test_nonzero(self):
+    def test_bool(self):
         d = self._get_instance()
-        self.assertEqual(d.__nonzero__(), True)
+        self.assertEqual(d.__bool__(), True)
         d.dicts = [{}]
-        self.assertEqual(d.__nonzero__(), False)
+        self.assertEqual(d.__bool__(), False)
         assert not d
 
 

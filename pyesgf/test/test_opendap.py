@@ -113,7 +113,7 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
         import netCDF4
 
         LogonManager(self.esgf_dir, dap_config=self.dap_config)
-        print('Using dap_config at %s' % self.dap_config)
+        print(('Using dap_config at %s' % self.dap_config))
 
         conn = SearchConnection(TEST_SERVICE, distrib=False)
 
@@ -127,10 +127,10 @@ CURL.SSL.CAPATH=/tmp/foo/certificates/certificates
         file_results = f_ctx.search()
 
         opendap_url = file_results[0].opendap_url
-        print('OPeNDAP URL is %s' % opendap_url)
+        print(('OPeNDAP URL is %s' % opendap_url))
 
         ds = netCDF4.Dataset(opendap_url)
-        print(ds.variables.keys())
+        print((list(ds.variables.keys())))
     test_open_url.__test__ = False
 
 

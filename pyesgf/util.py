@@ -4,8 +4,7 @@ Utility functions using the pyesgf package.
 """
 
 import sys
-from six.moves.urllib.parse import quote_plus
-from six import string_types
+from urllib.parse import quote_plus
 
 
 def get_manifest(drs_id, version, connection):
@@ -36,10 +35,10 @@ def get_manifest(drs_id, version, connection):
     manifest = {}
     for file in file_context.search():
         manifest[file.filename] = {
-                'checksum_type': file.checksum_type,
-                'checksum': file.checksum,
-                'size': file.size,
-                }
+            'checksum_type': file.checksum_type,
+            'checksum': file.checksum,
+            'size': file.size,
+        }
 
     return manifest
 
@@ -59,7 +58,7 @@ def urlencode(query):
 
     if hasattr(query, "items"):
         # mapping objects
-        query = query.items()
+        query = list(query.items())
     else:
         # it's a bother at times that strings and string-like objects are
         # sequences...
@@ -100,8 +99,7 @@ def urlencode(query):
         tag, v = strip_tag(v)
         k = quote_plus(str(k))
 
-        if isinstance(v, string_types):
-            # string_types -> unicode or str
+        if isinstance(v, str):
 
             if hasattr(v, 'encode'):
                 # is there a reasonable way to convert to ASCII?

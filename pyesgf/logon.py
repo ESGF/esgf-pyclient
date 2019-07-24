@@ -39,7 +39,6 @@ import os.path as op
 import shutil
 from xml.etree import ElementTree
 import requests
-from six.moves import input
 import re
 from getpass import getpass
 
@@ -167,11 +166,11 @@ class LogonManager(object):
         """
         if interactive:
             if hostname is None:
-                print('Enter myproxy hostname:'),
-                hostname = input()
+                print('Enter myproxy hostname:', end=' ')
+                hostname = eval(input())
             if username is None:
-                print('Enter myproxy username:'),
-                username = input()
+                print('Enter myproxy username:', end=' ')
+                username = eval(input())
             if password is None:
                 password = getpass('Enter password for %s: ' % username)
 

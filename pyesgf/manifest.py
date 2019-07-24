@@ -6,7 +6,7 @@ Generate ESGF manifest files from ESGF search results
 """
 
 import os
-import urllib2
+import urllib
 import csv
 import re
 import datetime
@@ -106,13 +106,13 @@ class SolrManifestExtractor(ManifestExtractor):
             ('sort', 'dataset_id%20asc'),
             ('start', offset),
             ('rows', self.SOLR_BATCH_SIZE),
-            )
+        )
         param_str = '&'.join(('{0}={1}'.format(k, v)) for (k, v) in params)
 
         url = '{0}/solr/files/select?{1}'.format(self.endpoint,
                                                  param_str)
         log.info('SOLR QUERY: {0}'.format(url))
-        response = urllib2.urlopen(url)
+        response = urllib.request.urlopen(url)
 
         return response
 
@@ -141,7 +141,7 @@ class SolrManifestExtractor(ManifestExtractor):
             reader = csv.reader(response)
 
             # Read first line and check the header
-            header = reader.next()
+            header = next(reader)
             self._check_header(header)
 
             empty_batch = True
@@ -200,8 +200,8 @@ def extract_from_solr(endpoint, project, target_dir, from_date=None):
     for manifest in solr_extractor:
 
         manifest_path = os.path.join(
-                                 target_dir,
-                                 *cmip5_manifest_partitioner(manifest.drs_id))
+            target_dir,
+            *cmip5_manifest_partitioner(manifest.drs_id))
         if not os.path.exists(manifest_path):
             log.info('Creating repo directory {0}'.format(manifest_path))
             os.makedirs(manifest_path)

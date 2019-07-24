@@ -180,9 +180,9 @@ class SearchContext(object):
         """
         facet_options = {}
         hits = self.hit_count
-        for facet, counts in self.facet_counts.items():
+        for facet, counts in list(self.facet_counts.items()):
             # filter out counts that match total hits
-            counts = dict(items for items in counts.items()
+            counts = dict(items for items in list(counts.items())
                           if items[1] < hits)
             if len(counts) > 1:
                 facet_options[facet] = counts
@@ -205,8 +205,7 @@ class SearchContext(object):
             query_dict['facets'] = self.facets
 
         response = self.connection.send_search(query_dict, limit=0)
-        for facet, counts in (response['facet_counts']['facet_fields']
-                              .items()):
+        for facet, counts in (list(response['facet_counts']['facet_fields'].items())):
             d = self.__facet_counts[facet] = {}
             while counts:
                 d[counts.pop()] = counts.pop()
@@ -244,7 +243,7 @@ class SearchContext(object):
         self.__facet_counts = None
 
     def _constrain_facets(self, facet_constraints):
-        for key, values in facet_constraints.mixed().items():
+        for key, values in list(facet_constraints.mixed().items()):
             current_values = self.facet_constraints.getall(key)
             if isinstance(values, list):
                 for value in values:
@@ -284,7 +283,7 @@ class SearchContext(object):
         constraints_split = dict((kw, MultiDict()) for kw
                                  in QUERY_KEYWORD_TYPES)
 
-        for kw, val in constraints.items():
+        for kw, val in list(constraints.items()):
             constraint_type = query_keyword_type(kw)
             constraints_split[constraint_type][kw] = val
 
