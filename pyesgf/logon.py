@@ -167,10 +167,10 @@ class LogonManager(object):
         if interactive:
             if hostname is None:
                 print('Enter myproxy hostname:', end=' ')
-                hostname = eval(input())
+                hostname = input()
             if username is None:
                 print('Enter myproxy username:', end=' ')
-                username = eval(input())
+                username = input()
             if password is None:
                 password = getpass('Enter password for %s: ' % username)
 
