@@ -1,6 +1,4 @@
 *.egg-info
-doc/html
-doc/doctrees
 dist
 tmp
 
@@ -37,3 +35,9 @@ setup_env_conda.sh
 setup_env_virtualenv.sh
 .idea
 .pytest_cache
+
+# sphinx
+docs/_build/
+
+# IPython
+.ipynb_checkpoints

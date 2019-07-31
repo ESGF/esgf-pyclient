@@ -10,13 +10,28 @@
    :target: https://github.com/ESGF/esgf-pyclient/blob/master/LICENSE
    :alt: GitHub license
 
-This package contains API code for calling the `ESGF Search API`_ within
-client code.  The initial implementation is in Python.
+ESGF PyClient is a Python package designed for interacting with the `Earth System Grid Federation`_ system.
+Currently this package contains API code for calling the `ESGF Search API`_ within
+client code.
+
+You can try it online using Binder, or view the notebooks on NBViewer.
+
+.. image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/ESGF/esgf-pyclient.git/master?filepath=notebooks
+   :alt: Binder Launcher
+   :height: 20
+
+.. image:: https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg
+   :target: https://nbviewer.jupyter.org/github/ESGF/esgf-pyclient/tree/master/notebooks/
+   :alt: NBViewer
+   :height: 20
 
 Please submit bugs and feature requests through the bug tracker on
-github.  Pull requests are always welcome.
+github_. Pull requests are always welcome.
 
-Full `documentation`_ is available on ReadTheDocs or in the docs directory.
+Full documentation_ is available on ReadTheDocs or in the docs directory.
 
+.. _`Earth System Grid Federation`: http://esgf.org
 .. _`ESGF Search API`: https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API
-.. _`documentation`: http://esgf-pyclient.readthedocs.org
+.. _documentation: http://esgf-pyclient.readthedocs.org
+.. _`github`: https://github.com/ESGF/esgf-pyclient

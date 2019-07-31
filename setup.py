@@ -14,6 +14,9 @@ from pyesgf import __version__
 from pyesgf import __doc__ as long_description
 sys.path[:0] = os.path.dirname(__file__)
 
+reqs = [line.strip() for line in open('requirements.txt')]
+dev_reqs = [line.strip() for line in open('requirements_dev.txt')]
+
 setup(name='esgf-pyclient',
       version=__version__,
       description="A library interacting with ESGF services within Python",
@@ -36,9 +39,9 @@ setup(name='esgf-pyclient',
       packages=find_packages(exclude=['ez_setup', 'examples', 'test']),
       include_package_data=True,
       zip_safe=False,
-      install_requires=['jinja2', 'requests', 'requests_cache'],
-      extras_require={'testing':
-                      ['myproxyclient', 'pytest', 'nose', 'flake8']},
-      tests_require=['pytest', 'flake8'],
+      install_requires=reqs,
+      extras_require={
+          "dev": dev_reqs,              # pip install ".[dev]"
+      },
       entry_points={},
       test_suite='test')

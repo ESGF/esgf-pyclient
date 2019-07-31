@@ -1,0 +1,6 @@
+# conda env update -f environment.yml
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - jupyterlab

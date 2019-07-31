@@ -8,7 +8,7 @@ os:
   - linux
 sudo: false
 install:
-    - pip install -e .[testing]
+    - pip install -e .[dev]
 
 script:
     - pytest

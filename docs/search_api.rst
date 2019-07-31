@@ -1,4 +1,3 @@
-
 Search API
 ==========
 
@@ -13,4 +12,3 @@ Search API
 
 .. automodule:: pyesgf.search.results
    :members:
-
