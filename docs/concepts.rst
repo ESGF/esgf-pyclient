@@ -1,9 +1,7 @@
-
-
 Search Concepts
 ===============
 
-The :mod:`pyesgf.search` interface to ESGF search reflects the typical workflow of a user navigating through the sets of facets categorising available data.  
+The :mod:`pyesgf.search` interface to ESGF search reflects the typical workflow of a user navigating through the sets of facets categorising available data.
 
 
 Keyword classification
@@ -15,9 +13,9 @@ The keyword arguments described in the `ESGF Search API`_ have a wide veriety of
 System keywords
 '''''''''''''''
 
-===========  ================  =================================================================================================== 
+===========  ================  ===================================================================================================
 API keyword  class             Notes
-===========  ================  =================================================================================================== 
+===========  ================  ===================================================================================================
 limit        SearchConnection  Set in :meth:`SearchConnection:send_query` method or transparently through :class:`SearchContext`
 offset       SearchConnection  Set in :meth:`SearchConnection:send_query` method or transparently through :class:`SearchContext`
 shards       SearchConnection  Set in constructor
@@ -32,7 +30,7 @@ to           SearchContext     Set in constructor. Use "to_timestamp" in the con
 fields       n/a               Managed internally
 format       n/a               Managed internally
 id           n/a               Managed internally
-===========  ================  =================================================================================================== 
+===========  ================  ===================================================================================================
 
 Temporal keywords
 '''''''''''''''''
@@ -74,7 +72,7 @@ SearchContext objects can be created in several ways:
 ResultSet
 '''''''''
 
-:class:`ResultSet` instances are returned by the  :meth:`SearchContext.search` method and represent the results from a query.  They supports transparent paging of results with a client-side cache.  
+:class:`ResultSet` instances are returned by the  :meth:`SearchContext.search` method and represent the results from a query.  They supports transparent paging of results with a client-side cache.
 
 Result
 ''''''

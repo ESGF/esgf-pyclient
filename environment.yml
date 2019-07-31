@@ -1,0 +1,9 @@
+# conda env create -f environment.yml
+name: esgf-pyclient
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - python>=3.5
+  - requests
+  - jinja2
