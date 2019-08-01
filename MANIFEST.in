@@ -1,1 +1,8 @@
 include LICENSE
+include Makefile
+include *.txt
+include *.rst
+recursive-include pyesgf *
+global-exclude *.*~
+global-exclude __pycache__
+global-exclude *.py[co]
