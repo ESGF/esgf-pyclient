@@ -31,7 +31,7 @@ github_. Pull requests are always welcome.
 
 Full documentation_ is available on ReadTheDocs or in the docs directory.
 
-.. _`Earth System Grid Federation`: http://esgf.org
+.. _`Earth System Grid Federation`: https://esgf.llnl.gov/
 .. _`ESGF Search API`: https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API
 .. _documentation: http://esgf-pyclient.readthedocs.org
 .. _`github`: https://github.com/ESGF/esgf-pyclient

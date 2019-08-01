@@ -50,10 +50,10 @@ class TestConnection(TestCase):
         import warnings
         warnings.simplefilter("ignore")
         conn1 = SearchConnection(self.test_service)
-        conn2 = SearchConnection(self.test_service+'/')
-        conn3 = SearchConnection(self.test_service+'///')
-        conn4 = SearchConnection(self.test_service+'/search')
-        conn5 = SearchConnection(self.test_service+'/search///')
+        conn2 = SearchConnection(self.test_service + '/')
+        conn3 = SearchConnection(self.test_service + '///')
+        conn4 = SearchConnection(self.test_service + '/search')
+        conn5 = SearchConnection(self.test_service + '/search///')
         warnings.resetwarnings()
 
         assert conn1.url == conn2.url == conn3.url == conn4.url == conn5.url

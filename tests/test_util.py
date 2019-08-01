@@ -3,6 +3,8 @@ Test pyesgf.util module.
 
 """
 
+import pytest
+
 import re
 
 from pyesgf.search.connection import SearchConnection
@@ -15,6 +17,7 @@ class TestUtil(TestCase):
         # !TODO: Make this one of the test services.
         self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
 
+    @pytest.mark.slow
     def test_get_manifest(self):
         conn = SearchConnection(self.test_service, distrib=False)
 
@@ -49,6 +52,7 @@ class TestUtil(TestCase):
         opendap_url = agg.opendap_url
         print(opendap_url)
 
+    @pytest.mark.slow
     def test_download_url(self):
         conn = SearchConnection(self.test_service, distrib=False)
 

@@ -12,7 +12,7 @@ from pyesgf.logon import LogonManager, ESGF_CREDENTIALS
 import pytest
 from unittest import TestCase
 try:
-    from myproxy.client import MyProxyClient
+    from myproxy.client import MyProxyClient  # noqa: F401
     _has_myproxy = True
 except (ImportError, SyntaxError):
     _has_myproxy = False
@@ -80,7 +80,8 @@ class TestLogon(TestCase):
         _clear_creds(self.esgf_dir)
         _load_creds(self.esgf_dir, certificates_tarball='pcmdi9-certs.tar.gz')
 
-        if not extra_args: extra_args = {}
+        if not extra_args:
+            extra_args = {}
         lm = LogonManager(self.esgf_dir, **extra_args)
         lm.logon(TEST_USER, TEST_PASSWORD, TEST_MYPROXY)
 

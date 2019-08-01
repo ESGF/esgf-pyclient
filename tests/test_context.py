@@ -3,6 +3,8 @@ Test the SearchContext class
 
 """
 
+import pytest
+
 from pyesgf.search import SearchConnection, not_equals
 from unittest import TestCase
 import os
@@ -91,6 +93,7 @@ class TestContext(TestCase):
         self.assertTrue(list(counts['model'].keys()) == ['IPSL-CM5A-LR'])
         self.assertTrue(list(counts['project'].keys()) == ['CMIP5'])
 
+    @pytest.mark.slow
     def test_distrib(self):
         conn = SearchConnection(self.test_service, distrib=False)
 
@@ -160,6 +163,7 @@ class TestContext(TestCase):
 
         assert hits1 == hits2 + hits3
 
+    @pytest.mark.slow
     def test_replica(self):
         # Test that we can exclude replicas
         # This tests assumes the test dataset is replicated
@@ -194,6 +198,7 @@ class TestContext(TestCase):
                 "Invalid query parameter(s): rubbish",
                 "No JSON object could be decoded"))
 
+    @pytest.mark.slow
     def test_context_project_cmip6(self):
         test_service = 'https://esgf-node.llnl.gov/esg-search'
         conn = SearchConnection(test_service)

@@ -14,7 +14,7 @@ import pytest
 from pyesgf.logon import LogonManager, DAP_CONFIG_MARKER
 from pyesgf.search import SearchConnection
 try:
-    from myproxy.client import MyProxyClient
+    from myproxy.client import MyProxyClient  # noqa: F401
     _has_myproxy = True
 except (ImportError, SyntaxError):
     _has_myproxy = False

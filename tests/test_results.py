@@ -37,6 +37,7 @@ class TestResults(TestCase):
 
         assert f_ctx.facet_constraints['dataset_id'] == r1.dataset_id
 
+    @pytest.mark.slow
     def test_file_list(self):
         conn = SearchConnection(self.test_service, distrib=False)
 
@@ -56,6 +57,7 @@ class TestResults(TestCase):
         ds_subpath = ds_id.replace('.', '/')
         assert ds_subpath.lower() in download_url.lower()
 
+    @pytest.mark.slow
     def test_file_list2(self):
         conn = SearchConnection(self.test_service, distrib=False)
 
@@ -69,6 +71,7 @@ class TestResults(TestCase):
         for file_result in file_results:
             assert re.search(r'ds/.*\.nc', file_result.download_url)
 
+    @pytest.mark.slow
     def test_gridftp_url_in_file_result(self):
         conn = SearchConnection(self.test_service, distrib=False)
 
@@ -84,6 +87,7 @@ class TestResults(TestCase):
             assert gridftp_url.split(":")[0] == "gsiftp"
             assert file_result.gridftp_url.endswith(".nc")
 
+    @pytest.mark.slow
     def test_aggregations(self):
         conn = SearchConnection(self.test_service, distrib=False)
 
@@ -113,6 +117,7 @@ class TestResults(TestCase):
 
         assert r1.index_node == service.hostname
 
+    @pytest.mark.slow
     def test_other_index_node(self):
         conn = SearchConnection(self.test_service, distrib=True)
 
@@ -126,7 +131,7 @@ class TestResults(TestCase):
         assert r1.index_node is not None
         assert r1.index_node != service.hostname
 
-    @pytest.mark.xfail(reason='This test does not work - to be removed?')
+    @pytest.mark.skip(reason='This test does not work - to be removed?')
     def test_shards_constrain(self):
         # Test that a file-context constrains the shard list
         conn = SearchConnection(self.test_service, distrib=True)
@@ -156,6 +161,7 @@ class TestResults(TestCase):
         f_r1 = f_results[0]
         assert f_r1.json['index_node'] == r1.json['index_node']
 
+    @pytest.mark.slow
     def test_shards_constrain2(self):
         # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
         conn = SearchConnection(self.test_service_pcmdi, distrib=True)
@@ -176,6 +182,7 @@ class TestResults(TestCase):
         for j in searchContext.search():
             print((j.download_url, j.checksum, j.checksum_type, j.size))
 
+    @pytest.mark.slow
     def test_shards_constrain3(self):
         # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
         conn = SearchConnection(self.test_service_pcmdi, distrib=True)
@@ -195,6 +202,7 @@ class TestResults(TestCase):
         for j in searchContext.search():
             print((j.download_url, j.checksum, j.checksum_type, j.size))
 
+    @pytest.mark.slow
     def test_shards_constrain4(self):
         # Regression test for issue #8 reported by ian.edmond@metoffice.gov.uk
         conn = SearchConnection(self.test_service_pcmdi, distrib=True)
