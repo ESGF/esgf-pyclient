@@ -6,6 +6,10 @@
    :target: https://travis-ci.org/ESGF/esgf-pyclient
    :alt: Travis Build
 
+.. image:: https://api.codacy.com/project/badge/Grade/0b6bb4503f4d4c90b41c8e1c9b41cb93
+   :target: https://app.codacy.com/app/cehbrecht/esgf-pyclient?utm_source=github.com&utm_medium=referral&utm_content=ESGF/esgf-pyclient&utm_campaign=Badge_Grade_Dashboard
+   :alt: Codacy Badge
+   
 .. image:: https://img.shields.io/github/license/ESGF/esgf-pyclient.svg
    :target: https://github.com/ESGF/esgf-pyclient/blob/master/LICENSE
    :alt: GitHub license
