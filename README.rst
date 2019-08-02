@@ -35,3 +35,8 @@ Full documentation_ is available on ReadTheDocs or in the docs directory.
 .. _`ESGF Search API`: https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API
 .. _documentation: http://esgf-pyclient.readthedocs.org
 .. _GitHub: https://github.com/ESGF/esgf-pyclient
+
+
+.. image:: https://api.codacy.com/project/badge/Grade/0b6bb4503f4d4c90b41c8e1c9b41cb93
+   :alt: Codacy Badge
+   :target: https://app.codacy.com/app/cehbrecht/esgf-pyclient?utm_source=github.com&utm_medium=referral&utm_content=ESGF/esgf-pyclient&utm_campaign=Badge_Grade_Dashboard
