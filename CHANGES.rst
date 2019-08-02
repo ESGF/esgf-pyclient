@@ -1,14 +1,14 @@
 Release Notes
 =============
 
-Release 0.2.2
--------------
+0.2.2 (2019-07-19)
+------------------
 
 - Fixed test suite (#33)
 - Added badges for RTD and Travis CI to Readme.
 
-Release 0.2.1
--------------
+0.2.1 (2018-03-14)
+------------------
 
 This release includes the following features:
 
@@ -17,8 +17,8 @@ This release includes the following features:
  - Works with Python 3 version of `MyProxyClient`.
  - Testing structure with `pytest` has been improved.
 
-Release 0.1.8
--------------
+0.1.8 (2017-01-03)
+------------------
 
 This release includes the following changes:
 
@@ -34,15 +34,14 @@ This release includes the following changes:
  4. Searches at the file-level now return a `gridftp_url` property along with other existing properties such
     as `download_url`.
 
-Release 0.1b1
--------------
+0.1.6 (2016-05-16)
+------------------
 
-This release marks the start of the 0.1 series which is considered beta-quality.  API changes in this series will be clearly marked in the documentation and backward-compatible releases will be maintained on pypi.
+This release includes a fix for Issue #4 to cope with ESGF Search end points
+being given with or without a ":port" component in the host address.
 
-The 0.1b1 release includes integrated MyProxy logon support in the :mod:`pyesgf.logon` module.  This release also includes optimisations to the search system to avoid querying multiple shards when requesting the files from a dataset.
-
-Release 0.1.1
--------------
+0.1.1 (2013-04-15)
+------------------
 
 This release will include wget script download support.
 
@@ -61,3 +60,10 @@ This release changes the call signature of :meth:`SearchConnection.send_query()`
 
  1. Change the *url* parameter to :meth:`SearchConnection()` to not include the ``/search`` suffix
  2. Change any occurance of :meth:`send_query()` to :meth:`send_search()`
+
+0.1b1 (2013-01-19)
+------------------
+
+This release marks the start of the 0.1 series which is considered beta-quality.  API changes in this series will be clearly marked in the documentation and backward-compatible releases will be maintained on pypi.
+
+The 0.1b1 release includes integrated MyProxy logon support in the :mod:`pyesgf.logon` module.  This release also includes optimisations to the search system to avoid querying multiple shards when requesting the files from a dataset.

@@ -27,11 +27,11 @@ You can try it online using Binder, or view the notebooks on NBViewer.
    :height: 20
 
 Please submit bugs and feature requests through the bug tracker on
-github_. Pull requests are always welcome.
+GitHub_. Pull requests are always welcome.
 
 Full documentation_ is available on ReadTheDocs or in the docs directory.
 
 .. _`Earth System Grid Federation`: https://esgf.llnl.gov/
 .. _`ESGF Search API`: https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API
 .. _documentation: http://esgf-pyclient.readthedocs.org
-.. _`github`: https://github.com/ESGF/esgf-pyclient
+.. _GitHub: https://github.com/ESGF/esgf-pyclient
