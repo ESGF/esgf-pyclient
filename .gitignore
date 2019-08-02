@@ -37,7 +37,7 @@ setup_env_virtualenv.sh
 .pytest_cache
 
 # sphinx
-docs/_build/
+docs/build/
 
 # IPython
 .ipynb_checkpoints
