@@ -10,7 +10,7 @@ query.
 
 import copy
 
-from ..multidict import MultiDict
+from webob.multidict import MultiDict
 
 from .constraints import GeospatialConstraint
 from .consts import (TYPE_DATASET, TYPE_FILE, TYPE_AGGREGATION,

@@ -31,10 +31,11 @@ from urllib.parse import urlparse
 import warnings
 import logging
 
+from webob.multidict import MultiDict
+
 from .context import DatasetSearchContext
 from .consts import RESPONSE_FORMAT, SHARD_REXP
 from .exceptions import EsgfSearchException
-from ..multidict import MultiDict
 from ..util import urlencode
 
 logging.basicConfig()
