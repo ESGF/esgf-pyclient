@@ -255,7 +255,7 @@ if __name__ == '__main__':
     if args.from_date:
         from_date = parse_timestamp(args.from_date)
     else:
-        from_date is None
+        from_date = None
 
     extract_from_solr(args.endpoint, args.project, args.repository,
                       from_date=from_date)
