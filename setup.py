@@ -43,5 +43,4 @@ setup(name='esgf-pyclient',
       extras_require={
           "dev": dev_reqs,              # pip install ".[dev]"
       },
-      entry_points={},
-      test_suite='test')
+      entry_points={},)
