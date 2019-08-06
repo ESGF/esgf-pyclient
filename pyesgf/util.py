@@ -21,7 +21,7 @@ def get_manifest(drs_id, version, connection):
 
     """
 
-    if type(version) == int:
+    if isinstance(version, int):
         version = str(version)
 
     context = connection.new_context(drs_id=drs_id, version=version)
@@ -87,7 +87,7 @@ def urlencode(query):
             raise ValueError('Unknown operator tag %s' % tag)
 
     def strip_tag(v):
-        if type(v) == tuple:
+        if isinstance(v, tuple):
             tag, v = v
         else:
             tag = None

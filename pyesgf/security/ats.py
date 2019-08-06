@@ -7,7 +7,7 @@ from jinja2 import Template
 import uuid
 import datetime
 from urllib.request import urlopen, Request
-from xml.etree import ElementTree as ET
+from defusedxml import ElementTree as ET
 
 from . import NS
 

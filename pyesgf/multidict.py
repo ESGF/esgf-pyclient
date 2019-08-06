@@ -194,6 +194,7 @@ class MultiDict(MutableMapping):
         return default
 
     def pop(self, key, *args):
+        # TODO: is this used? Differs from overridden `pop` method.
         if len(args) > 1:
             raise TypeError("pop expected at most 2 arguments, got %s"
                             % repr(1 + len(args)))

@@ -121,7 +121,7 @@ class TestResults(TestCase):
     def test_other_index_node(self):
         conn = SearchConnection(self.test_service, distrib=True)
 
-        ctx = conn.new_context(project='CMIP5', institute='INM')
+        ctx = conn.new_context(project='CMIP5', institute='IPSL')
         results = ctx.search()
 
         r1 = results[0]

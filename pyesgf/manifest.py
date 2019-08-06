@@ -30,10 +30,11 @@ class Manifest(object):
         Instantiate a Manifest instance from a
         :class:`search.results:DatasetResult`.
 
+        TODO: not used.
         """
 
         ctx = dataset_result.file_context()
-        obj = cls()
+        obj = cls(drs_id=None)
         for file_result in ctx.search():
             filename = file_result.filename
             # !TODO: trap exceptions here

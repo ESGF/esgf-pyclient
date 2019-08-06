@@ -37,7 +37,7 @@ from the OpenID where possible::
 import os
 import os.path as op
 import shutil
-from xml.etree import ElementTree
+from defusedxml import ElementTree
 import requests
 import re
 from getpass import getpass
@@ -229,7 +229,8 @@ class LogonManager(object):
 
         # !TODO maybe support different myproxy port
         if port is not None:
-            assert int(port) == 7512
+            if not int(port) == 7512:
+                raise AssertionError()
 
         return username, hostname
 
