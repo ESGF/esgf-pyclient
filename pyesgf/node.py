@@ -1,6 +1,7 @@
 """
 Convenience interface for defining service URL endpoints for ESGF nodes
 
+TODO: not used.
 """
 
 
@@ -16,7 +17,7 @@ class ESGFNode(object):
 
         This URL is the prefix required for search and wget endpoints.
         """
-        return '/'.join(self.base_url, 'esg-search')
+        return '/'.join([self.base_url, 'esg-search'])
 
     @property
     def ats_url(self):

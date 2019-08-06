@@ -6,14 +6,11 @@ An interface to the `ESGF Search API`_
 
 """
 
-from .connection import SearchConnection
-from .context import SearchContext
-from .constraints import GeospatialConstraint, any_of, not_equals
-from .results import ResultSet
-from .consts import TYPE_DATASET, TYPE_FILE
-
-__all__ = [SearchConnection, SearchContext, GeospatialConstraint, any_of,
-           not_equals, ResultSet, TYPE_DATASET, TYPE_FILE]
+from .connection import SearchConnection  # noqa: F401
+from .context import SearchContext  # noqa: F401
+from .constraints import GeospatialConstraint, any_of, not_equals  # noqa: F401
+from .results import ResultSet  # noqa: F401
+from .consts import TYPE_DATASET, TYPE_FILE  # noqa: F401
 
 # !TODO: ResultFormatter class.  process response json to specialise the result
 #        json.  Default is None

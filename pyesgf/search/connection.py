@@ -132,7 +132,8 @@ class SearchConnection(object):
         """
 
         mo = re.match(r'(.*?)(/search)?/*$', self.url)
-        assert mo
+        if mo is None:
+            raise AssertionError()
 
         if mo.group(2):
             warnings.warn('Old-style SearchContext URL specified.  '
