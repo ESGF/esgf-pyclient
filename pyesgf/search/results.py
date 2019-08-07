@@ -92,7 +92,7 @@ class BaseResult(object):
     :ivar json: The oroginial json representation of the result.
     :ivar context: The SearchContext which generated this result.
     :property urls: a dictionary of the form
-                    {service: [(url, mime_type), ...], ...}
+                    ``{service: [(url, mime_type), ...], ...}``
     :property opendap_url: The url of an OPeNDAP endpoint for this result
                            if available
     :property las_url: The url of an LAS endpoint for this result if available
@@ -101,7 +101,7 @@ class BaseResult(object):
     :property gridftp_url: The url for downloading the result by Globus
                            if available
     :property index_node: The index node from where the metadata is stored.
-        Calls to *_context() will optimise queries to only address this node.
+        Calls to ``*_context()`` will optimise queries to only address this node.
 
     """
     def __init__(self, json, context):
