@@ -4,7 +4,7 @@
 Examples
 ########
 
-You can try this notebook examples online using Binder, or view the notebooks on NBViewer.
+You can try these notebook online using Binder, or view the notebooks on NBViewer.
 
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/ESGF/esgf-pyclient.git/master?filepath=notebooks
@@ -16,9 +16,21 @@ You can try this notebook examples online using Binder, or view the notebooks on
    :alt: NBViewer
    :height: 20
 
+Basic Usage
+===========
+
 .. toctree::
    :maxdepth: 1
 
    notebooks/examples/search
    notebooks/examples/logon
    notebooks/examples/download
+
+Demo
+====
+
+.. toctree::
+   :maxdepth: 1
+
+   notebooks/demo/subset-cmip5
+   notebooks/demo/subset-cmip6

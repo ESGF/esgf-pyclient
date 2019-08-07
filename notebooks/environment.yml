@@ -4,3 +4,8 @@ channels:
 dependencies:
   - pip
   - jupyterlab
+  # demo
+  - xarray
+  - dask
+  - netcdf4
+  - matplotlib

@@ -114,7 +114,7 @@ class SearchContext(object):
 
         :batch_size: The number of results to get per HTTP request.
         :param constraints: Further constraints for this query.  Equivilent
-            to calling self.constrain(**constraints).search()
+            to calling ``self.constrain(**constraints).search()``
         :return: A ResultSet for this query
 
         """
@@ -140,10 +140,9 @@ class SearchContext(object):
         """
         Download a script for downloading all files in the set of results.
 
-        :param constraints: Further constraints for this query.  Equivilent
-            to calling self.constrain(**constraints).get_download_script()
+        :param constraints: Further constraints for this query. Equivilent
+            to calling ``self.constrain(**constraints).get_download_script()``
         :return: A string containing the script
-
         """
         if constraints:
             sc = self.constrain(**constraints)
