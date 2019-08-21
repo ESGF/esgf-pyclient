@@ -14,7 +14,7 @@ it with logon details::
   >>> lm = LogonManager()
   >>> lm.is_logged_on()
   False
-  >>> lm.logon(username, password, myproxy_hostname)
+  >>> lm.logon(username, password, myproxy_hostname, bootstrap=True)
   >>> lm.is_logged_on()
   True
 
@@ -22,13 +22,15 @@ Logon parameters that aren't specified will be prompted for at the terminal
 by default.  The :class:`LogonManager` object also writes a ``.httprc`` file
 configuring OPeNDAP access through the NetCDF API.
 
+The option ``bootstrap=True`` is needed on the first run.
+
 You can use your OpenID to logon instead.  The logon details will be deduced
 from the OpenID where possible::
 
   >>> lm.logoff()
   >>> lm.is_logged_on()
   False
-  >>> lm.logon_with_openid(openid, password)
+  >>> lm.logon_with_openid(openid, password, bootstrap=True)
   >>> lm.is_logged_on()
   True
 
