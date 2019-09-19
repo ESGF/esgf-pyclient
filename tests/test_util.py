@@ -8,7 +8,7 @@ import pytest
 import re
 
 from pyesgf.search.connection import SearchConnection
-from pyesgf.util import get_manifest
+from pyesgf.util import get_manifest, ats_url
 from unittest import TestCase
 
 
@@ -16,6 +16,9 @@ class TestUtil(TestCase):
     def setUp(self):
         # !TODO: Make this one of the test services.
         self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
+
+    def test_ats_url(self):
+        assert ats_url('https://esgf-node.llnl.gov') == 'https://esgf-node.llnl.gov/esgf-idp/saml/soap/secure/attributeService.htm'  # noqa
 
     @pytest.mark.slow
     def test_get_manifest(self):

@@ -7,6 +7,16 @@ import sys
 from urllib.parse import quote_plus
 
 
+def ats_url(base_url):
+    """
+    Return the URL for the ESGF SAML AttributeService
+    """
+    # Strip '/' from url as necessary
+    base_url = base_url.rstrip('/')
+    return '/'.join([base_url,
+                    'esgf-idp/saml/soap/secure/attributeService.htm'])
+
+
 def get_manifest(drs_id, version, connection):
     """
     Retrieve the filenames, sizes and checksums of a dataset.
