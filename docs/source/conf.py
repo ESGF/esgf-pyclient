@@ -13,6 +13,7 @@
 
 import sys
 import os
+from pathlib import Path
 
 sys.path.insert(0, os.path.abspath('../../'))
 from pyesgf import __version__ as pyesgf_version
@@ -34,6 +35,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode']
+
+autodoc_mock_imports = (Path(__file__).parent.parent.parent /
+                        'requirements.txt').read_text().split('\n')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
