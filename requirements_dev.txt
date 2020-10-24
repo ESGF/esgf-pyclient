@@ -5,3 +5,9 @@ nbsphinx
 pandoc
 ipykernel
 nbconvert
+defusedxml
+jinja2
+requests
+requests_cache
+webob
+myproxyclient
