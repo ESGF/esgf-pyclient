@@ -4,8 +4,7 @@ dependencies:
   - pip
   - python>=3
   - sphinx>=1.6
+  - nbsphinx
   - pandoc
   - nbconvert!=5.4
   - ipykernel
-  - pip:
-    - nbsphinx
