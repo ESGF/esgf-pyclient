@@ -100,6 +100,8 @@ class BaseResult(object):
                             if available
     :property gridftp_url: The url for downloading the result by Globus
                            if available
+    :property globus_url: The url for downloading the result by Globus
+                           if available (including endpoint)
     :property index_node: The index node from where the metadata is stored.
         Calls to ``*_context()`` will optimise queries to only address this node.
 
@@ -150,6 +152,15 @@ class BaseResult(object):
     def gridftp_url(self):
         try:
             url, mime = self.urls['GridFTP'][0]
+        except (KeyError, IndexError):
+            return None
+
+        return url
+
+    @property
+    def globus_url(self):
+        try:
+            url, mime = self.urls['Globus'][0]
         except (KeyError, IndexError):
             return None
 

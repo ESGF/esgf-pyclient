@@ -88,6 +88,22 @@ class TestResults(TestCase):
             assert file_result.gridftp_url.endswith(".nc")
 
     @pytest.mark.slow
+    def test_globus_url_in_file_result(self):
+        conn = SearchConnection(self.test_service, distrib=False)
+
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search()
+
+        r1 = results[0]
+        f_ctx = r1.file_context()
+
+        file_results = f_ctx.search()
+        for file_result in file_results:
+            globus_url = file_result.globus_url
+            assert globus_url.split(":")[0] == "globus"
+            assert file_result.globus_url.endswith(".nc")
+
+    @pytest.mark.slow
     def test_aggregations(self):
         conn = SearchConnection(self.test_service, distrib=False)
 
