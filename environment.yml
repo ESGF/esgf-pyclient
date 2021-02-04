@@ -4,6 +4,6 @@ channels:
   - conda-forge
 dependencies:
   - pip
-  - python>=3.5
+  - python>=3.6
   - requests
   - jinja2
