@@ -55,6 +55,9 @@ test: ## run tests quickly with the default Python
 test-all: ## run tests on every Python version
 	pytest -v
 
+test-nb:  ## py.test for notebooks
+	pytest --nbval $(CURDIR)/notebooks/examples/search.ipynb
+
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source birdy -m pytest
 	coverage report -m
