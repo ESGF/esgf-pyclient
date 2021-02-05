@@ -86,13 +86,13 @@ def urlencode(query):
             raise TypeError("not a valid non-string sequence "
                             "or mapping object", tb)
 
-    def append(k, v, tag, l):
+    def append(k, v, tag, lst):
         from .search.consts import OPERATOR_NEQ
 
         if tag == OPERATOR_NEQ:
-            l.append('%s!=%s' % (k, v))
+            lst.append('%s!=%s' % (k, v))
         elif tag is None:
-            l.append('%s=%s' % (k, v))
+            lst.append('%s=%s' % (k, v))
         else:
             raise ValueError('Unknown operator tag %s' % tag)
 

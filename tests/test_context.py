@@ -208,10 +208,3 @@ class TestContext(TestCase):
 
         context2 = context.constrain(variable='tas')
         self.assertTrue(context2.hit_count > 10)
-
-    def test_context_project_c3s_cmip5(self):
-        test_service = 'https://cp4cds-index1.ceda.ac.uk/esg-search'
-        conn = SearchConnection(test_service)
-
-        context = conn.new_context(project='c3s-cmip5')
-        self.assertTrue(context.hit_count > 20000)

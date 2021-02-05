@@ -251,7 +251,7 @@ class LogonManager(object):
                       '# END {marker}\n'
                       '{postamble}\n')
                      .format(verbose=1 if verbose else 0,
-                             validate=1 if validate else 0,
+                             # validate=1 if validate else 0,
                              esgf_certs_dir=self.esgf_certs_dir,
                              esgf_dir=self.esgf_dir,
                              marker=DAP_CONFIG_MARKER,
