@@ -11,3 +11,4 @@ requests
 requests_cache
 webob
 myproxyclient
+nbval
