@@ -2,7 +2,7 @@
    :target: https://esgf-pyclient.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://github.com/ESGF/esgf-pyclient/workflows/build/badge.svg
+.. image:: https://github.com/ESGF/esgf-pyclient/workflows/build%20%E2%9A%99%EF%B8%8F/badge.svg
     :target: https://github.com/ESGF/esgf-pyclient/actions
     :alt: Build Status
 
