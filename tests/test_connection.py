@@ -68,7 +68,7 @@ class TestConnection(TestCase):
     def test_passed_cached_session(self):
         import requests_cache
         td = datetime.timedelta(hours=1)
-        session = requests_cache.core.CachedSession(self.cache,
+        session = requests_cache.CachedSession(self.cache,
                                                     expire_after=td)
         conn = SearchConnection(self.test_service, session=session)
         context = conn.new_context(project='cmip5')
@@ -77,7 +77,7 @@ class TestConnection(TestCase):
     def test_connection_instance(self):
         import requests_cache
         td = datetime.timedelta(hours=1)
-        session = requests_cache.core.CachedSession(self.cache,
+        session = requests_cache.CachedSession(self.cache,
                                                     expire_after=td)
         with SearchConnection(self.test_service, session=session) as conn:
             context = conn.new_context(project='cmip5')

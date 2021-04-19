@@ -95,7 +95,7 @@ class SearchConnection(object):
 
     def open(self):
         if (isinstance(self._passed_session, requests.Session) or isinstance(
-                self._passed_session, requests_cache.core.CachedSession)):
+                self._passed_session, requests_cache.CachedSession)):
             self.session = self._passed_session
         else:
             self.session = create_single_session(
@@ -115,7 +115,7 @@ class SearchConnection(object):
     def close(self):
         # Close the session
         if not (isinstance(self._passed_session, requests.Session) or isinstance(
-                self._passed_session, requests_cache.core.CachedSession)):
+                self._passed_session, requests_cache.CachedSession)):
             self.session.close()
         self._isopen = False
         return
@@ -361,7 +361,7 @@ def create_single_session(cache=None, expire_after=datetime.timedelta(hours=1),
     """
     if cache is not None:
         try:
-            session = (requests_cache.core
+            session = (requests_cache
                        .CachedSession(cache,
                                       expire_after=expire_after))
         except DatabaseError:
@@ -370,7 +370,7 @@ def create_single_session(cache=None, expire_after=datetime.timedelta(hours=1),
                 os.remove(cache)
             except Exception:
                 pass
-            session = (requests_cache.core
+            session = (requests_cache
                        .CachedSession(cache, expire_after=expire_after))
     else:
         session = requests.Session()
