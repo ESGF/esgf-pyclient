@@ -12,6 +12,9 @@ from pyesgf.search.connection import SearchConnection
 
 
 class TestResults(TestCase):
+
+    _test_few_facets = 'project,model,index_node,data_node'
+
     def setUp(self):
         self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
         self.test_service_pcmdi = 'https://esgf-node.llnl.gov/esg-search'
@@ -238,19 +241,33 @@ class TestResults(TestCase):
         for j in searchContext.search():
             print((j.download_url, j.checksum, j.checksum_type, j.size))
 
-    @pytest.mark.slow
-    def test_batch_size_has_no_impact_on_results(self):
+    def _test_batch_size_has_no_impact_on_results(self, facets=None):
         conn = SearchConnection(self.test_service, distrib=True)
-        ctx = conn.new_context(
-            mip_era='CMIP6', institution_id='CCCma',
-            experiment_id='pdSST-pdSIC', table_id='Amon', variable_id='ua')
+        
+        constraints = {
+            'mip_era': 'CMIP6',
+            'institution_id': 'CCCma',
+            'experiment_id': 'pdSST-pdSIC',
+            'table_id': 'Amon',
+            'variable_id': 'ua',
+            'facets': facets}
+        ctx = conn.new_context(**constraints)
+            
         results = ctx.search(batch_size=50)
         ids_batch_size_50 = sorted(results, key=lambda x: x.dataset_id)
 
-        ctx = conn.new_context(
-            mip_era='CMIP6', institution_id='CCCma',
-            experiment_id='pdSST-pdSIC', table_id='Amon', variable_id='ua')
+        ctx = conn.new_context(**constraints)
         results = ctx.search(batch_size=100)
         ids_batch_size_100 = sorted(results, key=lambda x: x.dataset_id)
 
         assert len(ids_batch_size_50) == len(ids_batch_size_100)
+
+    @pytest.mark.slow
+    def test_test_batch_size_has_no_impact_on_results_with_few_facets(self):
+        self._test_batch_size_has_no_impact_on_results(
+            facets=self._test_few_facets)
+
+    @pytest.mark.slow
+    @pytest.mark.xfail
+    def test_test_batch_size_has_no_impact_on_results_with_all_facets(self):
+        self._test_batch_size_has_no_impact_on_results()

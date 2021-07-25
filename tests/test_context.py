@@ -11,6 +11,9 @@ import os
 
 
 class TestContext(TestCase):
+
+    _test_few_facets = 'project,model,index_node,data_node'
+
     def setUp(self):
         self.test_service = 'http://esgf-data.dkrz.de/esg-search'
         self.cache = os.path.join(os.path.dirname(__file__), 'url_cache')
@@ -93,31 +96,53 @@ class TestContext(TestCase):
         self.assertTrue(list(counts['model'].keys()) == ['IPSL-CM5A-LR'])
         self.assertTrue(list(counts['project'].keys()) == ['CMIP5'])
 
-    @pytest.mark.slow
-    def test_distrib(self):
-        conn = SearchConnection(self.test_service, distrib=False)
+    
+    def _test_distrib(self, constraints=None, test_service=None,
+                      cache=None):
+        if constraints == None:
+            constraints={}
+        if test_service == None:
+            test_service = self.test_service
+        
+        conn1 = SearchConnection(test_service, distrib=False, cache=cache)
+        context1 = conn1.new_context(**constraints)
+        count1 = context1.hit_count
 
-        context = conn.new_context(project='CMIP5')
-        count1 = context.hit_count
-
-        conn2 = SearchConnection(self.test_service, distrib=True)
-        context = conn2.new_context(project='CMIP5')
-        count2 = context.hit_count
+        conn2 = SearchConnection(test_service, distrib=True, cache=cache)
+        context2 = conn2.new_context(**constraints)
+        count2 = context2.hit_count
 
         assert count1 < count2
+
+
+    _distrib_constraints_few_facets = {'project': 'CMIP5',
+                                       'facets': _test_few_facets}
+    _distrib_constraints_all_facets = {'project': 'CMIP5',
+                                       'facets': '*'}
+
+    def test_distrib_with_few_facets(self):
+        self._test_distrib(constraints=self._distrib_constraints_few_facets)
+
+    @pytest.mark.slow
+    @pytest.mark.xfail
+    # Expected failure: with facets=* the distrib=true appears to be 
+    # ignored.  This is observed both on the CEDA and also DKRZ index nodes 
+    # (the only nodes investigated).
+    def test_distrib_with_all_facets(self):
+        self._test_distrib(constraints=self._distrib_constraints_all_facets)
 
     # @pytest.mark.skip(reason="cache fails on python 3.7")
-    def test_distrib_with_cache(self):
-        conn = SearchConnection(self.test_service, cache=self.cache, distrib=False)
+    def test_distrib_with_cache_with_few_facets(self):
+        self._test_distrib(constraints=self._distrib_constraints_few_facets,
+                           cache=self.cache)
 
-        context = conn.new_context(project='CMIP5')
-        count1 = context.hit_count
+    # @pytest.mark.skip(reason="cache fails on python 3.7")
+    @pytest.mark.xfail
+    # Expected failure: see test_distrib_all_facets above
+    def test_distrib_with_cache_with_all_facets(self):
+        self._test_distrib(constraints=self._distrib_constraints_all_facets,
+                           cache=self.cache)
 
-        conn2 = SearchConnection(self.test_service, cache=self.cache, distrib=True)
-        context = conn2.new_context(project='CMIP5')
-        count2 = context.hit_count
-
-        assert count1 < count2
 
     def test_constrain(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
@@ -163,8 +188,8 @@ class TestContext(TestCase):
 
         assert hits1 == hits2 + hits3
 
-    @pytest.mark.slow
-    def test_replica(self):
+    def _test_replica(self, facets=None):
+
         # Test that we can exclude replicas
         # This tests assumes the test dataset is replicated
         conn = SearchConnection(self.test_service)
@@ -172,14 +197,26 @@ class TestContext(TestCase):
         version = '20111128'
 
         # Search for all replicas
-        context = conn.new_context(query=qry, version=version)
+        context = conn.new_context(query=qry, version=version,
+                                   facets=facets)
+
         # Expecting more than 2 search hits for replicas
         assert context.hit_count > 2
 
         # Search for only one replicant
-        context = conn.new_context(query=qry, replica=False, version=version)
+        context = conn.new_context(query=qry, replica=False, version=version,
+                                   facets=facets)
         # Expecting one search replica
         assert context.hit_count == 1
+
+    def test_replica_with_few_facets(self):
+        self._test_replica(facets=self._test_few_facets)
+
+    @pytest.mark.xfail
+    # Expected failure - same considerations as test_distrib_all_facets
+    @pytest.mark.slow
+    def test_replica_with_all_facets(self):
+        self._test_replica()
 
     def test_response_from_bad_parameter(self):
         # Test that a bad parameter name raises a useful exception
