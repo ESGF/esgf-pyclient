@@ -41,9 +41,9 @@ class TestConnection(TestCase):
         #        replication configuration
         #        on the test server
         assert 'esgf-index1.ceda.ac.uk' in shards
-        # IPSL now replicates all non-local shards.
-        # Just check it has a few shards
-        assert len(shards['esgf-index1.ceda.ac.uk']) > 1
+        # in esg-search in esgf-index1.ceda.ac.uk, there are a bunch 
+        # of replicas hosted on esgf-index2
+        assert len(shards['esgf-index2.ceda.ac.uk']) > 1
 
     def test_url_fixing(self):
         # Switch off warnings for this case because we are testing that issue
