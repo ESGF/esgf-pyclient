@@ -96,14 +96,13 @@ class TestContext(TestCase):
         self.assertTrue(list(counts['model'].keys()) == ['IPSL-CM5A-LR'])
         self.assertTrue(list(counts['project'].keys()) == ['CMIP5'])
 
-    
     def _test_distrib(self, constraints=None, test_service=None,
                       cache=None):
-        if constraints == None:
-            constraints={}
-        if test_service == None:
+        if constraints is None:
+            constraints = {}
+        if test_service is None:
             test_service = self.test_service
-        
+
         conn1 = SearchConnection(test_service, distrib=False, cache=cache)
         context1 = conn1.new_context(**constraints)
         count1 = context1.hit_count
@@ -113,7 +112,6 @@ class TestContext(TestCase):
         count2 = context2.hit_count
 
         assert count1 < count2
-
 
     _distrib_constraints_few_facets = {'project': 'CMIP5',
                                        'facets': _test_few_facets}
@@ -125,8 +123,8 @@ class TestContext(TestCase):
 
     @pytest.mark.slow
     @pytest.mark.xfail
-    # Expected failure: with facets=* the distrib=true appears to be 
-    # ignored.  This is observed both on the CEDA and also DKRZ index nodes 
+    # Expected failure: with facets=* the distrib=true appears to be
+    # ignored.  This is observed both on the CEDA and also DKRZ index nodes
     # (the only nodes investigated).
     def test_distrib_with_all_facets(self):
         self._test_distrib(constraints=self._distrib_constraints_all_facets)
@@ -142,7 +140,6 @@ class TestContext(TestCase):
     def test_distrib_with_cache_with_all_facets(self):
         self._test_distrib(constraints=self._distrib_constraints_all_facets,
                            cache=self.cache)
-
 
     def test_constrain(self):
         conn = SearchConnection(self.test_service, cache=self.cache)

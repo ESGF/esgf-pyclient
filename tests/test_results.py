@@ -243,7 +243,7 @@ class TestResults(TestCase):
 
     def _test_batch_size_has_no_impact_on_results(self, facets=None):
         conn = SearchConnection(self.test_service, distrib=True)
-        
+
         constraints = {
             'mip_era': 'CMIP6',
             'institution_id': 'CCCma',
@@ -252,7 +252,7 @@ class TestResults(TestCase):
             'variable_id': 'ua',
             'facets': facets}
         ctx = conn.new_context(**constraints)
-            
+
         results = ctx.search(batch_size=50)
         ids_batch_size_50 = sorted(results, key=lambda x: x.dataset_id)
 
