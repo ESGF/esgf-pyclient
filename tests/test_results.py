@@ -29,6 +29,16 @@ class TestResults(TestCase):
         assert re.match(r'cmip5\.output1\..+\|esgf-data1.ceda.ac.uk',
                         r1.dataset_id)
 
+    def test_result1_ignore_facet_check(self):
+        conn = SearchConnection(self.test_service, distrib=False)
+
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search(ignore_facet_check=True)
+
+        r1 = results[0]
+        assert re.match(r'cmip5\.output1\..+\|esgf-data1.ceda.ac.uk',
+                        r1.dataset_id)
+
     def test_file_context(self):
         conn = SearchConnection(self.test_service, distrib=False)
 

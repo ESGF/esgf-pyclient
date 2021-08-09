@@ -36,16 +36,15 @@ class ResultSet(Sequence):
         """
         self.context = context
         self.__batch_size = batch_size
-        self.__batch_cache = [None] * ((len(self) // batch_size) + 1)
-        if eager and len(self) > 0:
+        self.__batch_cache = {}
+        self.__len_cache = None
+        if eager:
             self.__batch_cache[0] = self.__get_batch(0)
 
     def __getitem__(self, index):
         batch_i = index // self.batch_size
         offset = index % self.batch_size
-        if self.__batch_cache[batch_i] is None:
-            self.__batch_cache[batch_i] = self.__get_batch(batch_i)
-        batch = self.__batch_cache[batch_i]
+        batch = self.__get_batch(batch_i)
 
         search_type = self.context.search_type
         ResultClass = _result_classes[search_type]
@@ -54,7 +53,9 @@ class ResultSet(Sequence):
         return ResultClass(batch[offset], self.context)
 
     def __len__(self):
-        return self.context.hit_count
+        if self.__len_cache is None:
+            self.__get_batch(0)
+        return self.__len_cache
 
     @property
     def batch_size(self):
@@ -71,6 +72,9 @@ class ResultSet(Sequence):
         return result
 
     def __get_batch(self, batch_i):
+        if batch_i in self.__batch_cache:
+            return self.__batch_cache[batch_i]
+
         offset = self.batch_size * batch_i
         limit = self.batch_size
 
@@ -79,8 +83,14 @@ class ResultSet(Sequence):
                     .send_search(query_dict, limit=limit, offset=offset,
                                  shards=self.context.shards))
 
+        if self.__len_cache is None:
+            self.__len_cache = response['response']['numFound']
+
         # !TODO: strip out results
-        return response['response']['docs']
+        batch = response['response']['docs']
+
+        self.__batch_cache[batch_i] = batch
+        return batch
 
 
 class BaseResult(object):
@@ -259,7 +269,7 @@ class FileResult(BaseResult):
     :property checksum: The checksum of the file
     :property checksum_type: The algorithm used for generating the checksum
     :property filename: The filename
-    :proprty size: The file size in bytes
+    :property size: The file size in bytes
 
     """
     @property
