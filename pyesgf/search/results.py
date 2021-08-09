@@ -39,7 +39,7 @@ class ResultSet(Sequence):
         self.__batch_cache = {}
         self.__len_cache = None
         if eager:
-            self.__batch_cache[0] = self.__get_batch(0)
+            self.__get_batch(0)
 
     def __getitem__(self, index):
         batch_i = index // self.batch_size
