@@ -99,7 +99,7 @@ class BaseResult(object):
 
     Subclasses represent different search types such as File and Dataset.
 
-    :ivar json: The oroginial json representation of the result.
+    :ivar json: The original json representation of the result.
     :ivar context: The SearchContext which generated this result.
     :property urls: a dictionary of the form
                     ``{service: [(url, mime_type), ...], ...}``
