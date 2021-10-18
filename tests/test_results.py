@@ -242,7 +242,12 @@ class TestResults(TestCase):
             print((j.download_url, j.checksum, j.checksum_type, j.size))
 
     def _test_batch_size_has_no_impact_on_results(self, facets=None):
-        conn = SearchConnection(self.test_service, distrib=True)
+
+        # should work in principle with distrib=True, but use distrib=False
+        # because sometimes returned results misses results from some other indexes
+        # and we don't want this to cause a failure
+
+        conn = SearchConnection(self.test_service, distrib=False)
 
         constraints = {
             'mip_era': 'CMIP6',
