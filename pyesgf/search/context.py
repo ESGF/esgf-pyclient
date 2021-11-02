@@ -22,8 +22,7 @@ from .exceptions import EsgfSearchException
 
 
 class SearchContext(object):
-    """
-    Instances of this class represent the state of a current search.
+    """Instances of this class represent the state of a current search.
     It exposes what facets are available to select and the facet counts
     if they are available.
 
@@ -37,6 +36,15 @@ class SearchContext(object):
 
     :ivar constraints: A dictionary of facet constraints currently in effect.
         ``constraint[facet_name] = [value, value, ...]``
+
+    :ivar facets: A string containing a comma-separated list of facets to be
+        returned (for example ``'source_id,ensemble_id'``). If set, this will
+        be used to select which facet counts to include, as returned in the
+        ``facet_counts`` dictionary.  Defaults to including all available
+        facets, but with distributed searches (where the SearchConnection
+        instance was created with ``distrib=True``), some results may be
+        missing for server-side reasons when requesting all facets, so a
+        warning message will be issued. This contains further details.
     :property facet_counts: A dictionary of available hits with each
         facet value for the search as currently constrained.
         This property returns a dictionary of dictionaries where
@@ -228,7 +236,7 @@ successfully perform a distributed search when this option is used, so some
 results may be missing.  For full results, it is recommended to pass a list of
 facets of interest when instantiating a context object.  For example,
 
-      ctx = conn.new_context(facets=['project', 'experiment_id'])
+      ctx = conn.new_context(facets='project,experiment_id')
 
 Only the facets that you specify will be present in the facets_counts dictionary.
 
