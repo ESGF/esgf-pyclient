@@ -94,7 +94,7 @@ class SearchContext(object):
         self.freetext_constraint = None
         self.facet_constraints = MultiDict()
         self.temporal_constraint = [from_timestamp, to_timestamp]
-        self.geosplatial_constraint = None
+        self.geospatial_constraint = None
 
         self._update_constraints(constraints)
 
@@ -123,7 +123,9 @@ class SearchContext(object):
         Perform the search with current constraints returning a set of results.
 
         :batch_size: The number of results to get per HTTP request.
-        :param constraints: Further constraints for this query.  Equivilent
+        :ignore_facet_check: Do not make an extra HTTP request to populate
+            :py:attr:`~facet_counts` and :py:attr:`~hit_count`.
+        :param constraints: Further constraints for this query.  Equivalent
             to calling ``self.constrain(**constraints).search()``
         :return: A ResultSet for this query
 
@@ -133,7 +135,8 @@ class SearchContext(object):
         else:
             sc = self
 
-        sc.__update_counts(ignore_facet_check=ignore_facet_check)
+        if not ignore_facet_check:
+            sc.__update_counts()
 
         return ResultSet(sc, batch_size=batch_size)
 
@@ -150,7 +153,7 @@ class SearchContext(object):
         """
         Download a script for downloading all files in the set of results.
 
-        :param constraints: Further constraints for this query. Equivilent
+        :param constraints: Further constraints for this query. Equivalent
             to calling ``self.constrain(**constraints).get_download_script()``
         :return: A string containing the script
         """
@@ -198,7 +201,7 @@ class SearchContext(object):
 
         return facet_options
 
-    def __update_counts(self, ignore_facet_check=False):
+    def __update_counts(self):
         # If hit_count is set the counts are already retrieved
         if self.__hit_count is not None:
             return
@@ -209,7 +212,7 @@ class SearchContext(object):
 
         if self.facets:
             query_dict['facets'] = self.facets
-        elif not ignore_facet_check:
+        else:
             query_dict['facets'] = '*'
             if self.connection.distrib:
                 self._do_facets_star_warning()
