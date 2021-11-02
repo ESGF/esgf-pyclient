@@ -49,8 +49,10 @@ class SearchConnection(object):
         of the ESGF search service excluding the final endpoint name.
         Usually this is http://<hostname>/esg-search
     :ivar distrib: Boolean stating whether searches through this connection are
-        distributed.  I.e. whether the Search service distributes the query to
-        other search peers.
+        distributed.  i.e. whether the Search service distributes the query to
+        other search peers.  See also the documentation for the ``facets``
+        argument to ``pyesgf.search.context.SearchContext`` in relation to
+        distributed searches.
     :ivar cache: Path to `sqlite` cache file. Cache expires every hours.
     :ivar timeout: Time (in seconds) before query returns an error.
                    Default: 120s.
