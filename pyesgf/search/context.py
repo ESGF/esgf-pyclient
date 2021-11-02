@@ -8,6 +8,8 @@ query.
 
 """
 
+import os
+import sys
 import copy
 
 from webob.multidict import MultiDict
@@ -76,7 +78,7 @@ class SearchContext(object):
         self.connection = connection
         self.__facet_counts = None
         self.__hit_count = None
-
+        self._did_facets_star_warning = False
         if search_type is None:
             search_type = self.DEFAULT_SEARCH_TYPE
 
@@ -197,11 +199,12 @@ class SearchContext(object):
         self.__hit_count = None
         query_dict = self._build_query()
 
-        if not ignore_facet_check:
-            query_dict['facets'] = '*'
-
         if self.facets:
             query_dict['facets'] = self.facets
+        elif not ignore_facet_check:
+            query_dict['facets'] = '*'
+            if self.connection.distrib:
+                self._do_facets_star_warning()
 
         response = self.connection.send_search(query_dict, limit=0)
         for facet, counts in (list(response['facet_counts']['facet_fields'].items())):
@@ -210,6 +213,33 @@ class SearchContext(object):
                 d[counts.pop()] = counts.pop()
 
         self.__hit_count = response['response']['numFound']
+
+    def _do_facets_star_warning(self):
+        env_var_name = 'ESGF_PYCLIENT_NO_FACETS_STAR_WARNING'
+        if env_var_name in os.environ:
+            return
+        if not self._did_facets_star_warning:
+            sys.stderr.write(f'''
+-------------------------------------------------------------------------------
+Warning - defaulting to search with facets=*
+
+This behavior is kept for backward-compatibility, but ESGF indexes might not
+successfully perform a distributed search when this option is used, so some
+results may be missing.  For full results, it is recommended to pass a list of
+facets of interest when instantiating a context object.  For example,
+
+      ctx = conn.new_context(facets=['project', 'experiment_id'])
+
+Only the facets that you specify will be present in the facets_counts dictionary.
+
+This warning is displayed when a distributed search is performed while using the
+facets=* default, a maximum of once per context object.  To suppress this warning,
+set the environment variable {env_var_name} to any value
+or explicitly use  conn.new_context(facets='*')
+
+-------------------------------------------------------------------------------
+''')
+            self._did_facets_star_warning = True
 
     # -------------------------------------------------------------------------
     # Constraint mutation interface
