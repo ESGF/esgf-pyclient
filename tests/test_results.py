@@ -13,7 +13,7 @@ from pyesgf.search.connection import SearchConnection
 
 class TestResults(TestCase):
 
-    _test_few_facets = 'project,model,index_node,data_node'
+    _test_facets = 'project,model,index_node,data_node'
 
     def setUp(self):
         self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
@@ -278,11 +278,7 @@ class TestResults(TestCase):
         assert len(ids_batch_size_50) == len(ids_batch_size_100)
 
     @pytest.mark.slow
-    def test_test_batch_size_has_no_impact_on_results_with_few_facets(self):
+    def test_batch_size_has_no_impact_on_results_with_few_facets(self):
         self._test_batch_size_has_no_impact_on_results(
-            facets=self._test_few_facets)
+            facets=self._test_facets)
 
-    @pytest.mark.slow
-    @pytest.mark.xfail
-    def test_test_batch_size_has_no_impact_on_results_with_all_facets(self):
-        self._test_batch_size_has_no_impact_on_results()
