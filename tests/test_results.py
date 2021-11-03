@@ -281,4 +281,3 @@ class TestResults(TestCase):
     def test_batch_size_has_no_impact_on_results_with_few_facets(self):
         self._test_batch_size_has_no_impact_on_results(
             facets=self._test_facets)
-
