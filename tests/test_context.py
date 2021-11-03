@@ -13,14 +13,15 @@ import os
 _all_facets_explanation = ('tests with facets=* may fail for server-side reasons, '
                            'so these are marked XFAIL but may sometimes pass')
 
+
 class TestContext(TestCase):
 
     _test_few_facets = 'project,model,index_node,data_node'
 
     def setUp(self):
         self.test_service = 'http://esgf-data.dkrz.de/esg-search'
-        #self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
-        #self.test_service = 'http://esgf-node.llnl.gov/esg-search'
+        # self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
+        # self.test_service = 'http://esgf-node.llnl.gov/esg-search'
         self.cache = os.path.join(os.path.dirname(__file__), 'url_cache')
 
     def test_context_freetext(self):
@@ -125,7 +126,7 @@ class TestContext(TestCase):
         # server-side reasons, so we use a weaker test here.
         #
 
-        #assert count1 < count2
+        # assert count1 < count2
         assert count1 <= count2
 
     _distrib_constraints_few_facets = {'project': 'CMIP5',
