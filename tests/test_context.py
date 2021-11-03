@@ -158,6 +158,7 @@ class TestContext(TestCase):
         self._test_distrib(constraints=self._distrib_constraints_all_facets,
                            cache=self.cache)
 
+    @pytest.mark.xfail("may sometimes fail if server returns incomplete set of results")
     def test_constrain(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
 
@@ -186,6 +187,7 @@ class TestContext(TestCase):
         context2 = context.constrain(experiment='historical')
         self.assertTrue('experiment' in context2.facet_constraints)
 
+    @pytest.mark.xfail("may sometimes fail if server returns incomplete set of results")
     def test_negative_facet(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
 
