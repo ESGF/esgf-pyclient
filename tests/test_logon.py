@@ -17,10 +17,11 @@ try:
 except (ImportError, SyntaxError):
     _has_myproxy = False
 
+
 TEST_USER = os.environ.get('USERNAME')
 TEST_PASSWORD = os.environ.get('PASSWORD')
 TEST_OPENID = os.environ.get('OPENID')
-TEST_MYPROXY = 'slcs.ceda.ac.uk'
+TEST_MYPROXY = os.environ.get('MYPROXY')
 
 
 TEST_DATA_DIR = op.join(op.dirname(__file__), 'data')
