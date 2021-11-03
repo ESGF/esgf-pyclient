@@ -73,7 +73,7 @@ class TestContext(TestCase):
 
         self.assertTrue(hits2 > hits1)
 
-    @pytest.mark.xfail("results may sometimes be missing - may or may not pass")
+    @pytest.mark.xfail(reason="results may sometimes be missing - may or may not pass")
     def test_context_facet_options(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
         context = conn.new_context(project='CMIP5', model='IPSL-CM5A-LR',
