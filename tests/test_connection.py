@@ -41,7 +41,7 @@ class TestConnection(TestCase):
         #        replication configuration
         #        on the test server
         assert 'esgf-index1.ceda.ac.uk' in shards
-        # in esg-search in esgf-index1.ceda.ac.uk, there are a bunch 
+        # in esg-search in esgf-index1.ceda.ac.uk, there are a bunch
         # of replicas hosted on esgf-index2
         assert len(shards['esgf-index2.ceda.ac.uk']) > 1
 
@@ -69,7 +69,7 @@ class TestConnection(TestCase):
         import requests_cache
         td = datetime.timedelta(hours=1)
         session = requests_cache.CachedSession(self.cache,
-                                                    expire_after=td)
+                                               expire_after=td)
         conn = SearchConnection(self.test_service, session=session)
         context = conn.new_context(project='cmip5')
         assert context.facet_constraints['project'] == 'cmip5'
@@ -78,7 +78,7 @@ class TestConnection(TestCase):
         import requests_cache
         td = datetime.timedelta(hours=1)
         session = requests_cache.CachedSession(self.cache,
-                                                    expire_after=td)
+                                               expire_after=td)
         with SearchConnection(self.test_service, session=session) as conn:
             context = conn.new_context(project='cmip5')
         assert context.facet_constraints['project'] == 'cmip5'

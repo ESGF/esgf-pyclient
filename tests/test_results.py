@@ -13,7 +13,7 @@ from pyesgf.search.connection import SearchConnection
 
 class TestResults(TestCase):
 
-    _test_few_facets = 'project,model,index_node,data_node'
+    _test_facets = 'project,model,index_node,data_node'
 
     def setUp(self):
         self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
@@ -24,6 +24,16 @@ class TestResults(TestCase):
 
         ctx = conn.new_context(project='CMIP5')
         results = ctx.search()
+
+        r1 = results[0]
+        assert re.match(r'cmip5\.output1\..+\|esgf-data1.ceda.ac.uk',
+                        r1.dataset_id)
+
+    def test_result1_ignore_facet_check(self):
+        conn = SearchConnection(self.test_service, distrib=False)
+
+        ctx = conn.new_context(project='CMIP5')
+        results = ctx.search(ignore_facet_check=True)
 
         r1 = results[0]
         assert re.match(r'cmip5\.output1\..+\|esgf-data1.ceda.ac.uk',
@@ -242,8 +252,13 @@ class TestResults(TestCase):
             print((j.download_url, j.checksum, j.checksum_type, j.size))
 
     def _test_batch_size_has_no_impact_on_results(self, facets=None):
-        conn = SearchConnection(self.test_service, distrib=True)
-        
+
+        # should work in principle with distrib=True, but use distrib=False
+        # because sometimes returned results misses results from some other indexes
+        # and we don't want this to cause a failure
+
+        conn = SearchConnection(self.test_service, distrib=False)
+
         constraints = {
             'mip_era': 'CMIP6',
             'institution_id': 'CCCma',
@@ -252,7 +267,7 @@ class TestResults(TestCase):
             'variable_id': 'ua',
             'facets': facets}
         ctx = conn.new_context(**constraints)
-            
+
         results = ctx.search(batch_size=50)
         ids_batch_size_50 = sorted(results, key=lambda x: x.dataset_id)
 
@@ -263,11 +278,6 @@ class TestResults(TestCase):
         assert len(ids_batch_size_50) == len(ids_batch_size_100)
 
     @pytest.mark.slow
-    def test_test_batch_size_has_no_impact_on_results_with_few_facets(self):
+    def test_batch_size_has_no_impact_on_results_with_few_facets(self):
         self._test_batch_size_has_no_impact_on_results(
-            facets=self._test_few_facets)
-
-    @pytest.mark.slow
-    @pytest.mark.xfail
-    def test_test_batch_size_has_no_impact_on_results_with_all_facets(self):
-        self._test_batch_size_has_no_impact_on_results()
+            facets=self._test_facets)

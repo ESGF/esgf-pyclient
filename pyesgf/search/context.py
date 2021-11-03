@@ -8,6 +8,8 @@ query.
 
 """
 
+import os
+import sys
 import copy
 
 from webob.multidict import MultiDict
@@ -20,8 +22,7 @@ from .exceptions import EsgfSearchException
 
 
 class SearchContext(object):
-    """
-    Instances of this class represent the state of a current search.
+    """Instances of this class represent the state of a current search.
     It exposes what facets are available to select and the facet counts
     if they are available.
 
@@ -35,6 +36,15 @@ class SearchContext(object):
 
     :ivar constraints: A dictionary of facet constraints currently in effect.
         ``constraint[facet_name] = [value, value, ...]``
+
+    :ivar facets: A string containing a comma-separated list of facets to be
+        returned (for example ``'source_id,ensemble_id'``). If set, this will
+        be used to select which facet counts to include, as returned in the
+        ``facet_counts`` dictionary.  Defaults to including all available
+        facets, but with distributed searches (where the SearchConnection
+        instance was created with ``distrib=True``), some results may be
+        missing for server-side reasons when requesting all facets, so a
+        warning message will be issued. This contains further details.
     :property facet_counts: A dictionary of available hits with each
         facet value for the search as currently constrained.
         This property returns a dictionary of dictionaries where
@@ -76,7 +86,7 @@ class SearchContext(object):
         self.connection = connection
         self.__facet_counts = None
         self.__hit_count = None
-
+        self._did_facets_star_warning = False
         if search_type is None:
             search_type = self.DEFAULT_SEARCH_TYPE
 
@@ -84,7 +94,7 @@ class SearchContext(object):
         self.freetext_constraint = None
         self.facet_constraints = MultiDict()
         self.temporal_constraint = [from_timestamp, to_timestamp]
-        self.geosplatial_constraint = None
+        self.geospatial_constraint = None
 
         self._update_constraints(constraints)
 
@@ -113,7 +123,9 @@ class SearchContext(object):
         Perform the search with current constraints returning a set of results.
 
         :batch_size: The number of results to get per HTTP request.
-        :param constraints: Further constraints for this query.  Equivilent
+        :ignore_facet_check: Do not make an extra HTTP request to populate
+            :py:attr:`~facet_counts` and :py:attr:`~hit_count`.
+        :param constraints: Further constraints for this query.  Equivalent
             to calling ``self.constrain(**constraints).search()``
         :return: A ResultSet for this query
 
@@ -123,7 +135,8 @@ class SearchContext(object):
         else:
             sc = self
 
-        sc.__update_counts(ignore_facet_check=ignore_facet_check)
+        if not ignore_facet_check:
+            sc.__update_counts()
 
         return ResultSet(sc, batch_size=batch_size)
 
@@ -140,7 +153,7 @@ class SearchContext(object):
         """
         Download a script for downloading all files in the set of results.
 
-        :param constraints: Further constraints for this query. Equivilent
+        :param constraints: Further constraints for this query. Equivalent
             to calling ``self.constrain(**constraints).get_download_script()``
         :return: A string containing the script
         """
@@ -188,7 +201,7 @@ class SearchContext(object):
 
         return facet_options
 
-    def __update_counts(self, ignore_facet_check=False):
+    def __update_counts(self):
         # If hit_count is set the counts are already retrieved
         if self.__hit_count is not None:
             return
@@ -197,11 +210,12 @@ class SearchContext(object):
         self.__hit_count = None
         query_dict = self._build_query()
 
-        if not ignore_facet_check:
-            query_dict['facets'] = '*'
-
         if self.facets:
             query_dict['facets'] = self.facets
+        else:
+            query_dict['facets'] = '*'
+            if self.connection.distrib:
+                self._do_facets_star_warning()
 
         response = self.connection.send_search(query_dict, limit=0)
         for facet, counts in (list(response['facet_counts']['facet_fields'].items())):
@@ -210,6 +224,33 @@ class SearchContext(object):
                 d[counts.pop()] = counts.pop()
 
         self.__hit_count = response['response']['numFound']
+
+    def _do_facets_star_warning(self):
+        env_var_name = 'ESGF_PYCLIENT_NO_FACETS_STAR_WARNING'
+        if env_var_name in os.environ:
+            return
+        if not self._did_facets_star_warning:
+            sys.stderr.write(f'''
+-------------------------------------------------------------------------------
+Warning - defaulting to search with facets=*
+
+This behavior is kept for backward-compatibility, but ESGF indexes might not
+successfully perform a distributed search when this option is used, so some
+results may be missing.  For full results, it is recommended to pass a list of
+facets of interest when instantiating a context object.  For example,
+
+      ctx = conn.new_context(facets='project,experiment_id')
+
+Only the facets that you specify will be present in the facets_counts dictionary.
+
+This warning is displayed when a distributed search is performed while using the
+facets=* default, a maximum of once per context object.  To suppress this warning,
+set the environment variable {env_var_name} to any value
+or explicitly use  conn.new_context(facets='*')
+
+-------------------------------------------------------------------------------
+''')
+            self._did_facets_star_warning = True
 
     # -------------------------------------------------------------------------
     # Constraint mutation interface
