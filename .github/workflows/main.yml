@@ -30,7 +30,7 @@ jobs:
       if: matrix.python-version == 3.6
     - name: Test notebooks ⚙️
       run: make test-nb
-      if: matrix.python-version == 3.6
+      if: matrix.python-version == 3.7
     - name: Build docs 🏗️
       run: make docs
-      if: matrix.python-version == 3.6
+      if: matrix.python-version == 3.7
