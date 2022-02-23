@@ -4,6 +4,10 @@ channels:
   - conda-forge
 dependencies:
   - pip
-  - python>=3.6
+  - python>=3.6,<3.10
   - requests
+  - requests_cache
   - jinja2
+  - defusedxml
+  - webob
+  - myproxyclient
