@@ -14,7 +14,7 @@ jobs:
     - name: Install packages
       run: |
         sudo apt-get -y install pandoc
-      if: matrix.python-version == 3.6
+      if: matrix.python-version == 3.7
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
