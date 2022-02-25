@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
     steps:
     - uses: actions/checkout@v2
     - name: Install packages
       run: |
         sudo apt-get -y install pandoc
-      if: matrix.python-version == 3.6
+      if: matrix.python-version == 3.7
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -30,7 +30,7 @@ jobs:
       if: matrix.python-version == 3.6
     - name: Test notebooks ⚙️
       run: make test-nb
-      if: matrix.python-version == 3.6
+      if: matrix.python-version == 3.7
     - name: Build docs 🏗️
       run: make docs
-      if: matrix.python-version == 3.6
+      if: matrix.python-version == 3.7

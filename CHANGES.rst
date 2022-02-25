@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+0.3.1 (2022-02-25)
+------------------
+
+- Fix: fix tests and merge conflicts (#79).
+- Fix #75: ignore_facet_check search option appears to be broken (#76).
+- Fix #74: Add warnings when default facets=* used on distributed search (#77).
+- Fix #78: Updates for requests_cache API (#68).
+- Fix: Improvements to tests (#73).
+
 0.3.0 (2021-02-08)
 ------------------
 
