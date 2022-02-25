@@ -1,15 +1,14 @@
 Release Notes
 =============
 
-0.3.1 (2022-02-24)
+0.3.1 (2022-02-25)
 ------------------
 
-- Fix #75: ignore_facet_check search option appears to be broken. (#79)
-- Fix #74: Is there a way to search the entire ESGF? (#79)
+- Fix: fix tests and merge conflicts (#79).
+- Fix #75: ignore_facet_check search option appears to be broken (#76).
+- Fix #74: Add warnings when default facets=* used on distributed search (#77).
 - Fix #78: Updates for requests_cache API (#68).
-- Add warnings when default facets=* used on distributed search (#77).
-- Improve ignore_facet_check search argument (#76).
-- Improvements to tests (#73).
+- Fix: Improvements to tests (#73).
 
 0.3.0 (2021-02-08)
 ------------------
