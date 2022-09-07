@@ -56,10 +56,10 @@ from .exceptions import OpenidResolutionError
 # -----------------------------------------------------------------------------
 # Constants
 
-ESGF_DIR = op.join(os.path.expanduser('~'), '.esg')
+ESGF_DIR = op.join(os.environ['HOME'], '.esg')
 ESGF_CERTS_DIR = 'certificates'
 ESGF_CREDENTIALS = 'credentials.pem'
-DAP_CONFIG = op.join(os.path.expanduser('~'), '.dodsrc')
+DAP_CONFIG = op.join(os.environ['HOME'], '.dodsrc')
 DAP_CONFIG_MARKER = '<<< Managed by esgf-pyclient >>>'
 
 XRI_NS = 'xri://$xrd*($v*2.0)'
