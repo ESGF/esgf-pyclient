@@ -9,7 +9,7 @@ from unittest import TestCase
 
 class TestWget(TestCase):
     def setUp(self):
-        self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
+        self.test_service = 'http://esgf.ceda.ac.uk/esg-search'
 
     def test_download_script(self):
         conn = SearchConnection(self.test_service, distrib=False)

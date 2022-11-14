@@ -16,7 +16,7 @@ from unittest import TestCase
 
 class TestTemporalSearch(TestCase):
     def setUp(self):
-        self.test_service1 = 'http://esgf-index1.ceda.ac.uk/esg-search'
+        self.test_service1 = 'http://esgf.ceda.ac.uk/esg-search'
         self.test_service2 = "http://esgf-data.dkrz.de/esg-search"
 
     def test_temporal_search_CMIP5(self):

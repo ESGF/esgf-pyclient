@@ -16,7 +16,7 @@ import datetime
 
 class TestConnection(TestCase):
     def setUp(self):
-        self.test_service = 'http://esgf-index1.ceda.ac.uk/esg-search'
+        self.test_service = 'http://esgf.ceda.ac.uk/esg-search'
         self.cache = os.path.join(os.path.dirname(__file__), 'url_cache')
 
     def test_blank_query(self):
@@ -40,8 +40,8 @@ class TestConnection(TestCase):
         # !NOTE: the exact shard list will change depending on the shard
         #        replication configuration
         #        on the test server
-        assert 'esgf-index1.ceda.ac.uk' in shards
-        # in esg-search in esgf-index1.ceda.ac.uk, there are a bunch
+        assert 'esgf.ceda.ac.uk' in shards
+        # in esg-search in esgf.ceda.ac.uk, there are a bunch
         # of replicas hosted on esgf-index2
         assert len(shards['esgf-index2.ceda.ac.uk']) > 1
 
