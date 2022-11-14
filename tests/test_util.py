@@ -15,7 +15,7 @@ from unittest import TestCase
 class TestUtil(TestCase):
     def setUp(self):
         # !TODO: Make this one of the test services.
-        self.test_service = 'http://esgf.ceda.ac.uk/esg-search'
+        self.test_service = 'https://esgf.ceda.ac.uk/esg-search'
 
     def test_ats_url(self):
         assert ats_url('https://esgf-node.llnl.gov') == 'https://esgf-node.llnl.gov/esgf-idp/saml/soap/secure/attributeService.htm'  # noqa

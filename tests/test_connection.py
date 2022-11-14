@@ -16,7 +16,7 @@ import datetime
 
 class TestConnection(TestCase):
     def setUp(self):
-        self.test_service = 'http://esgf.ceda.ac.uk/esg-search'
+        self.test_service = 'https://esgf.ceda.ac.uk/esg-search'
         self.cache = os.path.join(os.path.dirname(__file__), 'url_cache')
 
     def test_blank_query(self):

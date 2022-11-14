@@ -16,7 +16,7 @@ class TestResults(TestCase):
     _test_facets = 'project,model,index_node,data_node'
 
     def setUp(self):
-        self.test_service = 'http://esgf.ceda.ac.uk/esg-search'
+        self.test_service = 'https://esgf.ceda.ac.uk/esg-search'
         self.test_service_pcmdi = 'https://esgf-node.llnl.gov/esg-search'
 
     def test_result1(self):
