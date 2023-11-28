@@ -13,7 +13,7 @@ dependencies:
   - jinja2
   - defusedxml
   - webob
-  - myproxyclient
+  - myproxyclient >=2.1.1
   # testing
   - flake8
   - pytest
