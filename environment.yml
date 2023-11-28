@@ -18,4 +18,10 @@ dependencies:
   - flake8
   - pytest
   # documentation
+  - sphinx
+  - nbsphinx
   - pandoc
+  # ipython notebook
+  - ipykernel
+  - nbconvert
+  - nbval
