@@ -146,12 +146,10 @@ class TestContext(TestCase):
     def test_distrib_with_all_facets(self):
         self._test_distrib(constraints=self._distrib_constraints_all_facets)
 
-    # @pytest.mark.skip(reason="cache fails on python 3.7")
     def test_distrib_with_cache_with_few_facets(self):
         self._test_distrib(constraints=self._distrib_constraints_few_facets,
                            cache=self.cache)
 
-    # @pytest.mark.skip(reason="cache fails on python 3.7")
     @pytest.mark.xfail(reason=_all_facets_explanation)
     # Expected failure: see test_distrib_all_facets above
     def test_distrib_with_cache_with_all_facets(self):

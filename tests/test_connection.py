@@ -40,10 +40,11 @@ class TestConnection(TestCase):
         # !NOTE: the exact shard list will change depending on the shard
         #        replication configuration
         #        on the test server
-        assert 'esgf.ceda.ac.uk' in shards
+        assert 'esgf-solr.ceda.ac.uk' in shards
         # in esg-search in esgf.ceda.ac.uk, there are a bunch
         # of replicas hosted on esgf-index2
-        assert len(shards['esgf-index2.ceda.ac.uk']) > 1
+        print("Shards:", shards)
+        assert len(shards['esgf-solr.ceda.ac.uk']) > 1
 
     def test_url_fixing(self):
         # Switch off warnings for this case because we are testing that issue
