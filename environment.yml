@@ -1,8 +1,11 @@
-# conda env create -f environment.yml
+---
 name: esgf-pyclient
 channels:
   - conda-forge
+  - nodefaults
+
 dependencies:
+  # installation
   - pip
   - python>=3.8
   - requests
@@ -11,3 +14,8 @@ dependencies:
   - defusedxml
   - webob
   - myproxyclient
+  # testing
+  - flake8
+  - pytest
+  # documentation
+  - pandoc
