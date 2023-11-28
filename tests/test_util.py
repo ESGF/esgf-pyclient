@@ -44,16 +44,17 @@ class TestUtil(TestCase):
 
         agg_ctx = results[0].aggregation_context()
         aggs = agg_ctx.search()
+        print(aggs)
 
         # Take first aggregation
-        agg = aggs[0]
+        # agg = aggs[0]
+        for agg in aggs:
+            print((agg.aggregation_id))
+            print((agg.json['cf_standard_name']))
+            print((agg.urls))
 
-        print((agg.aggregation_id))
-        print((agg.json['cf_standard_name']))
-        print((agg.urls))
-
-        opendap_url = agg.opendap_url
-        print(opendap_url)
+            opendap_url = agg.opendap_url
+            print(opendap_url)
 
     @pytest.mark.slow
     def test_download_url(self):
@@ -65,4 +66,5 @@ class TestUtil(TestCase):
         files = results[0].file_context().search()
 
         download_url = files[0].download_url
-        assert re.match(r'http://.*\.nc', download_url)
+        print("Download URL is: ", download_url)
+        assert re.match(r'https://.*\.nc', download_url)

@@ -1,13 +1,27 @@
-# conda env create -f environment.yml
+---
 name: esgf-pyclient
 channels:
   - conda-forge
+  - nodefaults
+
 dependencies:
+  # installation
   - pip
-  - python>=3.7
+  - python>=3.8
   - requests
   - requests_cache
   - jinja2
   - defusedxml
   - webob
   - myproxyclient
+  # testing
+  - flake8
+  - pytest
+  # documentation
+  - sphinx
+  - nbsphinx
+  - pandoc
+  # ipython notebook
+  - ipykernel
+  - nbconvert
+  - nbval

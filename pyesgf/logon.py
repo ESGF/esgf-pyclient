@@ -273,10 +273,6 @@ class LogonManager(object):
                 return ('', '', '')
             config_str = open(self.dap_config).read()
 
-        # !NOTE: The flags keyword argument to re.split was introduced
-        #        in Python2.7
-        #        Keep with call non-keyword arguments for compatibility with
-        #        Python2.6
         sections = re.split(r'^# (?:BEGIN|END) {0}$\n'
                             .format(DAP_CONFIG_MARKER),
                             config_str, re.M)
