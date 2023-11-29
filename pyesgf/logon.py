@@ -130,7 +130,7 @@ class LogonManager(object):
     def is_logged_on(self):
         return self.state == self.STATE_LOGGED_ON
 
-    def logon_with_openid(self, openid, password=None,
+    def logon_with_openid(self, openid, password=None, username=None,
                           bootstrap=False, update_trustroots=True,
                           interactive=True):
         """
@@ -143,7 +143,11 @@ class LogonManager(object):
         :param openid: OpenID to login with See :meth:`logon` for parameters
             ``interactive``, ``bootstrap`` and ``update_trustroots``.
         """
-        username, myproxy = self._get_logon_details(openid)
+        usern, myproxy = self._get_logon_details(openid)
+
+        if username == None:
+            username = usern
+            
         return self.logon(username, password, myproxy,
                           bootstrap=bootstrap,
                           update_trustroots=update_trustroots,
