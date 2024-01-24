@@ -10,9 +10,9 @@ from pyesgf.util import ats_url
 from unittest import TestCase
 import pytest
 
-ESGF_ATS_URL = ats_url('https://esgf-node.llnl.gov')
-TEST_OPENID = os.environ.get('LLNL_OPENID')
-TEST_USER_DETAILS = os.environ.get('LLNL_NAME', '').split()
+ESGF_ATS_URL = ats_url('https://esgf-data.dkrz.de')
+TEST_OPENID = os.environ.get('DKRZ_OPENID')
+TEST_USER_DETAILS = os.environ.get('DKRZ_NAME', '').split()
 
 
 class TestATS(TestCase):
