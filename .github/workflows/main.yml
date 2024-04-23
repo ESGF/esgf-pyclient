@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - fix_test_connection
   pull_request:
     branches:
     - master
