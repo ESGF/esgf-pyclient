@@ -42,6 +42,10 @@ class ResultSet(Sequence):
             self.__get_batch(0)
 
     def __getitem__(self, index):
+        if isinstance(index, slice):
+            # Handle slicing
+            return [self[i] for i in range(*index.indices(len(self)))]
+        
         batch_i = index // self.batch_size
         offset = index % self.batch_size
         batch = self.__get_batch(batch_i)
