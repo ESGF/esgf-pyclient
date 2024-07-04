@@ -30,6 +30,7 @@ class TestATS(TestCase):
         assert attrs['urn:esg:first:name'] == fn
         assert attrs['urn:esg:last:name'] == ln
 
+    @pytest.mark.skipif(not TEST_OPENID, reason="needs test openid")
     def test_unknown_principal(self):
         service = AttributeService(ESGF_ATS_URL, 'esgf-pyclient')
         openid = 'https://example.com/unknown'
