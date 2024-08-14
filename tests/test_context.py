@@ -19,7 +19,7 @@ class TestContext(TestCase):
     _test_few_facets = 'project,model,index_node,data_node'
 
     def setUp(self):
-        # DKRZ have retired CMIP5 data 
+        # DKRZ have retired CMIP5 data
         # self.test_service = 'http://esgf-data.dkrz.de/esg-search'
         self.test_service = 'https://esgf.ceda.ac.uk/esg-search'
         # self.test_service = 'http://esgf-node.llnl.gov/esg-search'
