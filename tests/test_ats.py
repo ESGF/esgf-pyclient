@@ -17,7 +17,7 @@ TEST_USER_DETAILS = os.environ.get('DKRZ_NAME', '').split()
 
 class TestATS(TestCase):
 
-    @pytest.mark.skipif(not TEST_OPENID, reason="needs test openid")
+    @pytest.mark.skip(reason="OpenID is getting retired")
     def test_ceda_ats(self):
         service = AttributeService(ESGF_ATS_URL, 'esgf-pyclient')
         fn, ln = TEST_USER_DETAILS
@@ -30,7 +30,7 @@ class TestATS(TestCase):
         assert attrs['urn:esg:first:name'] == fn
         assert attrs['urn:esg:last:name'] == ln
 
-    @pytest.mark.skipif(not TEST_OPENID, reason="needs test openid")
+    @pytest.mark.skip(reason="OpenID is getting retired")
     def test_unknown_principal(self):
         service = AttributeService(ESGF_ATS_URL, 'esgf-pyclient')
         openid = 'https://example.com/unknown'
@@ -40,7 +40,7 @@ class TestATS(TestCase):
         assert resp.get_status() == ('urn:oasis:names:tc:SAML:2.0:'
                                      'status:UnknownPrincipal')
 
-    @pytest.mark.skipif(not TEST_OPENID, reason="needs test openid")
+    @pytest.mark.skip(reason="OpenID is getting retired")
     def test_multi_attribute(self):
         service = AttributeService(ESGF_ATS_URL, 'esgf-pyclient')
         CMIP5_RESEARCH = 'CMIP5 Research'
