@@ -38,6 +38,8 @@ jobs:
       - run: python -V
       - name: Install 📦
         run: pip install -e .[develop]
+      - name: Inspect environment
+        run: conda list
       - name: Lint with flake8 ⚙️
         run: flake8
       - name: Run tests
