@@ -7,12 +7,12 @@ channels:
 dependencies:
   # installation
   - pip
-  - python>=3.8
+  - python >=3.9
   - requests
   - requests_cache
   - jinja2
   - defusedxml
-  - webob
+  - webob >=1.8.9  # Python 3.13 support
   - myproxyclient >=2.1.1
   # testing
   - flake8
