@@ -1,10 +1,6 @@
+-r requirements_docs.txt
 pytest
 flake8
-sphinx
-nbsphinx
-pandoc
-ipykernel
-nbconvert
 defusedxml
 jinja2
 requests
