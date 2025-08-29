@@ -15,7 +15,13 @@ from pyesgf import __doc__ as long_description
 sys.path[:0] = os.path.dirname(__file__)
 
 reqs = [line.strip() for line in open('requirements.txt')]
-dev_reqs = [line.strip() for line in open('requirements_dev.txt')]
+docs_reqs = [line.strip() for line in open('requirements_docs.txt')]
+dev_reqs = [
+    line.strip()
+    for line in open('requirements_dev.txt')
+    if line.strip() and not line.strip().startswith("-r ")
+]
+dev_reqs.extend(docs_reqs)
 
 setup(name='esgf-pyclient',
       version=__version__,
