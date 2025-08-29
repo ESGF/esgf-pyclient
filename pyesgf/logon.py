@@ -275,7 +275,7 @@ class LogonManager(object):
 
         sections = re.split(r'^# (?:BEGIN|END) {0}$\n'
                             .format(DAP_CONFIG_MARKER),
-                            config_str, re.M)
+                            config_str, flags=re.M)
 
         if len(sections) < 2:
             preamble, managed, postamble = sections[0], '', ''
