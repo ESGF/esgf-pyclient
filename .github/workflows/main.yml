@@ -24,11 +24,12 @@ jobs:
       fail-fast: false
     name: Python ${{ matrix.python-version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: conda-incubator/setup-miniconda@v3
         with:
+          conda-remove-defaults: true
           activate-environment: esgf-pyclient
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
@@ -37,7 +38,7 @@ jobs:
       - run: conda --version
       - run: python -V
       - name: Install 📦
-        run: pip install -e .[develop]
+        run: pip install -e .[dev]
       - name: Inspect environment
         run: conda list
       - name: Lint with flake8 ⚙️
