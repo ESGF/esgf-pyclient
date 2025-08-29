@@ -252,8 +252,7 @@ class TestContext(TestCase):
 
     @pytest.mark.slow
     def test_context_project_cmip6(self):
-        test_service = 'https://esgf-node.llnl.gov/esg-search'
-        conn = SearchConnection(test_service)
+        conn = SearchConnection(self.test_service)
 
         context = conn.new_context(project='CMIP6', institution_id='AWI', distrib=False)
         self.assertTrue(context.hit_count > 100)
