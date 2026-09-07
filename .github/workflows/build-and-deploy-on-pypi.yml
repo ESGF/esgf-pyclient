@@ -9,7 +9,7 @@ on:
   push:
     # Use this for testing the package build.
     branches:
-      - main
+      - master
       - v[0-9]+.[0-9]+.x # matches release branches like v0.3.x
 
 jobs:
