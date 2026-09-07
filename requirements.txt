@@ -3,4 +3,3 @@ jinja2
 requests
 requests_cache
 webob
-myproxyclient>=2.1.1
