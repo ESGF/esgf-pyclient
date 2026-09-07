@@ -139,7 +139,7 @@ class TestContext(TestCase):
         self._test_distrib(constraints=self._distrib_constraints_few_facets)
 
     @pytest.mark.slow
-    @pytest.mark.xfail(reason=_all_facets_explanation)
+    @pytest.mark.xfail(strict=False, reason=_all_facets_explanation)
     # Expected failure: with facets=* the distrib=true appears to be
     # ignored.  This is observed both on the CEDA and also DKRZ index nodes
     # (the only nodes investigated).
@@ -150,13 +150,13 @@ class TestContext(TestCase):
         self._test_distrib(constraints=self._distrib_constraints_few_facets,
                            cache=self.cache)
 
-    @pytest.mark.xfail(reason=_all_facets_explanation)
+    @pytest.mark.xfail(strict=False,reason=_all_facets_explanation)
     # Expected failure: see test_distrib_all_facets above
     def test_distrib_with_cache_with_all_facets(self):
         self._test_distrib(constraints=self._distrib_constraints_all_facets,
                            cache=self.cache)
 
-    @pytest.mark.xfail(reason="may sometimes fail if server returns incomplete set of results")
+    @pytest.mark.xfail(strict=False, reason="may sometimes fail if server returns incomplete set of results")
     def test_constrain(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
 
@@ -185,7 +185,7 @@ class TestContext(TestCase):
         context2 = context.constrain(experiment='historical')
         self.assertTrue('experiment' in context2.facet_constraints)
 
-    @pytest.mark.xfail(reason="may sometimes fail if server returns incomplete set of results")
+    @pytest.mark.xfail(strict=False, reason="may sometimes fail if server returns incomplete set of results")
     def test_negative_facet(self):
         conn = SearchConnection(self.test_service, cache=self.cache)
 
