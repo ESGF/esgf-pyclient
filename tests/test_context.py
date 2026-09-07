@@ -150,7 +150,7 @@ class TestContext(TestCase):
         self._test_distrib(constraints=self._distrib_constraints_few_facets,
                            cache=self.cache)
 
-    @pytest.mark.xfail(strict=False,reason=_all_facets_explanation)
+    @pytest.mark.xfail(strict=False, reason=_all_facets_explanation)
     # Expected failure: see test_distrib_all_facets above
     def test_distrib_with_cache_with_all_facets(self):
         self._test_distrib(constraints=self._distrib_constraints_all_facets,
