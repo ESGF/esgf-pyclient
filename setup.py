@@ -8,10 +8,10 @@
 from setuptools import setup, find_packages
 import sys
 import os
+from pathlib import Path
 
 # Import version from the top-level package
 from pyesgf import __version__
-from pyesgf import __doc__ as long_description
 sys.path[:0] = os.path.dirname(__file__)
 
 reqs = [line.strip() for line in open('requirements.txt')]
@@ -26,8 +26,8 @@ dev_reqs.extend(docs_reqs)
 setup(name='esgf-pyclient',
       version=__version__,
       description="A library interacting with ESGF services within Python",
-      long_description=long_description,
-      long_description_content_type="text/x-rst",
+      long_description=Path(__file__).parent.joinpath("README.md").read_text(encoding="utf-8"),
+      long_description_content_type="text/markdown",
       classifiers=[
           'Development Status :: 4 - Beta',
           'License :: OSI Approved :: BSD License',

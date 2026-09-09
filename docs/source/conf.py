@@ -34,7 +34,9 @@ extensions = [
     'nbsphinx',
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'sphinx.ext.viewcode']
+    'sphinx.ext.viewcode',
+    'sphinx_mdinclude',
+]
 
 autodoc_mock_imports = (Path(__file__).parent.parent.parent /
                         'requirements_dev.txt').read_text().split('\n')
@@ -79,7 +81,7 @@ except:
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', 'notebooks/README.md']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
