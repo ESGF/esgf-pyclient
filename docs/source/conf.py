@@ -34,7 +34,9 @@ extensions = [
     'nbsphinx',
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'sphinx.ext.viewcode']
+    'sphinx.ext.viewcode',
+    'sphinx_mdinclude',
+]
 
 autodoc_mock_imports = (Path(__file__).parent.parent.parent /
                         'requirements_dev.txt').read_text().split('\n')
