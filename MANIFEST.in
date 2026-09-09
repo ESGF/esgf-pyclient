@@ -2,6 +2,7 @@ include LICENSE
 include Makefile
 include *.txt
 include *.rst
+include *.md
 recursive-include pyesgf *
 global-exclude *.*~
 global-exclude __pycache__

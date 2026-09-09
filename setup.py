@@ -26,8 +26,8 @@ dev_reqs.extend(docs_reqs)
 setup(name='esgf-pyclient',
       version=__version__,
       description="A library interacting with ESGF services within Python",
-      long_description=Path(__file__).parent.joinpath("README.rst").read_text(encoding="utf-8"),
-      long_description_content_type="text/x-rst",
+      long_description=Path(__file__).parent.joinpath("README.md").read_text(encoding="utf-8"),
+      long_description_content_type="text/markdown",
       classifiers=[
           'Development Status :: 4 - Beta',
           'License :: OSI Approved :: BSD License',
