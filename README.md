@@ -1,14 +1,10 @@
-[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://esgf-pyclient.readthedocs.io/en/latest/?badge=latest)
-
-[![Build Status](https://github.com/ESGF/esgf-pyclient/workflows/build%20%E2%9A%99%EF%B8%8F/badge.svg)](https://github.com/ESGF/esgf-pyclient/actions)
-
-[![GitHub license](https://img.shields.io/github/license/ESGF/esgf-pyclient.svg)](https://github.com/ESGF/esgf-pyclient/blob/master/LICENSE)
+[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://esgf-pyclient.readthedocs.io/en/latest/?badge=latest)[![Build Status](https://github.com/ESGF/esgf-pyclient/workflows/build%20%E2%9A%99%EF%B8%8F/badge.svg)](https://github.com/ESGF/esgf-pyclient/actions)[![GitHub license](https://img.shields.io/github/license/ESGF/esgf-pyclient.svg)](https://github.com/ESGF/esgf-pyclient/blob/master/LICENSE)
 
 ESGF PyClient is a Python package designed for interacting with the [Earth System Grid Federation](https://esgf.llnl.gov/) system.
 
 > [!WARNING]
 > This package interacts with the legacy [ESGF Search
-> API](https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API),
+> API](https://esgf.github.io/esg-search/ESGF_Search_RESTful_API.html),
 > which is deprecated and servers may be shut down permanently.
 > 
 > Users are encouraged to switch to
@@ -21,10 +17,12 @@ ESGF PyClient is a Python package designed for interacting with the [Earth Syste
 > repository](https://github.com/ESGF/esgf-roadmap/blob/main/status/README.md).
 
 This package contains API code for calling the legacy
-[ESGF SearchAPI](https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API)
+[ESGF SearchAPI](https://esgf.github.io/esg-search/ESGF_Search_RESTful_API.html)
 within client code. It may be used to access data that is only findable
 through the legacy ESGF Search API, such as CMIP5, CORDEX, and older
 obs4MIPs data.
+
+You can try it online using Binder, or view the notebooks on NBViewer: [![Binder Launcher](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ESGF/esgf-pyclient.git/master?filepath=notebooks)[![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.jupyter.org/github/ESGF/esgf-pyclient/tree/master/notebooks/)
 
 At the time of writing (September 9, 2026), servers providing search
 using this API may be found at the following URLs:
@@ -41,12 +39,6 @@ page:
 - <https://esgf.nci.org.au/esg-search/search>
 - <https://esgf.nccs.nasa.gov/esg-search/search>
 - <https://esgdata.gfdl.noaa.gov/esg-search/search>
-
-You can try it online using Binder, or view the notebooks on NBViewer.
-
-[![Binder Launcher](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ESGF/esgf-pyclient.git/master?filepath=notebooks)
-
-[![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.jupyter.org/github/ESGF/esgf-pyclient/tree/master/notebooks/)
 
 Please submit bugs and feature requests through the bug tracker on
 [GitHub](https://github.com/ESGF/esgf-pyclient). Pull requests are
