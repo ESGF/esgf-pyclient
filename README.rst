@@ -11,8 +11,34 @@
    :alt: GitHub license
 
 ESGF PyClient is a Python package designed for interacting with the `Earth System Grid Federation`_ system.
-Currently this package contains API code for calling the `ESGF Search API`_ within
-client code.
+
+.. warning::
+
+   This package interacts with the legacy `ESGF Search API`_, which is
+   deprecated and servers may be shut down permanently.
+
+   Users are encouraged to switch to `intake-esgf`_, or use `pystac-client` to
+   interact with the new STAC-based search API. The new STAC servers are
+   available at https://discovery.west.esgf.io and https://discovery.east.esgf.io.
+   Progress reports on the development of the new STAC-based search API can be
+   found on the `ESGF Roadmap GitHub repository`_.
+
+This package contains API code for calling the legacy `ESGF Search API`_ within client code.
+It may be used to access data that is only findable through the legacy ESGF Search API, such as CMIP5, CORDEX, and older obs4MIPs data.
+
+At the time of writing (September 9, 2026), servers providing search using this API may be found at the following URLs:
+
+- https://esgf-node.ornl.gov/esgf-1-5-bridge (partially supports the legacy ESGF Search API, issues can be reported `here <https://github.com/esgf2-us/esg_fastapi/issues>`_)
+- https://esgf.ceda.ac.uk/esg-search/search
+- https://esgf-data.dkrz.de/esg-search/search
+- https://esg-dn1.nsc.liu.se/esg-search/search
+
+while the following servers appear to be online, but return an error page:
+
+- https://esgf-node.ipsl.upmc.fr/esg-search/search
+- https://esgf.nci.org.au/esg-search/search
+- https://esgf.nccs.nasa.gov/esg-search/search
+- https://esgdata.gfdl.noaa.gov/esg-search/search
 
 You can try it online using Binder, or view the notebooks on NBViewer.
 
@@ -35,3 +61,6 @@ Full documentation_ is available on ReadTheDocs or in the docs directory.
 .. _`ESGF Search API`: https://github.com/ESGF/esgf.github.io/wiki/ESGF_Search_REST_API
 .. _documentation: http://esgf-pyclient.readthedocs.org
 .. _GitHub: https://github.com/ESGF/esgf-pyclient
+.. _`intake-esgf`: https://intake-esgf.readthedocs.io/
+.. _`pystac-client`: https://pystac-client.readthedocs.io/
+.. _`ESGF Roadmap GitHub repository`: https://github.com/ESGF/esgf-roadmap/blob/main/status/README.md
