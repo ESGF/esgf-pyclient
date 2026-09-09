@@ -1,6 +1,25 @@
 Release Notes
 =============
 
+0.3.2 (2026-09-09)
+------------------
+
+- Update LogonManager by @navass11 in (#86)
+- Refresh CI: add conda/mamba environment file and modern env creation, fix tests, and add modern Github Action workflow file by @bouweandela in (#95)
+- Pin MyProxyClient `myproxyclient >=2.1.1` by @valeriupredoi in (#97)
+- Use DKRZ OpenID service because LLNL one has been retired by @bouweandela in (#101)
+- Fix `test_connection`: replace solr with solr1 by @valeriupredoi in (#103)
+- skip all ATS tests since OpenID is getting retired by @valeriupredoi in (#105)
+- retire Mambaforge by @valeriupredoi in (#108)
+- retire python 3.8 and add support for python 3.13 by @valeriupredoi in (#109)
+- Allow ResultSet slicing by @hoetmaaiers in (#104)
+- Fix GitHub workflow execution warnings by @kurtmckee in (#112)
+- Fix a deprecation warning in `logon.py` by @kurtmckee in (#113)
+- Fix Read the Docs builds by @kurtmckee in (#111)
+- Make myproxyclient optional by @bouweandela in (#116)
+- Add workflow for trusted publishing by @bouweandela in (#117)
+- Update README by @bouweandela in (#118)
+
 0.3.1 (2022-02-25)
 ------------------
 
